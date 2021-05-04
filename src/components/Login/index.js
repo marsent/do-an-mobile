@@ -9,7 +9,7 @@ export default Login = ({ token, setToken }) => {
     const onLoginPress = (e) => {
         e.preventDefault();
         setError({ username: usernameValidator(username), password: passwordValidator(password) })
-        console.log(token)
+
     }
 
     return (
