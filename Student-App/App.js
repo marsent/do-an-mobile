@@ -12,7 +12,7 @@ const App = () => {
   if (!token) {
     return (
       <PaperProvider>
-        <Notification token={token} setToken={setToken} />
+        <SetAccount token={token} setToken={setToken} />
       </PaperProvider>
     )
   }
