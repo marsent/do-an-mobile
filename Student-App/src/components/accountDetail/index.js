@@ -33,25 +33,26 @@ export default function AccountDetail() {
         <Text style={styles.headerText}>Thông tin sinh viên</Text>
       </View>
       <View style={styles.inforView}>
-        <View style={styles.avatar}>
-          <Avatar.Image size={140} source={Image1} />
-        </View>
+        
         <View style={styles.inforText}>
+            <View style={styles.avatar}>
+                <Avatar.Image size={140} source={Image1} />
+            </View>
             <Text style={styles.TitleText}>{accountData.Name}</Text>
             <Text style={styles.SubTitleText}>{accountData.ID}   |   {accountData.role}</Text>
-            <View style={styles.ContentText}>
-                <View style={styles.SubContentText}>
-                    <Text style={styles.lable}>Ngày sinh:</Text>
-                    <Text style={styles.textx}>{accountData.DateOfBirth}</Text>
-                </View>
-                <View style={styles.SubContentText}>
-                    <Text style={styles.lable}>Địa chỉ hiện tại:</Text>
-                    <Text style={styles.textx}>{accountData.Address}</Text>
-                </View>
-                <View style={styles.SubContentText}>
-                    <Text style={styles.lable}>lớp:</Text>
-                    <Text style={styles.textx}>{accountData.Major}</Text>
-                </View>
+        </View>
+        <View style={styles.ContentText}>
+            <View style={styles.SubContentText}>
+                <Text style={styles.lable}>Ngày sinh:</Text>
+                <Text style={styles.textx}>{accountData.DateOfBirth}</Text>
+            </View>
+            <View style={styles.SubContentText}>
+                <Text style={styles.lable}>Địa chỉ hiện tại:</Text>
+                <Text style={styles.textx}>{accountData.Address}</Text>
+            </View>
+            <View style={styles.SubContentText}>
+                <Text style={styles.lable}>lớp:</Text>
+                <Text style={styles.textx}>{accountData.Major}</Text>
             </View>
         </View>
       </View>
@@ -65,6 +66,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         alignItems: 'center',
         flexDirection: 'column',
+        backgroundColor:'#BFBFBF',
     },
     headerText: {
         position: "relative",
@@ -84,18 +86,22 @@ const styles = StyleSheet.create({
         fontSize: 16,
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: '5%',
     },
     avatar: {
-        marginTop:'10%',
         borderWidth: 1,
         borderRadius: 70,
         borderColor:'#BFBFBF',
+        marginTop: 30,
     },
     inforText: {
         marginHorizontal: '2.5%',
         marginVertical: '.5%',
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#FEFEFE',
+        borderRadius: 15,
+        width: '90%',
     },
     TitleText: {
         fontSize: 18,
@@ -104,10 +110,17 @@ const styles = StyleSheet.create({
     SubTitleText: {
         fontSize: 15,
         color:'black',
+        marginBottom: 15,
     },
     ContentText: {
-        marginVertical: '10%',
+        marginVertical: 5,
+        paddingVertical: 15,
+        paddingHorizontal: 15,
         width: '90%',
+        backgroundColor: '#FEFEFE',
+        borderRadius: 15,
+        shadowRadius: 15,
+        shadowColor: '#BFBFBF'
     },
     SubContentText: {
         justifyContent: 'space-around',
@@ -127,5 +140,8 @@ const styles = StyleSheet.create({
     },
     textx: {
         flex: 5,
+        // borderLeftWidth: 1,
+        // borderLeftColor:'#BFBFBF',
+        // paddingLeft: 5,
     }
 });
