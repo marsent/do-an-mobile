@@ -5,7 +5,7 @@ import { passwordValidator, retypePassValidator } from '../../helpers/passwordVa
 import { usernameValidator } from '../../helpers/usernameValidator'
 import { RadioButton, Card, Avatar } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
-export default Login = ({ token, setToken }) => {
+export default function Notification() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const notification_data = [
