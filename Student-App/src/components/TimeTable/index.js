@@ -64,7 +64,7 @@ export default function TimeTable() {
         },
         {
             ID : "456",
-            Name : "Domo 5",
+            Name : "Domo 6",
             Start_time: "9h",
             End_time: "10h30",
             DOW: "5",
@@ -105,7 +105,7 @@ export default function TimeTable() {
             {TimeTable_data.map((item, key)=>(
                 <View key={key}>
                     {( Number(item.DOW) === date.getDay())  &&
-                        <View key={key} style={styles.timetableText}>
+                        <View style={styles.timetableText}>
                             <Text style={styles.TitleText}>{item.ID} </Text>
                             <Text style={styles.ContentText}>{item.Name} </Text>
                         </View>
