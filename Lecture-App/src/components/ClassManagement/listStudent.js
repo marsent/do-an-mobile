@@ -8,11 +8,25 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import {Avatar} from 'react-native-paper';
+import Image1 from '../../asset/avt.png';
 export default function listStudent() {
     const listStudentData = [
         {
             ID : "18521467",
-            Avatar: '',
+            Avatar: Image1,
+            Name : "Đào Huỳnh Minh Thuận",
+            Status:"1"
+        },
+        {
+            ID : "18521467",
+            Avatar: Image1,
+            Name : "Đào Huỳnh Minh Thuận",
+            Status:"1"
+        },
+        {
+            ID : "18521467",
+            Avatar: Image1,
             Name : "Đào Huỳnh Minh Thuận",
             Status:"1"
         },
@@ -23,24 +37,22 @@ export default function listStudent() {
              <View style={styles.headerView}>
                  <Text style={styles.headerText}>Danh sách lớp</Text>
              </View>
-             <TouchableOpacity onPress = {() => {
-
-             }}>
+             
                 <ScrollView style={styles.NotiView}>
                 {
-                    listStudentData.map((item, key) => (
-                        <View key={key} style={styles.NotiText}>
-                            <Text style={styles.TitleText}>{item.Name} </Text>
-                            <Text style={styles.ContentText}>Sỉ số: {item.Amount} </Text>
-                            <Text style={styles.ContentText}>Phòng: {item.Room} </Text>
-                            <Text style={styles.ContentText}>Ngày BĐ: {item.StartDate} </Text>
-                            <Text style={styles.ContentText}>Ngày KT: {item.FinishDate} </Text>
-                           
-                        </View>
+                    listStudentData.map((item) => (
+                        <TouchableOpacity>
+                            <View key={item.ID} style={styles.NotiText}>
+                                <Avatar.Image size={24} source={Image1} />
+                                <Text style={styles.ContentText}>{item.Name} </Text>
+                                <Text style={styles.ContentText}>{item.ID} </Text>
+                            
+                            </View>
+                        </TouchableOpacity>
+                        
                     ))
                 }
                 </ScrollView>
-             </TouchableOpacity>
          </View>
      );
      
@@ -68,7 +80,8 @@ export default function listStudent() {
      },
      NotiView:{
         position: 'relative',
-        marginVertical: '2%'
+        marginVertical: '2%',
+        
     },
     NotiText:{
         marginHorizontal: '2.5%',
@@ -77,16 +90,15 @@ export default function listStudent() {
         padding: 30,
         marginVertical: '.5%',
         borderColor:'#BFBFBF',
+        flex: 1,
+        flexDirection: 'row'
     },
     TitleText: {
         fontSize: 16,
         fontWeight: 'bold',
     },
     ContentText: {
-        fontSize: 14,
+        fontSize: 16,
+        marginLeft: 20,
     },
-    Notification_date:{
-        fontSize: 10,
-        color: '#262626',
-    }
  });
