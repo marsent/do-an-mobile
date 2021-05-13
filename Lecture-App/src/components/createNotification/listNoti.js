@@ -1,75 +1,59 @@
-import React, {useState} from 'react';
+import React, {useState, Component, useEffect} from 'react';
 import {
-  StyleSheet,
+  KeyboardAvoidingView,
   View,
   Text,
-  KeyboardAvoidingView,
+  StyleSheet,
+  TextInput,
+  Button,
+  TouchableOpacity,
   SafeAreaView,
   ScrollView,
-  TouchableOpacity,
-  Alert,
-  Button,
 } from 'react-native';
-// import {Button, } from 'react-native-paper';
-export default function listNoti() {
-  const listClassData = [
+
+export default function Notification() {
+  const notification_data = [
     {
-      ID: '1',
-      Name: 'Phát triển ứng dụng trên di động',
-      Room: 'B2.22',
-      Amount: 80,
-      StartDate: '01/03/2021',
-      FinishDate: '26/06/2021',
+      ID: '123',
+      Name: 'Domo 1',
+      Content: 'Content 1',
+      Date_created: '01/01/2021',
+      Update_date: '01/01/2021',
       Status: '1',
     },
     {
-      ID: '1',
-      Name: 'Phát triển ứng dụng trên di động',
-      Room: 'B2.22',
-      Amount: 80,
-      StartDate: '01/03/2021',
-      FinishDate: '26/06/2021',
-      Status: '1',
+      ID: '321',
+      Name: 'Domo 2',
+      Content: 'Content 2',
+      Date_created: '02/02/2021',
+      Update_date: '02/02/2021',
+      Status: '0',
     },
     {
-      ID: '1',
-      Name: 'Phát triển ứng dụng trên di động',
-      Room: 'B2.22',
-      Amount: 80,
-      StartDate: '01/03/2021',
-      FinishDate: '26/06/2021',
-      Status: '1',
-    },
-    {
-      ID: '1',
-      Name: 'Phát triển ứng dụng trên di động',
-      Room: 'B2.22',
-      Amount: 80,
-      StartDate: '01/03/2021',
-      FinishDate: '26/06/2021',
+      ID: '123',
+      Name: 'Domo 1',
+      Content: 'Content 1',
+      Date_created: '01/01/2021',
+      Update_date: '01/01/2021',
       Status: '1',
     },
   ];
+
   return (
-    <View style={styles.Container}>
+    <SafeAreaView style={styles.Container}>
       <View style={styles.headerView}>
-        <Text style={styles.headerText}>Thông tin lớp học</Text>
+        <Text style={styles.headerText}>Thông báo</Text>
       </View>
       <ScrollView style={styles.NotiView}>
-        {listClassData.map((item, key) => (
+        {notification_data.map((item, key) => (
           <View key={key} style={styles.NotiText}>
             <Text style={styles.TitleText}>{item.Name} </Text>
-            <Text style={styles.ContentText}>Sỉ số: {item.Amount} </Text>
-            <Text style={styles.ContentText}>Phòng: {item.Room} </Text>
-            <Text style={styles.ContentText}>Ngày BĐ: {item.StartDate} </Text>
-            <Text style={styles.ContentText}>Ngày KT: {item.FinishDate} </Text>
-            <View style={styles.ButtonContainer}>
-              <Button style={styles.button} title="Xem danh sách lớp" />
-            </View>
+            <Text style={styles.ContentText}>{item.Content} </Text>
+            <Text style={styles.Notification_date}>{item.Update_date} </Text>
           </View>
         ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -99,13 +83,11 @@ const styles = StyleSheet.create({
   },
   NotiText: {
     marginHorizontal: '2.5%',
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderRadius: 10,
-    padding: 30,
+    padding: 10,
     marginVertical: '.5%',
     borderColor: '#BFBFBF',
-    flex: 1,
-    flexDirection: 'column',
   },
   TitleText: {
     fontSize: 16,
@@ -117,19 +99,5 @@ const styles = StyleSheet.create({
   Notification_date: {
     fontSize: 10,
     color: '#262626',
-  },
-  ButtonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-
-    justifyContent: 'flex-end',
-    marginTop: 20,
-  },
-  button: {
-    width: '70%',
-    height: 40,
-    backgroundColor: '#4B75F2',
-
-    borderRadius: 20,
   },
 });

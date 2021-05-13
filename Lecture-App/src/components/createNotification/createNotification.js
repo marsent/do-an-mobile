@@ -13,7 +13,6 @@ import {
   TextInput,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import Image2 from '../../asset/arrow_back.png';
 export default function informationOfStudent() {
   const [lop, setLop] = useState('IS336.L11');
   const [loai, setLoai] = useState('Nghỉ');
@@ -21,7 +20,6 @@ export default function informationOfStudent() {
   return (
     <View style={styles.Container}>
       <View style={styles.headerView}>
-        <Image style={styles.imageBack} source={Image2} />
         <Text style={styles.headerText}>Thông tin sinh viên</Text>
       </View>
       <View style={styles.createNoti}>

@@ -14,6 +14,7 @@ import {
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
 import Image2 from '../../asset/arrow_back.png';
+
 export default function informationOfStudent() {
   const listStudentData = {
     ID: '18521467',
