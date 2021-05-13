@@ -77,11 +77,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#FEFEFE',
-    marginLeft: 70,
   },
   headerView: {
     position: 'relative',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: '2.5%',
     backgroundColor: '#4B75F2',
@@ -109,10 +108,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   buttonContainer: {
-    width: '60%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 50,
   },
   input: {
     height: 100,

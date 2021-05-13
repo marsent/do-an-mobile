@@ -9,7 +9,7 @@ import createNotification from './src/components/createNotification/createNotifi
 import ListNoti from './src/components/createNotification/listNoti';
 import {Provider as PaperProvider} from 'react-native-paper';
 import {BottomNavigation} from 'react-native-paper';
-
+import detail from './src/components/accountDetail';
 const App = () => {
   // const [token, setToken] = useState();
   // if (!token) {
@@ -23,10 +23,12 @@ const App = () => {
   const [routes] = React.useState([
     {key: 'ListClass', title: 'Quản lý lớp học', icon: 'calendar-clock'},
     {key: 'ListNoti', title: 'Quản lý hông báo', icon: 'bell-outline'},
+    {key: 'detail', title: 'Thông tin cá nhân', icon: 'account-circle-outline'},
   ]);
   const renderScene = BottomNavigation.SceneMap({
     ListClass: ListClass,
     ListNoti: ListNoti,
+    detail: detail,
   });
   return (
     <BottomNavigation

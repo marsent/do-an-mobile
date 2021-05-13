@@ -13,23 +13,24 @@ import {
 } from 'react-native';
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
+import Image2 from '../../asset/arrow_back.png';
 export default function AccountDetail() {
   const accountData = {
     ID: '18521467',
     Avatar: Image1,
     Name: 'Đào Huỳnh Minh Thuận',
     DateOfBirth: '06/01/2000',
-    Major: 'TMĐT2018',
+    Phone: '0000000',
     Address: 'KTX Khu B ĐHQG Tp. Hồ Chí Minh',
-    Grade: 3,
     Status: '1',
-    role: 'Sinh viên',
+    Faculty: 'HTTT',
+    role: 'Giảng viên',
   };
   return (
     <View style={styles.Container}>
       <View style={styles.headerView}>
         {/* <Image style={styles.imageBack} source={Image2} /> */}
-        <Text style={styles.headerText}>Thông tin sinh viên</Text>
+        <Text style={styles.headerText}>Thông tin Giảng viên</Text>
         {/* <Button style={styles.logoutButton} title="Đăng xuất"/> */}
       </View>
       <View style={styles.inforView}>
@@ -52,8 +53,12 @@ export default function AccountDetail() {
             <Text style={styles.textx}>{accountData.Address}</Text>
           </View>
           <View style={styles.SubContentText}>
-            <Text style={styles.lable}>lớp:</Text>
-            <Text style={styles.textx}>{accountData.Major}</Text>
+            <Text style={styles.lable}>Khoa:</Text>
+            <Text style={styles.textx}>{accountData.Faculty}</Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Số điện thoại:</Text>
+            <Text style={styles.textx}>{accountData.Phone}</Text>
           </View>
         </View>
       </View>
