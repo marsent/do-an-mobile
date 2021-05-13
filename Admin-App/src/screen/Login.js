@@ -1,37 +1,49 @@
 import React, { useState } from 'react'
 import { TouchableOpacity, KeyboardAvoidingView, Text, View, ScrollView, TextInput, Button } from 'react-native'
-import { usernameValidator, passwordValidator, retypePassValidator } from '../helpers/validator'
+import { phoneValidator, passwordValidator, numberValidator } from '../helpers/validator'
+import HeaderText from '../components/HeaderText'
 
 
 import styles from '../style/style'
 
 export default Login = ({ token, setToken }) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    let [error, setError] = useState({ username: false, password: false });
-    const onLoginPress = (e) => {
+    const [account, setAccount] = useState({ phone: '', password: '' })
+    let [error, setError] = useState({ phone: false, password: false });
+    const onLoginPress = async (e) => {
         e.preventDefault();
-        setError({ username: usernameValidator(username), password: passwordValidator(password) })
-        setToken('3')
+        setError({ phone: numberValidator(account.phone), password: passwordValidator(account.password) })
+        if (!error.phone && !error.password) {
+            const data = await fetch('http://quocha.xyz/auth/admin/sign-in', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    phone: account.phone,
+                    password: account.password
+                })
+            }).then(res => res.json())
+                .then(res => res.data.token)
+            setToken(data)
+        }
     }
 
     return (
         <View style={{ flex: 1 }}>
 
-            <View style={[styles.headerView, { marginBottom: 120 }]}>
-                <Text style={styles.headerText}>Đăng nhập</Text>
-            </View>
+            <HeaderText>Đăng nhập</HeaderText>
             <ScrollView>
                 <View style={styles.container}>
                     <View style={[styles.inputView, { marginBottom: 50 }]}>
                         <TextInput
-                            style={[styles.input, !error.username ? null : styles.borderErr]}
+                            style={[styles.input, !error.phone ? null : styles.borderErr]}
                             placeholder="Tên đăng nhập"
                             onChangeText={text => {
-                                setAccount({ ...account, username: text })
+                                setAccount({ ...account, phone: text })
                             }}
                         />
-                        {!error.username ? null : <Text style={styles.textErr}>{!error.username ? null : error.username}</Text>}
+                        {!error.phone ? null : <Text style={styles.textErr}>{!error.phone ? null : error.phone}</Text>}
                         <TextInput
                             style={[styles.input, !error.password ? null : styles.borderErr]}
                             placeholder="Mật khẩu"

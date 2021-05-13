@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { KeyboardAvoidingView, View, Text, TextInput, Button, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, TouchableOpacity, ScrollView, ToastAndroid } from 'react-native';
 import { passwordValidator, retypePassValidator } from '../helpers/passwordValidator';
 import { usernameValidator } from '../helpers/usernameValidator'
 import { Picker } from '@react-native-picker/picker';
@@ -9,17 +9,21 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import styles from '../style/style'
 import { RadioButton } from 'react-native-paper';
+import HeaderText from '../components/HeaderText'
 
 import { emailValidator, numberValidator } from '../helpers/validator'
 
 const Tab = createBottomTabNavigator();
 
 export default SetAccount = () => {
-    const [account, setAccount] = useState({ email: '', phone: '', fullName: '', dateOfBirth: '', year: '', faculty: '' });
+    const [account, setAccount] = useState({ email: '', phone: '', fullName: '', dateOfBirth: '', year: '2022', faculty: 'TMDT' });
     const [show, setShow] = useState(false);
     const [mode, setMode] = useState(true)
     let [error, setError] = useState({ email: false, phone: false, dateOfBirth: false, fullName: false });
-    const onSubmitPress = (e) => {
+    const showToast = () => {
+        ToastAndroid.showWithGravity('Thêm tài khoản thành công', ToastAndroid.SHORT, ToastAndroid.BOTTOM, 25, 50)
+    }
+    const onSubmitPress = async (e) => {
         e.preventDefault();
         setError({
             email: emailValidator(account.email),
@@ -27,18 +31,38 @@ export default SetAccount = () => {
             dateOfBirth: !account.dateOfBirth ? 'Vui lòng chọn ngày sinh' : false,
             fullName: !account.fullName ? 'Vui lòng nhập tên' : false
         })
-        console.log(!error.dateOfBirth);
+        if (!error.email && !error.phone && !error.dateOfBirth && !error.fullName) {
+            if (mode === true) {
+                const data = await fetch('http://quocha.xyz/lecture/admin/', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: account.email,
+                        phone: account.phone,
+                        full_name: account.fullName,
+                        date_of_birth: account.dateOfBirth,
+                        year: account.year,
+                    })
+                }).then(res => res.json())
+                    .then(data => data)
+                console.log(data);
+            }
+            showToast();
+        }
+
     }
     const year = new Date().getFullYear()
     const yearList = [];
     for (let i = year - 10; i <= year; i++) yearList.push(i);
     const facultyList = ['HTTT', 'CNPM', 'KHMT', 'KTMT'];
+
     return (
 
         <View style={{ flex: 1 }}>
-            <View style={[styles.headerView, { marginBottom: 70 }]}>
-                <Text style={styles.headerText}>Thêm tài khoản</Text>
-            </View>
+            <HeaderText>Thêm tài khoản</HeaderText>
             <ScrollView>
                 <View style={styles.container}>
                     <View style={[styles.inputView]}>

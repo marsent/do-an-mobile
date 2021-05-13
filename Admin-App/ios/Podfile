@@ -18,6 +18,8 @@ target 'fontend' do
 
   pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
 
+  pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
+
   target 'fontendTests' do
     inherit! :complete
     # Pods for testing

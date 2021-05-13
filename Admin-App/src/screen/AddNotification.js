@@ -1,18 +1,41 @@
 import React, { useState } from 'react';
-import { View, KeyboardAvoidingView, Text, ScrollView, TextInput, Button } from "react-native";
+import { View, Text, ScrollView, TextInput, Button } from "react-native";
 import styles from '../style/style'
-import { t } from 'react-native-tailwindcss';
-import { Picker } from '@react-native-picker/picker';
+    ; import { Picker } from '@react-native-picker/picker';
+import HeaderText from '../components/HeaderText';
 export default AddNotifiacaion = () => {
     const [codeClass, setCodeClass] = useState('All')
-
+    const [type, setType] = useState(true)
     return (
         <View>
-            <View style={[styles.headerView, { marginBottom: 100 }]}>
-                <Text style={styles.headerText}>Thông báo</Text>
-            </View>
+            <HeaderText>Tạo thông báo</HeaderText>
+
             <ScrollView>
                 <View style={styles.container}>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%', padding: 10, }}>
+                        <Text style={{ textAlign: 'center' }}>Lớp</Text>
+                        <Picker
+                            selectedValue={codeClass}
+                            onValueChange={(value) => setCodeClass(value)}
+                            mode='dropdown'
+                            style={{ alignItems: 'center', width: '70%' }}>
+                            <Picker.Item label="All" value="All" />
+                            <Picker.Item label="IT001.J15" value="HTTT" />
+                            <Picker.Item label="IT002.J15" value="CNPM" />
+                        </Picker>
+                    </View>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%', padding: 10, }}>
+                        <Text style={{ textAlign: 'center' }}>Loại thông báo</Text>
+                        <Picker
+                            selectedValue={codeClass}
+                            onValueChange={(value) => setType(value)}
+                            mode='dropdown'
+                            style={{ alignItems: 'center', width: '50%' }}
+                        >
+                            <Picker.Item label="Nghỉ" value={true} />
+                            <Picker.Item label="Bù" value={false} />
+                        </Picker>
+                    </View>
                     <View style={[styles.inputView]}>
                         <TextInput style={[styles.input, styles.inputArea, { textAlignVertical: 'top' }]}
                             placeholder="Nội dung thông báo"
@@ -21,23 +44,6 @@ export default AddNotifiacaion = () => {
                             numberOfLines={10}
 
                         />
-                    </View>
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '100%', padding: 10, }}>
-
-                        <View style={{ display: 'flex', flexDirection: 'column', width: '40%' }}>
-                            <Text style={{ textAlign: 'center' }}>Lớp</Text>
-                            <Picker
-                                selectedValue={codeClass}
-                                onValueChange={(value) => setCodeClass(value)}
-                                mode='dropdown'
-                                style={{ alignItems: 'center' }}>
-                                <Picker.Item label="All" value="All" />
-                                <Picker.Item label="IT001.J15" value="HTTT" />
-                                <Picker.Item label="IT002.J15" value="CNPM" />
-
-                            </Picker>
-                        </View>
-
                     </View>
                     <Button title='Tạo thông báo' />
                 </View >

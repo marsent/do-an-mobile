@@ -5,7 +5,7 @@ export function emailValidator(email) {
     return ''
 }
 
-export function passwordValidator(password, length = 5) {
+export function passwordValidator(password, length = 6) {
     if (!password) return "Vui lòng nhập mật khẩu";
     if (password.length < length) return `Mật khẩu phải có ít nhất ${length} kí tự`;
     return '';
@@ -21,7 +21,7 @@ export function usernameValidator(username) {
 }
 export function numberValidator(number) {
     if (!number) return 'Vui lòng nhập số điện thoại';
-    const re = !/^[0-9]+$/;
-    if (re.test(number)) return 'Số điện thoại sai cú pháp';
+    const re = /^[0-9]+$/;
+    if (!re.test(number)) return 'Số điện thoại sai cú pháp';
     return '';
 }

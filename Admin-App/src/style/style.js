@@ -18,16 +18,16 @@ export default StyleSheet.create({
     headerText: {
         position: "relative",
         fontSize: 20,
-        fontFamily: 'Inter'
+        fontFamily: 'Inter',
+        color: '#FEFEFE',
 
     },
     headerView: {
         position: 'relative',
-        top: 10,
-        left: 0,
-        right: 0,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: '#4B75F2',
+        paddingVertical: '2.5%',
     },
     inputView: {
         position: 'relative',
