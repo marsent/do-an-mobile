@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { View, Text, TextInput, Button, TouchableOpacity, ScrollView, ToastAndroid } from 'react-native';
 import { passwordValidator, retypePassValidator } from '../helpers/passwordValidator';
 import { usernameValidator } from '../helpers/usernameValidator'
@@ -13,16 +13,27 @@ import HeaderText from '../components/HeaderText'
 
 import { emailValidator, numberValidator } from '../helpers/validator'
 
-const Tab = createBottomTabNavigator();
 
-export default SetAccount = () => {
-    const [account, setAccount] = useState({ email: '', phone: '', fullName: '', dateOfBirth: '', year: '2022', faculty: 'TMDT' });
+export default SetAccount = (props) => {
+    const [account, setAccount] = useState({ email: '', phone: '', fullName: '', dateOfBirth: '' });
     const [show, setShow] = useState(false);
     const [mode, setMode] = useState(true)
     let [error, setError] = useState({ email: false, phone: false, dateOfBirth: false, fullName: false });
+    const { token } = props.route.params
     const showToast = () => {
         ToastAndroid.showWithGravity('Thêm tài khoản thành công', ToastAndroid.SHORT, ToastAndroid.BOTTOM, 25, 50)
     }
+    let classList = [{
+        "quantity": 0,
+        "status": "active",
+        "_id": "609d45aecdacc46c207d7e52",
+        "name": "TMDT2022",
+        "year": 2022,
+        "faculty": "e_commerce",
+        "createdAt": "2021-05-13T15:28:46.582Z",
+        "updatedAt": "2021-05-13T15:28:46.582Z",
+        "__v": 0
+    }]
     const onSubmitPress = async (e) => {
         e.preventDefault();
         setError({
@@ -31,33 +42,60 @@ export default SetAccount = () => {
             dateOfBirth: !account.dateOfBirth ? 'Vui lòng chọn ngày sinh' : false,
             fullName: !account.fullName ? 'Vui lòng nhập tên' : false
         })
+
+
         if (!error.email && !error.phone && !error.dateOfBirth && !error.fullName) {
             if (mode === true) {
-                const data = await fetch('http://quocha.xyz/lecture/admin/', {
+                let data = JSON.stringify({
+                    email: account.email,
+                    phone: account.phone,
+                    full_name: account.fullName,
+                    date_of_birth: account.dateOfBirth,
+                    year: account.year,
+                    class_id: account.classId
+                })
+                await fetch('http://quocha.xyz/api/student/admin/', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
                     },
-                    body: JSON.stringify({
-                        email: account.email,
-                        phone: account.phone,
-                        full_name: account.fullName,
-                        date_of_birth: account.dateOfBirth,
-                        year: account.year,
-                    })
+                    body: data
                 }).then(res => res.json())
-                    .then(data => data)
-                console.log(data);
+                    .then(res => {
+                        if (res.data) showToast()
+                        console.log(res);
+                    })
+            } else {
+                let data = JSON.stringify({
+                    email: account.email,
+                    phone: account.phone,
+                    full_name: account.fullName,
+                    date_of_birth: account.dateOfBirth,
+                    faculty: account.faculty
+                })
+                await fetch('http://quocha.xyz/api/lecture/admin/', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: data
+                }).then(res => res.json())
+                    .then(res => {
+                        if (res.data) showToast()
+                        console.log(res);
+                    })
             }
-            showToast();
         }
 
     }
     const year = new Date().getFullYear()
     const yearList = [];
-    for (let i = year - 10; i <= year; i++) yearList.push(i);
-    const facultyList = ['HTTT', 'CNPM', 'KHMT', 'KTMT'];
+    for (let i = year - 1; i <= year + 1; i++) yearList.push(i);
+    const facultyList = ['computer_science', 'information_technology', 'data_science', 'computer_engineering', 'information_systems', 'e_commerce', 'software_engineering', 'information_security'];
 
     return (
 
@@ -124,8 +162,7 @@ export default SetAccount = () => {
                                 mode='date'
                                 onChange={(event, date) => {
                                     setShow(false);
-                                    let res = date.getDate().toString() + '/' + (date.getMonth() + 1).toString() + '/' + date.getFullYear()
-                                    setAccount({ ...account, dateOfBirth: res })
+                                    setAccount({ ...account, dateOfBirth: date.toISOString() })
                                 }}
                             />)}
                         </View>
@@ -154,27 +191,48 @@ export default SetAccount = () => {
                         </View>
 
                         {mode ? <View>
-                            <Text>Năm học:</Text>
-                            <Picker
-                                selectedValue={account.year}
-                                onValueChange={(val, index) => setAccount({ ...account, year: val })}
-                            >
-                                {yearList.map(y => <Picker.Item
+                            <View style={[styles.viewPicker, { width: '70%' }]}>
+                                <Text>Năm học:</Text>
+                                <Picker
+                                    selectedValue={account.year}
+                                    onValueChange={(val, index) => setAccount({ ...account, year: val })}
+                                    style={{ width: '50%' }}
+                                >
+                                    {yearList.map(y => <Picker.Item
 
-                                    label={y.toString()}
+                                        label={y.toString()}
 
-                                    value={y.toString()}
+                                        value={y.toString()}
 
-                                    key={y.toString()} />)}
+                                        key={y.toString()} />)}
 
-                            </Picker>
+                                </Picker>
+                            </View>
+                            <View style={[styles.viewPicker, { width: '70%' }]}>
+                                <Text>Lớp:</Text>
+                                <Picker
+                                    selectedValue={account.class}
+                                    onValueChange={(val, index) => setAccount({ ...account, classId: val })}
+                                    style={{ width: '60%' }}
+                                >
+                                    {classList.map(val => <Picker.Item
+
+                                        label={val.name}
+
+                                        value={val._id}
+
+                                        key={val._id} />)}
+
+                                </Picker>
+                            </View>
                         </View>
                             :
-                            <View>
+                            <View style={[styles.viewPicker]}>
                                 <Text>Khoa</Text>
                                 <Picker
                                     selectedValue={account.faculty}
                                     onValueChange={(val, index) => setAccount({ ...account, faculty: val })}
+                                    style={{ width: '60%' }}
                                 >
                                     {facultyList.map(faculty => <Picker.Item
                                         label={faculty}

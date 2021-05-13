@@ -11,6 +11,7 @@ export default Login = ({ token, setToken }) => {
     let [error, setError] = useState({ phone: false, password: false });
     const onLoginPress = async (e) => {
         e.preventDefault();
+
         setError({ phone: numberValidator(account.phone), password: passwordValidator(account.password) })
         if (!error.phone && !error.password) {
             const data = await fetch('http://quocha.xyz/auth/admin/sign-in', {

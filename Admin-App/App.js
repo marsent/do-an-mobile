@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -23,12 +23,13 @@ const Tab = createBottomTabNavigator();
 
 const App = () => {
   const [token, setToken] = useState();
-  useEffect(() => { console.log(token) }, [token])
+  if (!token) return <Login token={token} setToken={setToken} />
   return (
     <NavigationContainer>
       <Drawer.Navigator initialRouteName="Thêm tài khoản" >
+        <Drawer.Screen name="Home" component={Login} />
         <Drawer.Screen name="Khôi phục mật khẩu" component={ResetPassword} />
-        <Drawer.Screen name="Thêm tài khoản" component={SetAccount} />
+        <Drawer.Screen name="Thêm tài khoản" component={SetAccount} initialParams={{ token }} />
         <Drawer.Screen name="Tạo thông báo" component={AddNotification} />
         <Drawer.Screen name="Thêm cuộc thi" component={AddExam} />
         <Drawer.Screen name="Quản lý sinh viên" component={StudentManagement} />
