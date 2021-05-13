@@ -11,4 +11,4 @@ import listStudent from './src/components/ClassManagement/listStudent';
 import information from './src/components/ClassManagement/informationOfStudent';
 import listNoti from './src/components/createNotification/listNoti';
 import createNotification from './src/components/createNotification/createNotification';
-AppRegistry.registerComponent(appName, () => createNotification);
+AppRegistry.registerComponent(appName, () => ListClass);

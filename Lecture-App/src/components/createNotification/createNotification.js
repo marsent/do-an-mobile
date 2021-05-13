@@ -54,6 +54,7 @@ export default function informationOfStudent() {
           <TextInput
             style={styles.input}
             onChangeText={onChangeText}
+            multiline={true}
             value={text}
           />
         </View>
