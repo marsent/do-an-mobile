@@ -83,8 +83,7 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: "#F8FAFD",
         borderWidth: 1,
-        borderRadius: 10
-
+        borderRadius: 10,
     },
     button: {
         position: 'relative',

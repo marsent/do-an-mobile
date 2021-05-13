@@ -29,7 +29,7 @@ export default function AccountDetail() {
   return (
     <View style={styles.Container}>
       <View style={styles.headerView}>
-        <Image style={styles.imageBack} source={Image2} />
+        {/* <Image style={styles.imageBack} source={Image2} /> */}
         <Text style={styles.headerText}>Thông tin sinh viên</Text>
       </View>
       <View style={styles.inforView}>
