@@ -31,6 +31,7 @@ export default function AccountDetail() {
       <View style={styles.headerView}>
         {/* <Image style={styles.imageBack} source={Image2} /> */}
         <Text style={styles.headerText}>Thông tin sinh viên</Text>
+        {/* <Button style={styles.logoutButton} title="Đăng xuất"/> */}
       </View>
       <View style={styles.inforView}>
         
@@ -55,6 +56,7 @@ export default function AccountDetail() {
                 <Text style={styles.textx}>{accountData.Major}</Text>
             </View>
         </View>
+        
       </View>
     </View>
   );
@@ -143,5 +145,5 @@ const styles = StyleSheet.create({
         // borderLeftWidth: 1,
         // borderLeftColor:'#BFBFBF',
         // paddingLeft: 5,
-    }
+    },
 });

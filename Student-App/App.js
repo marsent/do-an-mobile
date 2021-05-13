@@ -24,7 +24,7 @@ const App = () => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     { key: 'TimeTable', title: 'TKB', icon: 'calendar-clock' },
-    { key: 'OnlineExam', title: 'Kiểm tra', icon: 'timer-outline' },
+    { key: 'OnlineExam', title: 'Kiểm tra', icon: 'head-question-outline' },
     { key: 'Notification', title: 'Thông báo', icon: 'bell-outline'},
     { key: 'AccountDetail', title: 'Sinh viên', icon: 'account-circle-outline' },
   ]);

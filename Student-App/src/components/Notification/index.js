@@ -192,10 +192,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: '2.5%',
         backgroundColor: '#4B75F2',
+        
     },
     NotiView:{
         position: 'relative',
-        marginVertical: '2%'
+        marginVertical: '2%',
+        marginBottom: 48,
     },
     NotiText:{
         marginHorizontal: '2.5%',
