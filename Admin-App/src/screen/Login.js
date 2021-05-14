@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { TouchableOpacity, KeyboardAvoidingView, Text, View, ScrollView, TextInput, Button } from 'react-native'
-import { phoneValidator, passwordValidator, numberValidator } from '../helpers/validator'
+import { Text, View, ScrollView, TextInput, Button, ToastAndroid } from 'react-native'
+import { passwordValidator, numberValidator } from '../helpers/validator'
 import HeaderText from '../components/HeaderText'
 
 
@@ -9,12 +9,15 @@ import styles from '../style/style'
 export default Login = ({ token, setToken }) => {
     const [account, setAccount] = useState({ phone: '', password: '' })
     let [error, setError] = useState({ phone: false, password: false });
+    const showToast = () => {
+        ToastAndroid.showWithGravity('Đăng nhập thành công', ToastAndroid.SHORT, ToastAndroid.BOTTOM, 25, -70)
+    }
     const onLoginPress = async (e) => {
         e.preventDefault();
 
         setError({ phone: numberValidator(account.phone), password: passwordValidator(account.password) })
-        if (!error.phone && !error.password) {
-            const data = await fetch('http://quocha.xyz/auth/admin/sign-in', {
+        if (!error.phone === true && !error.password === true) {
+            await fetch('http://quocha.xyz/auth/admin/sign-in', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -25,8 +28,11 @@ export default Login = ({ token, setToken }) => {
                     password: account.password
                 })
             }).then(res => res.json())
-                .then(res => res.data.token)
-            setToken(data)
+                .then(res => {
+                    if (res.error) return setError({ ...error, res: 'Tài khoản hoặc mật khẩu không chính xác' });
+                    showToast()
+                    return setTimeout(() => setToken(res.data.token), 1000)
+                })
         }
     }
 
@@ -52,15 +58,16 @@ export default Login = ({ token, setToken }) => {
                             onChangeText={text => setAccount({ ...account, password: text })}
                         />
                         {!error.password ? null : <Text style={styles.textErr}>{!error.password ? null : error.password}</Text>}
+                        {!error.res ? null : <Text style={styles.textErr}>{!error.res ? null : error.res}</Text>}
                     </View>
                     <Button
                         style={styles.button}
                         title="Đăng nhập"
                         onPress={onLoginPress}
                     />
-                    <TouchableOpacity style={{ marginTop: 10 }}>
+                    {/* <TouchableOpacity style={{ marginTop: 10 }}>
                         <Text style={{ color: "#067EFC" }}>Quên mật khẩu?</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View >
             </ScrollView>
         </View >
