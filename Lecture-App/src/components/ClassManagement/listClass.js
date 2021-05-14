@@ -58,9 +58,6 @@ function listClass({navigation}) {
 
   return (
     <View style={styles.Container}>
-      <View style={styles.headerView}>
-        <Text style={styles.headerText}>Thông tin lớp học</Text>
-      </View>
       <ScrollView style={styles.NotiView}>
         {listClassData.map((item, key) => (
           <View key={key} style={styles.NotiText}>
@@ -73,9 +70,9 @@ function listClass({navigation}) {
               <Button
                 style={styles.button}
                 title=" Xem danh sách lớp"
-                // onPress={() => {
-                //   navigation.navigate('Danh sách lớp');
-                // }}
+                onPress={() => {
+                  navigation.navigate('Danh sách lớp');
+                }}
               />
             </View>
           </View>
@@ -84,24 +81,24 @@ function listClass({navigation}) {
     </View>
   );
 }
-// const Stack = createStackNavigator();
-// const App = () => {
-//   return (
-//     <NavigationContainer>
-//       <Stack.Navigator>
-//         <Stack.Screen
-//           name="Thông tin lớp học"
-//           component={listClass}></Stack.Screen>
-//         <Stack.Screen
-//           name="Danh sách lớp"
-//           component={listStudent}></Stack.Screen>
-//         <Stack.Screen
-//           name="Thông tin sinh viên"
-//           component={information}></Stack.Screen>
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   );
-// };
+const Stack = createStackNavigator();
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Thông tin lớp học"
+          component={listClass}></Stack.Screen>
+        <Stack.Screen
+          name="Danh sách lớp"
+          component={listStudent}></Stack.Screen>
+        <Stack.Screen
+          name="Thông tin sinh viên"
+          component={information}></Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -162,4 +159,4 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
 });
-export default listClass;
+export default App;

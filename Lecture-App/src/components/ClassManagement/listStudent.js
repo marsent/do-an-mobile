@@ -3,17 +3,13 @@ import {
   StyleSheet,
   View,
   Text,
-  KeyboardAvoidingView,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  Modal,
-  Button,
 } from 'react-native';
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
-export default function listStudent() {
-  const [modalVisible, setModalVisible] = useState(false);
+
+function listStudent({navigation}) {
   const listStudentData = [
     {
       ID: '18521467',
@@ -36,13 +32,12 @@ export default function listStudent() {
   ];
   return (
     <View style={styles.Container}>
-      <View style={styles.headerView}>
-        <Text style={styles.headerText}>Danh sách lớp</Text>
-      </View>
-
       <ScrollView style={styles.NotiView}>
         {listStudentData.map(item => (
-          <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Thông tin sinh viên');
+            }}>
             <View key={item.ID} style={styles.NotiText}>
               <Avatar.Image size={24} source={Image1} />
               <Text style={styles.ContentText}>{item.Name} </Text>
@@ -141,3 +136,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+export default listStudent;
