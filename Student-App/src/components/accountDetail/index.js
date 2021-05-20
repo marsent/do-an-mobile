@@ -28,11 +28,11 @@ export default function AccountDetail() {
   };
   return (
     <View style={styles.Container}>
-      <View style={styles.headerView}>
-        {/* <Image style={styles.imageBack} source={Image2} /> */}
+      {/* <View style={styles.headerView}>
+        <Image style={styles.imageBack} source={Image2} />
         <Text style={styles.headerText}>Thông tin sinh viên</Text>
-        {/* <Button style={styles.logoutButton} title="Đăng xuất"/> */}
-      </View>
+        <Button style={styles.logoutButton} title="Đăng xuất"/>
+      </View> */}
       <View style={styles.inforView}>
         
         <View style={styles.inforText}>

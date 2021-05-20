@@ -10,7 +10,7 @@ import { usernameValidator } from '../../helpers/usernameValidator'
 import { RadioButton, Card, Avatar } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import WeekCalendar from './WeekCalendar';
-export default function TimeTable() {
+export default function TimeTable({navigation}){
     const TimeTable_data = [
         {
             ID : "123",
@@ -98,9 +98,9 @@ export default function TimeTable() {
 
     return (
        <SafeAreaView style={styles.safe}>
-           <View style={styles.headerView}>
+           {/* <View style={styles.headerView}>
                 <Text style={styles.headerText}>Lịch học</Text>
-            </View>
+            </View> */}
             <WeekCalendar date={date} onChange={(newDate) => setDate(newDate)} />
             {TimeTable_data.map((item, key)=>(
                 <View key={key}>
@@ -136,11 +136,12 @@ const styles = StyleSheet.create({
     },
     timetableText:{
         marginHorizontal: '2.5%',
-        borderWidth: .5,
+        // borderWidth: .5,
         borderRadius: 10,
         padding: 10,
         marginVertical: '.5%',
-        borderColor:'#BFBFBF',
+        // borderColor:'#BFBFBF',
+        backgroundColor: '#FEFEFE',
     },
     TitleText: {
         fontSize: 14,
