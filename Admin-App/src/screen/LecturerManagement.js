@@ -15,7 +15,7 @@ export default LecturerManagement = () => {
         <Tab.Navigator
             initialRouteName="Thêm mới"
             tabBarOptions={{
-                activeTintColor: '#e91e63',
+                activeTintColor: '#0598FC',
             }}
         >
             <Tab.Screen

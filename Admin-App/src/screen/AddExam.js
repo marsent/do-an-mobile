@@ -4,7 +4,7 @@ import { Button, TextInput, TouchableOpacity } from 'react-native'
 import { View, Text, ScrollView } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DocumentPicker from 'react-native-document-picker'
-import RNFS from 'react-native-fs';
+import RNFS, { uploadFiles } from 'react-native-fs';
 import { RadioButton } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
 
@@ -235,8 +235,8 @@ export default AddExam = () => {
                         : null
                     }
 
-                    {uploadExam ? (<View style={{ width: '90%', alignItems: 'center' }}>
-                        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                    {uploadExam ? (<View style={{ width: '50%', alignItems: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                        {/* <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
                             <Text style={{ fontFamily: 'Inter', fontSize: 16, marginLeft: 10, marginRight: "20%" }}>Tên file:</Text>
 
                             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -248,9 +248,16 @@ export default AddExam = () => {
                                     <Icon name='times' size={16} />
                                 </TouchableOpacity>
                             </View>
-                        </View>
-                        <View style={{ marginTop: 10 }}>
+                        </View> */}
+                        <View >
                             <Button title="Tạo đề thi" onPress={handlerSubmit} />
+                        </View>
+                        <View>
+                            <Button title='Hủy đề thi' onPress={() => {
+                                setUploadExam(false)
+                                setPrevewQuestions(false)
+                                setQuestions()
+                            }} />
                         </View>
                     </View>)
                         : <View style={{ marginTop: 10 }}>
@@ -261,7 +268,7 @@ export default AddExam = () => {
                 </View>
 
                 <TouchableOpacity onPress={() => setPrevewQuestions(!previewQuestions)}>
-                    {uploadExam && !previewQuestions ?
+                    {uploadExam ? !previewQuestions ?
                         (
                             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
                                 <Text style={{ fontFamily: 'Inter', marginRight: 2 }}>Xe trước đề thi</Text>
@@ -271,7 +278,7 @@ export default AddExam = () => {
                         : <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
                             <Text style={{ fontFamily: 'Inter', marginRight: 2 }}>Thu gọn </Text>
                             <Icon name='chevron-up' />
-                        </View>}
+                        </View> : null}
                 </TouchableOpacity>
 
                 {previewQuestions ? (

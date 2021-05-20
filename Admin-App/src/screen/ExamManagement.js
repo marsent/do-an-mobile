@@ -16,7 +16,7 @@ export default ExamManagement = () => {
             initialRouteName="Thêm mới"
             tabBarOptions={{
 
-                activeTintColor: '#e91e63',
+                activeTintColor: '#0598FC',
             }}
         >
             <Tab.Screen
