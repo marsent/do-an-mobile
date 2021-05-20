@@ -12,20 +12,20 @@ export default AddNotifiacaion = () => {
 
             <ScrollView>
                 <View style={styles.container}>
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%', padding: 10, }}>
-                        <Text style={{ textAlign: 'center' }}>Lớp</Text>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%', marginTop: 50 }}>
+                        <Text style={{ textAlign: 'center', fontFamily: 'Inter' }}>Lớp</Text>
                         <Picker
                             selectedValue={codeClass}
                             onValueChange={(value) => setCodeClass(value)}
                             mode='dropdown'
-                            style={{ alignItems: 'center', width: '70%' }}>
+                            style={{ alignItems: 'center', width: '50%' }}>
                             <Picker.Item label="All" value="All" />
                             <Picker.Item label="IT001.J15" value="HTTT" />
                             <Picker.Item label="IT002.J15" value="CNPM" />
                         </Picker>
                     </View>
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%', padding: 10, }}>
-                        <Text style={{ textAlign: 'center' }}>Loại thông báo</Text>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%' }}>
+                        <Text style={{ textAlign: 'center', fontFamily: 'Inter' }}>Loại thông báo</Text>
                         <Picker
                             selectedValue={codeClass}
                             onValueChange={(value) => setType(value)}
@@ -37,7 +37,7 @@ export default AddNotifiacaion = () => {
                         </Picker>
                     </View>
                     <View style={[styles.inputView]}>
-                        <TextInput style={[styles.input, styles.inputArea, { textAlignVertical: 'top' }]}
+                        <TextInput style={[styles.input, styles.inputArea, { textAlignVertical: 'top', fontFamily: 'Inter' }]}
                             placeholder="Nội dung thông báo"
                             focusable={false}
                             multiline={true}
@@ -45,7 +45,9 @@ export default AddNotifiacaion = () => {
 
                         />
                     </View>
-                    <Button title='Tạo thông báo' />
+                    <View style={{ marginTop: 20 }}>
+                        <Button title='Tạo thông báo' />
+                    </View>
                 </View >
             </ScrollView>
         </View>
