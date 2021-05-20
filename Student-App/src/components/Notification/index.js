@@ -5,9 +5,7 @@ import { passwordValidator, retypePassValidator } from '../../helpers/passwordVa
 import { usernameValidator } from '../../helpers/usernameValidator'
 import { RadioButton, Card, Avatar } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
-export default function Notification() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+export default Notification = () =>  {
     const notification_data = [
         {
             ID : "123",
@@ -138,27 +136,11 @@ export default function Notification() {
             Status:"0"
         },
     ];
-    /*list = () => {
-        return TimeTable_data.map((element) => {
-          return (
-            <View style={{margin: 10}}>
-                <text>{TimeTable_data.ID}</text>
-                <text>{TimeTable_data.Name}</text>
-            </View>
-          );
-        });
-      };
-    return (
-        <view>
-           
-        </view>
-    );*/
-    //var SampleNameArray = [ "Pankaj", "Rita", "Mohan", "Amit", "Babulal", "Sakshi" ];
     return (
        <SafeAreaView style={styles.Container}>
-            <View style={styles.headerView}>
+            {/* <View style={styles.headerView}>
                 <Text style={styles.headerText}>Thông báo</Text>
-            </View>
+            </View> */}
             <ScrollView style={styles.NotiView}>
             {notification_data.map((item, key)=>(
                 <View key={key} style={styles.NotiText}>
@@ -197,15 +179,16 @@ const styles = StyleSheet.create({
     NotiView:{
         position: 'relative',
         marginVertical: '2%',
-        marginBottom: 48,
+
     },
     NotiText:{
         marginHorizontal: '2.5%',
-        borderWidth: .5,
+        // borderWidth: .5,
         borderRadius: 10,
         padding: 10,
         marginVertical: '.5%',
-        borderColor:'#BFBFBF',
+        // borderColor:'#BFBFBF',
+        backgroundColor: '#FEFEFE',
     },
     TitleText: {
         fontSize: 16,
