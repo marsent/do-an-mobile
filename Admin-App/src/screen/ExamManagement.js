@@ -12,8 +12,10 @@ const Tab = createBottomTabNavigator();
 export default ExamManagement = () => {
     return (
         <Tab.Navigator
+
             initialRouteName="Thêm mới"
             tabBarOptions={{
+
                 activeTintColor: '#e91e63',
             }}
         >

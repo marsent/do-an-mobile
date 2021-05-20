@@ -88,48 +88,48 @@ export default AddExam = () => {
     const handlerSubmit = async (e) => {
         e.preventDefault();
         console.log(questions);
-        // await fetch(`${apiURL}/exam/admin`, {
-        //     method: 'POST',
-        //     headers: {
-        //         Accept: 'application/json',
-        //         'Content-Type': 'application/json',
-        //         'Authorization': 'Bearer ' + token
-        //     },
-        //     body: JSON.stringify({
-        //         name: nameExam,
-        //         for: type,
-        //         questions: questions,
-        //         year: new Date().getFullYear(),
-        //         time: time,
-        //         class_id: classId
-        //     })
-        // }).then(res => res.json())
-        //     .then(res => {
-        //         if (res.error == 4000) return setError(res.messages)
-        //         if (res.error == 7000) {
-        //             setError({ name: '' });
-        //             return Toast.show({
-        //                 type: 'error',
-        //                 position: 'top',
-        //                 text1: 'Thêm đề thi thất bại',
-        //                 text2: 'Đề thi đã tồn tại trong cơ sở dữ liệu',
-        //                 visibilityTime: 2000,
-        //                 autoHide: true,
-        //             })
-        //         }
-        //         setError({ name: '' });
-        //         setNameExam('');
-        //         setUploadExam(false)
-        //         return Toast.show({
-        //             type: 'success',
-        //             position: 'top',
-        //             text1: 'Thêm dề thi thành công',
-        //             visibilityTime: 2000,
-        //             autoHide: true,
+        await fetch(`${apiURL}/exam/admin`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                name: nameExam,
+                for: type,
+                questions: questions,
+                year: new Date().getFullYear(),
+                time: time,
+                class_id: classId
+            })
+        }).then(res => res.json())
+            .then(res => {
+                if (res.error == 4000) return setError(res.messages)
+                if (res.error == 7000) {
+                    setError({ name: '' });
+                    return Toast.show({
+                        type: 'error',
+                        position: 'top',
+                        text1: 'Thêm đề thi thất bại',
+                        text2: 'Đề thi đã tồn tại trong cơ sở dữ liệu',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
+                }
+                setError({ name: '' });
+                setNameExam('');
+                setUploadExam(false)
+                return Toast.show({
+                    type: 'success',
+                    position: 'top',
+                    text1: 'Thêm dề thi thành công',
+                    visibilityTime: 2000,
+                    autoHide: true,
 
 
-        //         })
-        //     })
+                })
+            })
     }
 
 
@@ -237,7 +237,7 @@ export default AddExam = () => {
 
                     {uploadExam ? (<View style={{ width: '90%', alignItems: 'center' }}>
                         <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                            <Text style={{ fontFamily: 'Inter', fontSize: 16, marginLeft: 7, marginRight: "20%" }}>Tên file:</Text>
+                            <Text style={{ fontFamily: 'Inter', fontSize: 16, marginLeft: 10, marginRight: "20%" }}>Tên file:</Text>
 
                             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Text style={{ fontFamily: 'Inter', fontSize: 16, marginRight: 5 }}>{fileExam}</Text>
@@ -261,7 +261,7 @@ export default AddExam = () => {
                 </View>
 
                 <TouchableOpacity onPress={() => setPrevewQuestions(!previewQuestions)}>
-                    {!previewQuestions ?
+                    {uploadExam && !previewQuestions ?
                         (
                             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
                                 <Text style={{ fontFamily: 'Inter', marginRight: 2 }}>Xe trước đề thi</Text>
