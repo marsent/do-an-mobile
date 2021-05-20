@@ -56,11 +56,11 @@ export default function AccountDetail() {
                 <Text style={styles.textx}>{accountData.Major}</Text>
             </View>
         </View>
-        
       </View>
     </View>
   );
-}
+};
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
