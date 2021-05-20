@@ -14,5 +14,4 @@ import information from './src/components/ClassManagement/informationOfStudent';
 import {StackNavigation} from 'react-navigation';
 import Login from './src/components/Login';
 import detail from './src/components/accountDetail';
-import testapi from './src/components/ClassManagement/testapi';
 AppRegistry.registerComponent(appName, () => App);

@@ -17,7 +17,7 @@ export default Login = ({token, setToken}) => {
   const onLoginPress = async e => {
     e.preventDefault();
     //setError({ username: usernameValidator(username), password: passwordValidator(password) })
-    await fetch('http://quocha.xyz/auth/admin/sign-in', {
+    await fetch('http://quocha.xyz/auth/lecture/sign-in', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
