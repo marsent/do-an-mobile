@@ -3,6 +3,7 @@ const React = require("react-native");
 const { StyleSheet } = React;
 
 export default StyleSheet.create({
+
     fontInter: {
         fontFamily: 'Inter'
     },
@@ -32,7 +33,6 @@ export default StyleSheet.create({
     inputView: {
         position: 'relative',
         width: "90%",
-        marginBottom: 30
     },
     input: {
         position: 'relative',
@@ -85,13 +85,14 @@ export default StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         marginTop: 15
     },
     viewRadio: {
-        width: '50%',
         display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
         paddingRight: 20
 
     },

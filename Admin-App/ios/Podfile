@@ -20,6 +20,8 @@ target 'fontend' do
 
   pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
 
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
   target 'fontendTests' do
     inherit! :complete
     # Pods for testing
