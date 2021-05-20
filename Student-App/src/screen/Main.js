@@ -31,7 +31,6 @@ const Tab = createMaterialBottomTabNavigator();
 
 
 const MainTabScreen = () => (
-  <NavigationContainer>
     <Tab.Navigator
       initialRouteName="TimeTable"
       activeColor="#fff"
@@ -106,7 +105,6 @@ const MainTabScreen = () => (
         }}
       />
     </Tab.Navigator>
-  </NavigationContainer>
 );
 
 export default MainTabScreen;

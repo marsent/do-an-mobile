@@ -1,4 +1,4 @@
-import React, { useState, Component, useEffect }from 'react'
+import React, { useState, Component, useEffect, useContext }from 'react'
 import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView,Modal, Alert, Pressable  } from 'react-native';
 import CalendarStrip from 'react-native-slideable-calendar-strip';
 import { passwordValidator, retypePassValidator } from '../../helpers/passwordValidator';
@@ -7,28 +7,39 @@ import { RadioButton, Card, Avatar, IconButton } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
+import TokenContext from '../../helpers/TokenContext';
 
 export default function OnlineExam({navigation}){
-    const notification_data = [
-        {
-            ID : "123",
-            Name : "Domo 1",
-            Content: "Content 1",
-            Date_created:"01/01/2021",
-            Update_date:"01/01/2021",
-            Status:"1"
-        },
-        {
-            ID : "321",
-            Name : "Domo 2",
-            Content: "Content 2",
-            Date_created:"02/02/2021",
-            Update_date:"02/02/2021",
-            Status:"0"
-        },
-    ];
+    // const notification_data = [
+    //     {
+    //         ID : "123",
+    //         Name : "Domo 1",
+    //         Content: "Content 1",
+    //         Date_created:"01/01/2021",
+    //         Update_date:"01/01/2021",
+    //         Status:"1"
+    //     }
+    // ];
     // const [count, setCount] = useState(0);
     // const onPress = () => setCount(prevCount => prevCount + 1);
+    // const token = useContext(TokenContext);
+    const token = useContext(TokenContext);
+    const [examList, setExamList] = useState([]);
+    useEffect(async () => {
+    //setError({ username: usernameValidator(username), password: passwordValidator(password) })
+        await fetch('http://quocha.xyz/api/class/admin', {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization:'Bearer '+token,
+        },
+        })
+        .then(res => res.json())
+        .then(res => {
+            setExamList(res.data);
+        });
+    });
     const [modalVisible, setModalVisible] = useState(false);
     const [examID,setExamID]=useState([]);
     const examDetail = () => {
@@ -51,7 +62,7 @@ export default function OnlineExam({navigation}){
                                     onPress={() => {setModalVisible(!modalVisible)}}>
                                     <Icon name="md-close" size={23} color='#BFBFBF' />
                             </TouchableOpacity>
-                            <Text style={{fontWeight: 'bold',}}>{examID.Name}</Text>
+                            <Text style={{fontWeight: 'bold',}}>{examID.name}</Text>
                             <Text>{examID.Content}</Text>
                             <TouchableOpacity
                                     style={[styles.button]}
@@ -62,24 +73,20 @@ export default function OnlineExam({navigation}){
                     </View>
             </Modal>
             <ScrollView style={styles.NotiView}>
-            {notification_data.map((item, key)=>(
-                <TouchableOpacity key={key} style={styles.NotiText}  onPress={() => {
-                    setExamID(item);
-                    setModalVisible(!modalVisible);
-                }}>
-                {/* <View > */}
-                    <Text style={styles.TitleText}>{item.Name} </Text>
-                    <Text style={styles.ContentText}>{item.Content} </Text>
-                    <Text style={styles.Notification_date}>{item.Update_date} </Text>
-                    {/* <Text>Count: {count}</Text> */}
-                {/* </View> */}
-                </TouchableOpacity>
-            ))}
+                {examList.map((item, i)=>(
+                    <TouchableOpacity key={i} style={styles.NotiText}  onPress={() => {
+                        setExamID(item);
+                        setModalVisible(!modalVisible);
+                    }}>
+                    <View > 
+                        <Text style={styles.TitleText}>{item.name} </Text>
+                    </View> 
+                    </TouchableOpacity>
+                ))}
             </ScrollView>
 
         </SafeAreaView>
     );
-    
 }
 
 const styles = StyleSheet.create({
