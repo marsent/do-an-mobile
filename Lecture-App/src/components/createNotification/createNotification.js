@@ -1,26 +1,15 @@
 import React, {useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  Modal,
-  Button,
-  Image,
-  TextInput,
-} from 'react-native';
+import {StyleSheet, View, Text, TextInput} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 export default function informationOfStudent() {
   const [lop, setLop] = useState('IS336.L11');
   const [loai, setLoai] = useState('Nghỉ');
   const [text, onChangeText] = React.useState('');
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={styles.Container}>
       <View style={styles.headerView}>
-        <Text style={styles.headerText}>Thông tin sinh viên</Text>
+        <Text style={styles.headerText}>Tạo thông báo</Text>
       </View>
       <View style={styles.createNoti}>
         <Text style={styles.tex}>Lớp</Text>
@@ -57,9 +46,6 @@ export default function informationOfStudent() {
           />
         </View>
       </View>
-      <View style={styles.buttonContainer}>
-        <Button style={styles.button} title="Tạo thông báo" />
-      </View>
     </View>
   );
 }
@@ -76,14 +62,14 @@ const styles = StyleSheet.create({
     position: 'relative',
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FEFEFE',
+    color: 'black',
   },
   headerView: {
-    position: 'relative',
+    // position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: '2.5%',
-    backgroundColor: '#4B75F2',
+    paddingVertical: '3.5%',
+    // backgroundColor: '#4B75F2',
     flexDirection: 'row',
   },
   createNoti: {

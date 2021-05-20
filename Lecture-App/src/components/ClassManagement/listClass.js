@@ -1,71 +1,43 @@
-import React, {useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Button,
-} from 'react-native';
+import React, {useEffect, useState, useContext} from 'react';
+import {StyleSheet, View, Text, ScrollView, Button} from 'react-native';
 // import {Button, } from 'react-native-paper';
 import information from '../ClassManagement/informationOfStudent';
 import listStudent from '../ClassManagement/listStudent';
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import TokenContext from '../../Context/TokenContext';
+
 function listClass({navigation}) {
-  const listClassData = [
-    {
-      ID: '1',
-      Name: 'Phát triển ứng dụng trên di động',
-      Room: 'B2.22',
-      Amount: 80,
-      StartDate: '01/03/2021',
-      FinishDate: '26/06/2021',
-      Status: '1',
-    },
-    {
-      ID: '1',
-      Name: 'Phát triển ứng dụng trên di động',
-      Room: 'B2.22',
-      Amount: 80,
-      StartDate: '01/03/2021',
-      FinishDate: '26/06/2021',
-      Status: '1',
-    },
-    {
-      ID: '1',
-      Name: 'Phát triển ứng dụng trên di động',
-      Room: 'B2.22',
-      Amount: 80,
-      StartDate: '01/03/2021',
-      FinishDate: '26/06/2021',
-      Status: '1',
-    },
-    {
-      ID: '1',
-      Name: 'Phát triển ứng dụng trên di động',
-      Room: 'B2.22',
-      Amount: 80,
-      StartDate: '01/03/2021',
-      FinishDate: '26/06/2021',
-      Status: '1',
-    },
-  ];
+  const token = useContext(TokenContext);
+  const [classList, setClassList] = useState([]);
+
+  useEffect(async () => {
+    //setError({ username: usernameValidator(username), password: passwordValidator(password) })
+    await fetch('http://quocha.xyz/api/class/admin', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then(res => res.json())
+      .then(res => {
+        setClassList(res.data);
+      });
+  });
 
   return (
     <View style={styles.Container}>
       <ScrollView style={styles.NotiView}>
-        {listClassData.map((item, key) => (
-          <View key={key} style={styles.NotiText}>
-            <Text style={styles.TitleText}>{item.Name} </Text>
-            <Text style={styles.ContentText}>Sỉ số: {item.Amount} </Text>
-            <Text style={styles.ContentText}>Phòng: {item.Room} </Text>
-            <Text style={styles.ContentText}>Ngày BĐ: {item.StartDate} </Text>
-            <Text style={styles.ContentText}>Ngày KT: {item.FinishDate} </Text>
+        {classList.map((item, i) => (
+          <View key={i} style={styles.NotiText}>
+            <Text style={styles.TitleText}>{item.name} </Text>
+            <Text style={styles.ContentText}>Sỉ số: {item.quantity} </Text>
+            <Text style={styles.ContentText}>Khoa: {item.faculty} </Text>
+            {/* <Text style={styles.ContentText}>Ngày BĐ: {item.StartDate} </Text>
+          <Text style={styles.ContentText}>Ngày KT: {item.FinishDate} </Text> */}
             <View style={styles.ButtonContainer}>
               <Button
                 style={styles.button}
@@ -88,13 +60,36 @@ const App = () => {
       <Stack.Navigator>
         <Stack.Screen
           name="Thông tin lớp học"
-          component={listClass}></Stack.Screen>
+          component={listClass}
+          options={{
+            headerTitle: 'Thông tin lớp học',
+            headerTintColor: '#FEFEFE',
+            headerTitleAlign: 'center',
+            headerStyle: {
+              backgroundColor: '#4B75F2',
+            },
+          }}></Stack.Screen>
         <Stack.Screen
           name="Danh sách lớp"
-          component={listStudent}></Stack.Screen>
+          component={listStudent}
+          options={{
+            headerTintColor: '#FEFEFE',
+            headerTitleAlign: 'center',
+
+            headerStyle: {
+              backgroundColor: '#4B75F2',
+            },
+          }}></Stack.Screen>
         <Stack.Screen
           name="Thông tin sinh viên"
-          component={information}></Stack.Screen>
+          component={information}
+          options={{
+            headerTintColor: '#FEFEFE',
+            headerTitleAlign: 'center',
+            headerStyle: {
+              backgroundColor: '#4B75F2',
+            },
+          }}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

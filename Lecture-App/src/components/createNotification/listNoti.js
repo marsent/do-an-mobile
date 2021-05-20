@@ -1,17 +1,21 @@
 import React, {useState, Component, useEffect} from 'react';
 import {
-  KeyboardAvoidingView,
   View,
   Text,
   StyleSheet,
-  TextInput,
-  Button,
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  Image,
+  Button,
+  Modal,
 } from 'react-native';
-
-export default function Notification() {
+import 'react-native-gesture-handler';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
+import {createStackNavigator, HeaderTitle} from '@react-navigation/stack';
+import CreateNotification from '../createNotification/createNotification';
+import Image1 from '../../asset/add.png';
+function Notification() {
   const notification_data = [
     {
       ID: '123',
@@ -29,24 +33,12 @@ export default function Notification() {
       Update_date: '02/02/2021',
       Status: '0',
     },
-    {
-      ID: '123',
-      Name: 'Domo 1',
-      Content: 'Content 1',
-      Date_created: '01/01/2021',
-      Update_date: '01/01/2021',
-      Status: '1',
-    },
   ];
-
   return (
     <SafeAreaView style={styles.Container}>
-      <View style={styles.headerView}>
-        <Text style={styles.headerText}>Thông báo</Text>
-      </View>
       <ScrollView style={styles.NotiView}>
-        {notification_data.map((item, key) => (
-          <View key={key} style={styles.NotiText}>
+        {notification_data.map((item, i) => (
+          <View key={i} style={styles.NotiText}>
             <Text style={styles.TitleText}>{item.Name} </Text>
             <Text style={styles.ContentText}>{item.Content} </Text>
             <Text style={styles.Notification_date}>{item.Update_date} </Text>
@@ -56,7 +48,55 @@ export default function Notification() {
     </SafeAreaView>
   );
 }
-
+const Stack = createStackNavigator();
+function App() {
+  const [modalVisible, setModalVisible] = useState(false);
+  return (
+    <NavigationContainer>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        backdrop={true}
+        position="center"
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <CreateNotification />
+            <Button
+              style={[styles.button, styles.buttonClose]}
+              title="Tạo thông báo"
+              onPress={() => setModalVisible(!modalVisible)}
+            />
+          </View>
+        </View>
+      </Modal>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Danh sách thông báo"
+          component={Notification}
+          options={{
+            headerTintColor: '#FEFEFE',
+            headerTitleAlign: 'center',
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(true);
+                }}>
+                <Image style={styles.image} source={Image1} />
+              </TouchableOpacity>
+            ),
+            headerStyle: {
+              backgroundColor: '#4B75F2',
+            },
+          }}></Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -100,4 +140,32 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#262626',
   },
+  image: {
+    height: 40,
+    width: 40,
+    marginRight: 10,
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
 });
+export default App;

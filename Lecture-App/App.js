@@ -10,6 +10,9 @@ import ListNoti from './src/components/createNotification/listNoti';
 import {Provider as PaperProvider} from 'react-native-paper';
 import {BottomNavigation} from 'react-native-paper';
 import detail from './src/components/accountDetail';
+
+import {TokenProvider} from './src/Context/TokenContext';
+
 const App = () => {
   // const [token, setToken] = useState();
   // if (!token) {
@@ -19,6 +22,7 @@ const App = () => {
   //     </PaperProvider>
   //   )
   // }
+  const [token, setToken] = useState('');
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {key: 'ListClass', title: 'Quản lý lớp học', icon: 'calendar-clock'},
@@ -30,13 +34,16 @@ const App = () => {
     ListNoti: ListNoti,
     detail: detail,
   });
+  if (!token) return <Login token={token} setToken={setToken} />;
   return (
-    <BottomNavigation
-      navigationState={{index, routes}}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-      barStyle={{backgroundColor: '#4B75F2'}}
-    />
+    <TokenProvider value={token}>
+      <BottomNavigation
+        navigationState={{index, routes}}
+        onIndexChange={setIndex}
+        renderScene={renderScene}
+        barStyle={{backgroundColor: '#4B75F2'}}
+      />
+    </TokenProvider>
   );
 };
 
