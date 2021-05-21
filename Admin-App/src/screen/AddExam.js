@@ -235,7 +235,7 @@ export default AddExam = () => {
                         : null
                     }
 
-                    {uploadExam ? (<View style={{ width: '50%', alignItems: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    {uploadExam ? (<View style={{ width: '70%', alignItems: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                         {/* <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
                             <Text style={{ fontFamily: 'Inter', fontSize: 16, marginLeft: 10, marginRight: "20%" }}>Tên file:</Text>
 
@@ -250,36 +250,63 @@ export default AddExam = () => {
                             </View>
                         </View> */}
                         <View >
-                            <Button title="Tạo đề thi" onPress={handlerSubmit} />
+                            {/* <Button title="Tạo đề thi" onPress={handlerSubmit} /> */}
+                            <View>
+                                <TouchableOpacity
+                                    style={{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', width: 140, borderRadius: 30, elevation: 5, paddingVertical: 5 }}
+                                    onPress={handlerSubmit}                                >
+                                    <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}>Tạo đề thi</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                         <View>
-                            <Button title='Hủy đề thi' onPress={() => {
+                            {/* <Button title='Hủy đề thi' onPress={() => {
                                 setUploadExam(false)
                                 setPrevewQuestions(false)
                                 setQuestions()
-                            }} />
+                            }} /> */}
+                            <View>
+                                <TouchableOpacity
+                                    style={{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', width: 140, borderRadius: 30, elevation: 5, paddingVertical: 5 }}
+                                    onPress={() => {
+                                        setUploadExam(false)
+                                        setPrevewQuestions(false)
+                                        setQuestions()
+                                    }}                               >
+                                    <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}>Hủy đề thi</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>)
                         : <View style={{ marginTop: 10 }}>
-                            <Button title='Chọn file Đề thi' onPress={handlerUploadExam} />
+                            {/* <Button title='Chọn file Đề thi' onPress={handlerUploadExam} /> */}
+                            <View>
+                                <TouchableOpacity
+                                    style={{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', width: 170, borderRadius: 30, elevation: 5, paddingVertical: 5 }}
+                                    onPress={handlerUploadExam}                                 >
+                                    <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}>Thêm File đề thi</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     }
                     <Toast ref={(ref) => Toast.setRef(ref)} />
                 </View>
 
-                <TouchableOpacity onPress={() => setPrevewQuestions(!previewQuestions)}>
-                    {uploadExam ? !previewQuestions ?
-                        (
-                            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
-                                <Text style={{ fontFamily: 'Inter', marginRight: 2 }}>Xe trước đề thi</Text>
-                                <Icon name='chevron-down' />
-                            </View>
-                        )
-                        : <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
-                            <Text style={{ fontFamily: 'Inter', marginRight: 2 }}>Thu gọn </Text>
-                            <Icon name='chevron-up' />
-                        </View> : null}
-                </TouchableOpacity>
+                <View style={{ marginTop: 10 }}>
+                    <TouchableOpacity onPress={() => setPrevewQuestions(!previewQuestions)}>
+                        {uploadExam ? !previewQuestions ?
+                            (
+                                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
+                                    <Text style={{ fontFamily: 'Inter', marginRight: 2 }}>Xe trước đề thi</Text>
+                                    <Icon name='chevron-down' />
+                                </View>
+                            )
+                            : <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
+                                <Text style={{ fontFamily: 'Inter', marginRight: 2 }}>Thu gọn </Text>
+                                <Icon name='chevron-up' />
+                            </View> : null}
+                    </TouchableOpacity>
+                </View>
 
                 {previewQuestions ? (
                     <View style={{ alignItems: 'center', marginBottom: 50 }}>

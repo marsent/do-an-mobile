@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Text, View, ScrollView, TextInput, Button, ToastAndroid, Platform } from 'react-native'
+import { Text, View, ScrollView, TextInput, Button, ToastAndroid, Platform, TouchableOpacity } from 'react-native'
 import HeaderText from '../components/HeaderText'
 import Toast from 'react-native-toast-message';
 
@@ -66,10 +66,18 @@ export default Login = ({ token, setToken }) => {
                         {!error.password ? null : <Text style={styles.textErr}>{error.password}</Text>}
                         {!error.messages ? null : <Text style={styles.textErr}>{error.messages}</Text>}
                     </View>
-                    <Button
+                    {/* <Button
                         title="Đăng nhập"
                         onPress={onLoginPress} messages
-                    />
+                    /> */}
+                    <View>
+                        <TouchableOpacity
+                            style={{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', width: 150, borderRadius: 30, elevation: 5, paddingVertical: 5 }}
+                            onPress={onLoginPress}
+                        >
+                            <Text style={{ fontFamily: 'Inter', fontSize: 20, color: '#FFFFFF' }}>Đăng nhập</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View >
             </ScrollView>
             <Toast ref={(ref) => Toast.setRef(ref)} />

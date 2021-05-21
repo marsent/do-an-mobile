@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, TextInput, TouchableOpacity, Button } from 'react-native';
+import { View, ScrollView, TextInput, TouchableOpacity, Button, Text } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { Picker } from '@react-native-picker/picker';
@@ -8,7 +8,6 @@ import Toast from 'react-native-toast-message';
 
 
 import HeaderText from '../components/HeaderText'
-import Text from '../components/Text'
 
 import styles from '../style/style'
 import { apiURL, yearList } from '../config/config'
@@ -181,11 +180,19 @@ const AddStudent = () => {
 
 
                     </View>
-                    <Button
+                    {/* <Button
                         style={styles.button}
                         title="Thêm tài khoản"
                         onPress={onSubmitPress}
-                    />
+                    /> */}
+                    <View>
+                        <TouchableOpacity
+                            style={{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', width: 170, borderRadius: 30, elevation: 5, paddingVertical: 5 }}
+                            onPress={onSubmitPress}
+                        >
+                            <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}>Thêm tài khoản</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </ScrollView>
             <Toast ref={(ref) => Toast.setRef(ref)} />

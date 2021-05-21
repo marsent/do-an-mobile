@@ -152,11 +152,19 @@ const AddStudent = () => {
                         </View>
 
                     </View>
-                    <Button
+                    {/* <Button
                         style={styles.button}
                         title="Thêm tài khoản"
                         onPress={onSubmitPress}
-                    />
+                    /> */}
+                    <View>
+                        <TouchableOpacity
+                            style={{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', width: 170, borderRadius: 30, elevation: 5, paddingVertical: 5 }}
+                            onPress={onSubmitPress}
+                        >
+                            <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}>Thêm tài khoản</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </ScrollView>
             <Toast ref={(ref) => Toast.setRef(ref)} />
