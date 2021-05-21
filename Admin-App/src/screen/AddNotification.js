@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, Button } from "react-native";
+import { View, Text, ScrollView, TextInput, Button, TouchableOpacity } from "react-native";
 import styles from '../style/style'
     ; import { Picker } from '@react-native-picker/picker';
 import HeaderText from '../components/HeaderText';
@@ -13,7 +13,7 @@ export default AddNotifiacaion = () => {
             <ScrollView>
                 <View style={styles.container}>
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%', marginTop: 50 }}>
-                        <Text style={{ textAlign: 'center', fontFamily: 'Inter' }}>Lớp</Text>
+                        <Text style={{ textAlign: 'center', fontFamily: 'Inter', fontSize: 18 }}>Lớp:</Text>
                         <Picker
                             selectedValue={codeClass}
                             onValueChange={(value) => setCodeClass(value)}
@@ -25,7 +25,7 @@ export default AddNotifiacaion = () => {
                         </Picker>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '60%' }}>
-                        <Text style={{ textAlign: 'center', fontFamily: 'Inter' }}>Loại thông báo</Text>
+                        <Text style={{ textAlign: 'center', fontFamily: 'Inter', fontSize: 18 }}>Loại thông báo:</Text>
                         <Picker
                             selectedValue={codeClass}
                             onValueChange={(value) => setType(value)}
@@ -46,7 +46,14 @@ export default AddNotifiacaion = () => {
                         />
                     </View>
                     <View style={{ marginTop: 20 }}>
-                        <Button title='Tạo thông báo' />
+                        <View>
+                            <TouchableOpacity
+                                style={{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', width: 150, borderRadius: 30, elevation: 5, paddingVertical: 5 }}
+                            // onPress={handlerSubmit}
+                            >
+                                <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}>Tạo thông báo</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View >
             </ScrollView>

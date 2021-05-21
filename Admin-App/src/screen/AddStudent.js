@@ -148,7 +148,7 @@ const AddStudent = () => {
 
                         {/* Year */}
                         <View style={[styles.viewPicker, { width: '70%', marginLeft: 10 }]}>
-                            <Text style={{ fontFamily: 'Inter' }}>Năm học:</Text>
+                            <Text style={{ fontFamily: 'Inter', fontSize: 18 }}>Năm học:</Text>
                             <Picker
                                 selectedValue={account.year}
                                 onValueChange={(val, index) => {
@@ -165,7 +165,7 @@ const AddStudent = () => {
 
                         {/* Class */}
                         <View style={[styles.viewPicker, { width: '70%', marginLeft: 10 }]}>
-                            <Text style={{ fontFamily: 'Inter' }}>Lớp:</Text>
+                            <Text style={{ fontFamily: 'Inter', fontSize: 18 }}>Lớp:</Text>
                             <Picker
                                 selectedValue={account.class}
                                 onValueChange={(val, index) => setAccount({ ...account, class_id: val })}

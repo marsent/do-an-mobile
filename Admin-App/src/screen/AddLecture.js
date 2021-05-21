@@ -136,7 +136,7 @@ const AddStudent = () => {
 
                         {/* Faculty */}
                         <View style={[styles.viewPicker, { width: '70%', marginLeft: 10 }]}>
-                            <Text style={{ fontFamily: 'Inter', marginRight: '20%' }}>Khoa:</Text>
+                            <Text style={{ fontFamily: 'Inter', marginRight: '20%', fontSize: 18 }}>Khoa:</Text>
                             <Picker
                                 selectedValue={account.year}
                                 onValueChange={(val, index) => {

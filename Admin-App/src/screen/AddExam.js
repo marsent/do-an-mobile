@@ -148,7 +148,7 @@ export default AddExam = () => {
                     <View style={{ width: '90%', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center' }}>
                         <RadioButton.Group value={type} onValueChange={val => setType(val)}>
                             <View style={[styles.viewRadioGroup, { width: '90%', marginBottom: 10, marginLeft: 5 }]}>
-                                <Text style={{ fontFamily: 'Inter', fontSize: 16 }}>Loại cuộc thi:</Text>
+                                <Text style={{ fontFamily: 'Inter', fontSize: 18 }}>Loại cuộc thi:</Text>
                                 <View style={[styles.viewRadio]}>
                                     <Text style={{ fontFamily: 'Inter' }}>All</Text>
                                     <RadioButton value='all' />
@@ -179,10 +179,9 @@ export default AddExam = () => {
                         {!error.name ? null : <Text style={styles.textErr}>{error.name}</Text>}
 
                     </View>
-
                     {/* Time */}
                     <View style={{ width: '90%', díplay: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ fontFamily: 'Inter', fontSize: 16, marginLeft: 10 }} >Thời gian làm bài</Text>
+                        <Text style={{ fontFamily: 'Inter', fontSize: 16, marginLeft: 10, fontSize: 18 }} >Thời gian làm bài</Text>
                         <Picker
                             style={{ width: '40%' }}
                             onValueChange={val => setTime(val)}
@@ -196,13 +195,14 @@ export default AddExam = () => {
                             <Picker.Item label='180 phút' value={180} />
                         </Picker>
                     </View>
+
                     {/* TypeExam */}
                     {type === 'class' ? (
                         <View style={[styles.viewPicker, { width: '90%' }]}>
-                            <Text style={{ fontFamily: 'Inter', fontSize: 16, marginLeft: 13 }}>Lớp:</Text>
+                            <Text style={{ fontFamily: 'Inter', fontSize: 18, marginLeft: 13 }}>Lớp:</Text>
                             <Picker
                                 selectedValue={year}
-                                style={{ width: '60%' }}
+                                style={{ width: '40%', marginRight: '18%' }}
                                 onValueChange={(val) => {
                                     setClassId(val);
                                 }}

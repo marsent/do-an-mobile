@@ -75,7 +75,7 @@ export default Login = ({ token, setToken }) => {
                             style={{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', width: 150, borderRadius: 30, elevation: 5, paddingVertical: 5 }}
                             onPress={onLoginPress}
                         >
-                            <Text style={{ fontFamily: 'Inter', fontSize: 20, color: '#FFFFFF' }}>Đăng nhập</Text>
+                            <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}>Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
                 </View >
