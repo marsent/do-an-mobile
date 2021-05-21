@@ -179,10 +179,10 @@ const StudentList = () => {
     return (
         <View>
             <HeaderText>Danh sách sinh viên</HeaderText>
-            <ScrollView>
-                <View style={[styles.container]}>
-                    {/* Chọn khoa */}
-                    <View style={[styles.viewPicker, { borderWidth: 1, width: '90%' }]}>
+            {/* <ScrollView>
+                <View style={[styles.container]}> */}
+            {/* Chọn khoa */}
+            {/* <View style={[styles.viewPicker, { borderWidth: 1, width: '90%' }]}>
                         <Text style={{ fontSize: 18 }}>Khoa</Text>
 
                         <Picker
@@ -195,9 +195,9 @@ const StudentList = () => {
                                 key={val}
                             />)}
                         </Picker>
-                    </View>
-                    {/* Year picker */}
-                    <View style={[styles.viewPicker, { borderWidth: 1, width: '90%' }]}>
+                    </View> */}
+            {/* Year picker */}
+            {/* <View style={[styles.viewPicker, { borderWidth: 1, width: '90%' }]}>
                         <Text style={{ fontSize: 18 }}>Lớp</Text>
                         <Picker
                             style={{ width: '60%' }}
@@ -209,9 +209,9 @@ const StudentList = () => {
                                 key={val.toString()}
                             />)}
                         </Picker>
-                    </View>
-                    {/* Class picker */}
-                    <View style={[styles.viewPicker, { borderWidth: 1, width: '90%' }]}>
+                    </View> */}
+            {/* Class picker */}
+            {/* <View style={[styles.viewPicker, { borderWidth: 1, width: '90%' }]}>
                         <Text style={{ fontSize: 18 }}>Lớp</Text>
                         <Picker
                             style={{ width: '60%' }}
@@ -234,7 +234,7 @@ const StudentList = () => {
                         })}
                     </View>
                 </View>
-            </ScrollView>
+            </ScrollView> */}
         </View>
     );
 };

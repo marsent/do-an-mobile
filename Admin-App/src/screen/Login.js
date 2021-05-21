@@ -30,7 +30,13 @@ export default Login = ({ token, setToken }) => {
             .then(res => {
                 if (res.error == 4000) return setError(res.messages);
                 if (res.error == 7000) return setError({ messages: 'Tài khoản hoặc mật khẩu không chính xác' })
-                showToast('Đăng nhập thành công')
+                Toast.show({
+                    type: 'success',
+                    position: 'top',
+                    text1: 'Đăng nhập thành công',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                })
                 return setTimeout(() => setToken(res.data.token), 1000)
             })
 
@@ -61,13 +67,12 @@ export default Login = ({ token, setToken }) => {
                         {!error.messages ? null : <Text style={styles.textErr}>{error.messages}</Text>}
                     </View>
                     <Button
-                        style={styles.button}
                         title="Đăng nhập"
                         onPress={onLoginPress} messages
                     />
-                    <Toast ref={(ref) => Toast.setRef(ref)} />
                 </View >
             </ScrollView>
+            <Toast ref={(ref) => Toast.setRef(ref)} />
         </View >
     )
 }

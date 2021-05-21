@@ -27,7 +27,7 @@ export default StyleSheet.create({
         position: 'relative',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#4B75F2',
+        backgroundColor: '#0779FC',
         paddingVertical: '2.5%',
     },
     inputView: {

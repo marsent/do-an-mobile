@@ -25,7 +25,7 @@ const Drawer = createDrawerNavigator();
 import { TokenProvider } from './src/Context/TokenContext'
 
 const App = () => {
-  const [token, setToken] = useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDhjZDU5ZDFiYzNmODYzNzQ4ZDliNzQiLCJwaG9uZSI6IjAxMjM0NTY3ODkiLCJpYXQiOjE2MjE0Mjg4Njl9.0daqR90rUnesWQlVONGefhe6rOGU-XaxqCU0oUZ5EjM');
+  const [token, setToken] = useState('');
   if (!token) return <Login token={token} setToken={setToken} />
   return (
     <NavigationContainer>
@@ -37,7 +37,8 @@ const App = () => {
         >
           {/* <Drawer.Screen name="Home" component={Login} /> */}
           {/* <Drawer.Screen name="Thêm tài khoản" component={SetAccount} initialParams={{ token }} /> */}
-          <Drawer.Screen name="Tạo thông báo" component={AddNotification} />
+          <Drawer.Screen name="Tạo thông báo" component={AddNotification}
+          />
           <Drawer.Screen name="Thêm cuộc thi" component={ExamManagement} initialParams={{ token }} />
           <Drawer.Screen name="Quản lý sinh viên" component={StudentManagement} />
           <Drawer.Screen name="Quản lý giảng viên" component={LecturerManagement} />

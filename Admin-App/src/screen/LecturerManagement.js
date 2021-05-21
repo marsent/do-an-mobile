@@ -1,11 +1,11 @@
 import React from 'react'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+const Tab = createMaterialBottomTabNavigator();
 import Icon from 'react-native-vector-icons/FontAwesome'
 
 import AddLecture from './AddLecture';
 import LectureList from './LectureList'
 
-const Tab = createBottomTabNavigator();
 
 
 

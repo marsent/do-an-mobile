@@ -1,10 +1,11 @@
 import React from 'react'
 import { View } from 'react-native'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+const Tab = createMaterialBottomTabNavigator();
 import AddStudent from './AddStudent';
 import StudentList from './StudentList'
 import Icon from 'react-native-vector-icons/FontAwesome'
-const Tab = createBottomTabNavigator();
+
 export default StudentManagement = () => {
 
 
