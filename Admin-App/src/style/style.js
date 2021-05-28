@@ -42,7 +42,6 @@ export default StyleSheet.create({
         borderRadius: 20,
         borderColor: '#E9EEF4',
         fontFamily: 'Inter',
-        marginTop: 15
     },
     inputArea: {
         height: 150

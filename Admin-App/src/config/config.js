@@ -8,4 +8,5 @@ const value = {
 }
 
 export const yearList = years;
-export const apiURL = 'http://quocha.xyz/api'
+export const apiURL = 'http://localhost:3000/api'
+export const authUrl = 'http://localhost:3000/auth/admin/sign-in'

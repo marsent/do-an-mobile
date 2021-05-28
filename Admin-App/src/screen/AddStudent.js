@@ -96,7 +96,7 @@ const AddStudent = () => {
                         </View>
 
                         {/* Phone */}
-                        <View>
+                        <View style={{ marginTop: 10 }}>
                             <TextInput
                                 style={[styles.input, !error.phone ? null : styles.borderErr]}
                                 placeholder='Số điện thoại'
@@ -106,7 +106,7 @@ const AddStudent = () => {
                         </View>
 
                         {/* Full nme */}
-                        <View>
+                        <View style={{ marginTop: 10 }}>
                             <TextInput
                                 style={[styles.input, !error.full_name ? null : styles.borderErr]}
                                 placeholder='Họ tên'

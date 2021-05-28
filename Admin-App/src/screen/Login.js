@@ -3,8 +3,10 @@ import { Text, View, ScrollView, TextInput, Button, ToastAndroid, Platform, Touc
 import HeaderText from '../components/HeaderText'
 import Toast from 'react-native-toast-message';
 
-
+import { authUrl } from '../config/config'
 import styles from '../style/style'
+
+
 
 export default Login = ({ token, setToken }) => {
     const [account, setAccount] = useState({ phone: '', password: '' })
@@ -16,7 +18,7 @@ export default Login = ({ token, setToken }) => {
         e.preventDefault();
 
 
-        await fetch('http://quocha.xyz/auth/admin/sign-in', {
+        await fetch(authUrl, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',

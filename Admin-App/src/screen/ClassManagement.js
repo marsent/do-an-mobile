@@ -1,31 +1,24 @@
-import React from 'react'
-import { View } from 'react-native'
+import React from 'react';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
-
-const Stack = createStackNavigator();
-const Tab = createMaterialBottomTabNavigator();
-
-
-
-import AddStudent from './AddStudent';
-import StudentList from './StudentList'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
-export default StudentManagement = () => {
+import AddClass from './AddClass';
+import ClassList from './ClassList';
 
 
+const Tab = createMaterialBottomTabNavigator();
 
+const ClassManagement = () => {
     return (
         <Tab.Navigator
-            initialRouteName="Danh sách"
+            initialRouteName="Thêm mới"
             tabBarOptions={{
                 activeTintColor: '#0598FC',
             }}
         >
             <Tab.Screen
                 name="Thêm mới"
-                component={AddStudent}
+                component={AddClass}
                 options={{
                     tabBarLabel: "Thêm mới",
                     tabBarIcon: ({ color, size }) => (
@@ -33,10 +26,9 @@ export default StudentManagement = () => {
 
                 }}
             />
-
             <Tab.Screen
                 name="Danh sách"
-                component={StudentList}
+                component={ClassList}
                 options={{
                     tabBarLabel: "Danh sách",
                     tabBarIcon: ({ color, size }) => (
@@ -44,7 +36,8 @@ export default StudentManagement = () => {
                     )
                 }}
             />
-
         </Tab.Navigator>
-    )
-}
+    );
+};
+
+export default ClassManagement;
