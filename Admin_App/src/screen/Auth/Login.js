@@ -17,8 +17,7 @@ export default Login = ({ token, setToken }) => {
     const showToast = (message) => {
         ToastAndroid.showWithGravityAndOffset(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM, 25, 90)
     }
-    const onLoginPress = async (e) => {
-        e.preventDefault();
+    const onLoginPress = async () => {
         SetIsLoading(true)
         await setTimeout(async () => {
             await fetch(authUrl, {
@@ -77,7 +76,7 @@ export default Login = ({ token, setToken }) => {
                     </View>
 
 
-                    <Button onPress={() => onLoginPress}>Đăng nhập</Button>
+                    <Button onPress={() => onLoginPress()}>Đăng nhập</Button>
                 </View >
             </View>
             <Toast ref={(ref) => Toast.setRef(ref)} />
