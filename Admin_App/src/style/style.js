@@ -57,6 +57,7 @@ export default StyleSheet.create({
 
     },
     borderErr: {
+        borderWidth: 1,
         borderColor: '#ED557A'
     },
     viewPicker: {
