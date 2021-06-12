@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
-import { View, ToastAndroid, Image } from 'react-native'
-import HeaderText from '../../components/HeaderText'
+import React, { useEffect, useState, Component } from 'react'
+import { View, ToastAndroid, SafeAreaView } from 'react-native'
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import Modal from 'react-native-modal'
+import Spinkit from 'react-native-spinkit';
+import { Checkbox } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import LoadingModal from '../../components/LoadingModal';
 import { authUrl } from '../../config/config'
@@ -15,12 +19,29 @@ export default Login = ({ token, setToken }) => {
     const [account, setAccount] = useState({ phone: '', password: '' })
     let [error, setError] = useState({ phone: false, password: false });
     const [isLoading, SetIsLoading] = useState(false);
+    const [savePassword, setSavePassword] = useState(false)
 
-    const showToast = (message) => {
-        ToastAndroid.showWithGravityAndOffset(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM, 25, 90)
+    useEffect(async () => {
+        let data = await getPassword()
+        if (data) {
+            setSavePassword(true)
+            setAccount({ phone: data.phone, password: data.password })
+
+        }
+
+    }, [])
+    useEffect(async () => {
+        await handlerSavePassword()
+    }, [savePassword])
+    const handlerSavePassword = async () => {
+        if (savePassword) {
+            await storagePassword(JSON.stringify(account))
+        } else {
+            await storagePassword('')
+        }
     }
     const onLoginPress = async () => {
-        SetIsLoading(true)
+        await SetIsLoading(true)
         await setTimeout(async () => {
             await fetch(authUrl, {
                 method: 'POST',
@@ -32,30 +53,45 @@ export default Login = ({ token, setToken }) => {
                     phone: account.phone,
                     password: account.password
                 })
-            }).then(res => res.json())
-                .then(res => {
-                    SetIsLoading(false)
-                    if (res.error == 4000) return setError(res.messages);
-                    if (res.error == 7000) return setError({ messages: 'Tài khoản hoặc mật khẩu không chính xác' })
-                    setError({ phone: false, password: false })
-                    Toast.show({
-                        type: 'success',
-                        position: 'top',
-                        text1: 'Đăng nhập thành công',
-                        visibilityTime: 2000,
-                        autoHide: true,
-                    })
-                    return setTimeout(() => setToken(res.data.token), 1000)
+            }).then(async (res) => {
+                return await res.json()
+            })
+                .then(async (res) => {
+                    await SetIsLoading(false)
+
+                    if (res.error == 4000) {
+                        return setError(res.messages);
+                    }
+                    if (res.error == 7000) {
+                        return setError({ messages: 'Tài khoản hoặc mật khẩu không chính xác' })
+                    }
+                    await setError({ phone: false, password: false })
+                    setToken(res.data.token)
+                    return await SetIsLoading(false)
+
+
                 })
         }, 2000)
+        handlerSavePassword()
     }
 
     return (
-        <View style={{ flex: 1 }}>
-            <LoadingModal isVisible={isLoading} />
+        <SafeAreaView style={{ flex: 1 }}>
+            {isLoading && <Modal isVisible={true}
+                backdropColor='#0598FC'
+                backdropOpacity={1}
+                animationIn='fadeInDown'
+                animationInTiming={1000}
+            >
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
+                    <View style={{ alignItems: 'center' }}>
+                        <Spinkit type='FadingCircleAlt' color='#FFFFF' size={50} />
+                        <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}> Đang đăng nhập</Text>
+                    </View>
+                </View>
+            </Modal>}
             <View style={{ height: '40%', borderBottomLeftRadius: 120, backgroundColor: '#0598FC', justifyContent: 'space-around', alignItems: 'center' }}>
                 <Icon name='user-cog' size={56} color='#FFFFFF' />
-                {/* <Text size={} color='#FFFFFF'>Đăng nhập</Text> */}
             </View>
             <View style={{ flex: 1, marginTop: 50 }}>
                 <View style={styles.container}>
@@ -77,6 +113,14 @@ export default Login = ({ token, setToken }) => {
                             errorMessage={error.password}
                         />
                         {error.messages && <Text size={14} style={styles.textErr}>{error.messages}</Text>}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, marginLeft: 5 }}>
+                            <Checkbox
+                                status={savePassword ? 'checked' : 'unchecked'}
+                                onPress={() => setSavePassword(!savePassword)}
+                                color='#0598FC'
+                            />
+                            <Text>Nhớ mật khẩu</Text>
+                        </View>
                     </View>
                     <Button onPress={() => onLoginPress()}>Đăng nhập</Button>
 
@@ -86,7 +130,23 @@ export default Login = ({ token, setToken }) => {
                     </View>
                 </View >
             </View>
-            <Toast ref={(ref) => Toast.setRef(ref)} />
-        </View >
+        </SafeAreaView >
     )
+}
+const storagePassword = async (data) => {
+    try {
+        await AsyncStorage.setItem('account', data)
+    } catch (err) {
+        console.log('Save Error: ', err);
+    }
+}
+
+const getPassword = async () => {
+    let data = '';
+    try {
+        data = await AsyncStorage.getItem('account')
+        return data != null ? JSON.parse(data) : null
+    } catch (err) {
+        console.log('Read Error: ', err);
+    }
 }

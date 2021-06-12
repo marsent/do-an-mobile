@@ -21,10 +21,7 @@ import { TokenProvider } from './src/Context/TokenContext'
 const App = () => {
 
   const [token, setToken] = useState('');
-  // useEffect(() => setToken(getToken()), [])
   if (!token) return <Login token={token} setToken={setToken} />
-  // useEffect(() => storageToken(token), [token])
-
   return (
     <NavigationContainer>
       <TokenProvider value={token} >
@@ -45,21 +42,10 @@ const App = () => {
   )
 };
 
-const storageToken = async (token) => {
-  try {
-    await AsyncStorage.setItem('@token', token)
-  } catch (err) {
-    console.log('Error: ', err);
-  }
-}
+import { YellowBox } from 'react-native';
 
-const getToken = async () => {
-  let token = '';
-  try {
-    token = await AsyncStorage.setItem('@token')
-  } catch (err) {
-    console.log('Error: ', err);
-  }
-  return token;
-}
+YellowBox.ignoreWarnings([
+  'Non-serializable values were found in the navigation state',
+]);
+
 export default App;
