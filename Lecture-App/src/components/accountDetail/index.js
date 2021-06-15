@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   StyleSheet,
   View,
@@ -13,19 +13,24 @@ import {
 } from 'react-native';
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
-import Image2 from '../../asset/arrow_back.png';
+import TokenContext from '../../Context/TokenContext';
 export default function AccountDetail() {
-  const accountData = {
-    ID: '18521467',
-    Avatar: Image1,
-    Name: 'Đào Huỳnh Minh Thuận',
-    DateOfBirth: '06/01/2000',
-    Phone: '0000000',
-    Address: 'KTX Khu B ĐHQG Tp. Hồ Chí Minh',
-    Status: '1',
-    Faculty: 'HTTT',
-    role: 'Giảng viên',
-  };
+  const token = useContext(TokenContext);
+  const [info, setInfo] = useState({});
+  useEffect(async () => {
+    await fetch('http://quocha.xyz/api/lecture', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then(res => res.json())
+      .then(res => {
+        setInfo(res.data);
+      });
+  });
   return (
     <View style={styles.Container}>
       <View style={styles.headerView}>
@@ -38,27 +43,25 @@ export default function AccountDetail() {
           <View style={styles.avatar}>
             <Avatar.Image size={140} source={Image1} />
           </View>
-          <Text style={styles.TitleText}>{accountData.Name}</Text>
-          <Text style={styles.SubTitleText}>
-            {accountData.ID} | {accountData.role}
-          </Text>
+          <Text style={styles.TitleText}>{info.full_name}</Text>
+          <Text style={styles.SubTitleText}>{info._id} | Giảng viên</Text>
         </View>
         <View style={styles.ContentText}>
           <View style={styles.SubContentText}>
             <Text style={styles.lable}>Ngày sinh:</Text>
-            <Text style={styles.textx}>{accountData.DateOfBirth}</Text>
+            <Text style={styles.textx}>{info.date_of_birth}</Text>
           </View>
           <View style={styles.SubContentText}>
-            <Text style={styles.lable}>Địa chỉ hiện tại:</Text>
-            <Text style={styles.textx}>{accountData.Address}</Text>
+            <Text style={styles.lable}>Email:</Text>
+            <Text style={styles.textx}>{info.email}</Text>
           </View>
           <View style={styles.SubContentText}>
             <Text style={styles.lable}>Khoa:</Text>
-            <Text style={styles.textx}>{accountData.Faculty}</Text>
+            <Text style={styles.textx}>{info.faculty}</Text>
           </View>
           <View style={styles.SubContentText}>
             <Text style={styles.lable}>Số điện thoại:</Text>
-            <Text style={styles.textx}>{accountData.Phone}</Text>
+            <Text style={styles.textx}>{info.phone}</Text>
           </View>
         </View>
       </View>

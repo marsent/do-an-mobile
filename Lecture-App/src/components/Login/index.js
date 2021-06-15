@@ -8,11 +8,13 @@ import {
   TextInput,
   Button,
 } from 'react-native';
-import {passwordValidator} from '../../helpers/passwordValidator';
-import {usernameValidator} from '../../helpers/usernameValidator';
+// import {passwordValidator} from '../../helpers/passwordValidator';
+// import {usernameValidator} from '../../helpers/usernameValidator';
+// import Toast from 'react-native-toast-message';
 export default Login = ({token, setToken}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
   let [error, setError] = useState({username: false, password: false});
   const onLoginPress = async e => {
     e.preventDefault();
@@ -36,7 +38,7 @@ export default Login = ({token, setToken}) => {
           return setError({
             messages: 'Tài khoản hoặc mật khẩu không chính xác',
           });
-        //   showToast('Đăng nhập thành công');
+
         return setTimeout(() => setToken(res.data.token), 1000);
       });
   };
