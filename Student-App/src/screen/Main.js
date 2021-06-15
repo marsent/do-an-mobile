@@ -15,6 +15,9 @@ import BubbleTabBar, {
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomTabBar from './MainStyle'
+import { FlexibleTabBarComponent, withCustomStyle } from 'react-navigation-custom-bottom-tab-component/FlexibleTabBarComponent';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView,Modal, Alert, Pressable  } from 'react-native';
 
 import TimeTable from '../components/TimeTable';
 import Notification from '../components/Notification';
@@ -29,18 +32,10 @@ const ADStack = createStackNavigator();
 
 const Tab = createMaterialBottomTabNavigator();
 
-
 const MainTabScreen = () => (
     <Tab.Navigator
       initialRouteName="TimeTable"
       activeColor="#fff"
-      tabBar={({ state, descriptors, navigation }) =>
-        <CustomTabBar
-          state={state}
-          descriptors={descriptors}
-          navigation={navigation}
-        />
-      }
     >
       <Tab.Screen
         name="TimeTable"
@@ -56,31 +51,29 @@ const MainTabScreen = () => (
       <Tab.Screen
         name="Exam"
         component={OEStackS}
-        // options={{
-        //   tabBarLabel: 'Kiểm tra',
-        //   tabBarColor: '#3891E9',
-        //   tabBarIcon: ({ color }) => (
-        //     <Icons name="add-task" color={color} size={26} />
-        //   ),          
-        // }}
-        options={({ navigation }) => {
-          const { routes, index } = navigation.dangerouslyGetState();
-          const { state: exploreState } = routes[index];
-          let tabBarVisible = true;
-          if (exploreState) {
-            const { routes: exploreRoutes, index: exploreIndex } = exploreState;
-            const exploreActiveRoute = exploreRoutes[exploreIndex];
-            if (exploreActiveRoute.name === "MainExam") tabBarVisible = false;
-          }
-          return {
-            tabBarVisible,
-            tabBarLabel: 'Kiểm tra',
-            tabBarColor: '#3891E9',
-            tabBarIcon: ({ color }) => (
-            <Icons name="add-task" color={color} size={26}/>
-            ),
-          };
+        options={{
+          tabBarLabel: 'Kiểm tra',
+          tabBarColor: '#3891E9',
+          tabBarIcon: ({ color }) => (
+            <Icons name="add-task" color={color} size={26} />
+          ),          
         }}
+        // options={({ navigation }) => {
+        //   const { routes, index } = navigation.dangerouslyGetState();
+        //   const { state: exploreState } = routes[index];
+        //   if (exploreState) {
+        //     const { routes: exploreRoutes, index: exploreIndex } = exploreState;
+        //     const exploreActiveRoute = exploreRoutes[exploreIndex];
+        //     if (exploreActiveRoute.name === "MainExam") {Tab.barStyle.add({display: 'none'});Tab.forceUpdate();}; 
+        //   };
+        //   return {
+        //     tabBarLabel: 'Kiểm tra',
+        //     tabBarColor: '#3891E9',
+        //     tabBarIcon: ({ color }) => (
+        //       <Icons name="add-task" color={color} size={26} />
+        //     ),
+        //   };
+        // }}
       />
       <Tab.Screen
         name="Notifications"
@@ -91,6 +84,7 @@ const MainTabScreen = () => (
           tabBarIcon: ({ color }) => (
             <Icon name="notifications-outline" color={color} size={26} />
           ),
+          
         }}
       />
       <Tab.Screen
@@ -122,11 +116,10 @@ const TTStackS = ({navigation}) => (
         }}>
             <TTStack.Screen name="TimeTable" component={TimeTable} options={{
             title:'Lịch học',
-            tabBarVisible: false,
             }} />
     </TTStack.Navigator>
 );
-const OEStackS = ({navigation}) => (
+const OEStackS = ({navigation, route}) => (
   <OEStack.Navigator screenOptions={{
           headerStyle: {
           backgroundColor: '#3891E9',
@@ -135,16 +128,49 @@ const OEStackS = ({navigation}) => (
           headerTitleStyle: {
           fontWeight: 'bold'
           },
-          headerTitleAlign: 'center'
-      }}>
+          headerTitleAlign: 'center',
+      }}
+      >
           <OEStack.Screen name="OnlineExam" component={OnlineExam} options={{
           title:'Kiểm tra',
           }} />
           <OEStack.Screen name="MainExam" component={mainExam} options={{
           title:'Kiểm tra',
-          }} />
+          
+          }}
+          
+          />
   </OEStack.Navigator>
 );
+// const OEStackS = ({ navigation, route }) => {
+//   React.useLayoutEffect(() => {
+//     if(tabHiddenRoutes.includes(getFocusedRouteNameFromRoute(route))){
+//       navigation.setOptions({tabBarVisible: false});
+//      }else{
+//      navigation.setOptions({tabBarVisible: true});
+//     }
+//   }, [navigation, route]);
+//   return(
+//     <OEStack.Navigator screenOptions={{
+//             headerStyle: {
+//             backgroundColor: '#3891E9',
+//             },
+//             headerTintColor: '#fff',
+//             headerTitleStyle: {
+//             fontWeight: 'bold'
+//             },
+//             headerTitleAlign: 'center'
+//         }}
+//         >
+//             <OEStack.Screen name="OnlineExam" component={OnlineExam} options={{
+//             title:'Kiểm tra',
+//             }} />
+//             <OEStack.Screen name="MainExam" component={mainExam} options={{
+//             title:'Kiểm tra',
+//             }} />
+//     </OEStack.Navigator>
+//   )};
+
 const NTStackS = ({navigation}) => (
   <NTStack.Navigator screenOptions={{
           headerStyle: {
@@ -177,4 +203,11 @@ const ADStackS = ({navigation}) => (
           }} />
   </ADStack.Navigator>
 );
-
+// const styles = StyleSheet.create({
+//   barstyle : {
+//     // display: "none"
+//   },
+//   sbarstyle : {
+//     display: "none"
+//   },
+// });
