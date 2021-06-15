@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, TouchableOpacity, TextInput, Button } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'
+import { View, Button } from 'react-native';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker'
 
@@ -12,6 +11,8 @@ import LoadingDataModal from '../../components/LoadingDataModal'
 import FlatList from '../../components/FlatList'
 import Text from '../../components/Text'
 import CustomButton from '../../components/Button'
+import { Search } from '../../components/TextInput'
+
 
 const ClassList = ({ navigation }) => {
     const token = useContext(TokenContext);
@@ -77,21 +78,16 @@ const ClassList = ({ navigation }) => {
             <HeaderText navigation={navigation}>Danh sách lớp học</HeaderText>
             <View style={{ flex: 1 }}>
                 <View style={[styles.container]}>
-                    <View style={[styles.inputView,]}>
-                        {/* Search bar */}
-                        <View style={{ display: 'flex', flexDirection: 'row', borderRadius: 20, marginTop: 20 }}>
-                            <TextInput
-                                style={[styles.input, { textAlign: 'center', margin: 0, width: '90%', borderTopRightRadius: 0, borderBottomRightRadius: 0, borderRightWidth: 0 }]}
-                                placeholder='Tên lớp'
-                                onChangeText={text => setKeyWord(text)}
-                            />
-                            <TouchableOpacity
-                                style={{ borderWidth: 1, width: '10%', alignItems: 'center', backgroundColor: '#F8FAFD', borderTopRightRadius: 20, borderBottomRightRadius: 20, borderColor: '#E9EEF4', borderLeftWidth: 0 }}
-                                onPress={() => { setModalVisible(true) }}
-                            >
-                                <Icon name='sort-down' size={28} color='#495057' />
-                            </TouchableOpacity>
-                        </View>
+                    <View style={{ width: '90%', marginTop: 10 }} >
+                        <Search
+                            placeholder='Tên bài thi'
+                            value={keyWord}
+                            onChangeText={val => setKeyWord(val)}
+                            onEndEditing={() => handlerSearch()}
+                            onSearch={() => handlerSearch()}
+                            onFilter={() => { setModalVisible(true) }}
+                        />
+
                     </View>
 
                     {/* List Class */}
@@ -144,9 +140,9 @@ const ClassItem = ({ item, navigation }) => {
                 <Text>Khoa quản lý: {item.faculty}</Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
-                    <Button title='Chi tiết'
+                    {/* <Button title='Chi tiết'
                         onPress={() => navigation.navigate('ClassDetail', { item })}
-                    />
+                    /> */}
                 </View>
             </View>
         </View>

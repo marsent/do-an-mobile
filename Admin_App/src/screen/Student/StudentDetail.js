@@ -11,14 +11,75 @@ import Text from '../../components/Text';
 import Button from '../../components/Button';
 import TokenContext from '../../Context/TokenContext';
 import LoadingModal from '../../components/LoadingModal';
+import HeaderUserDetail from '../../components/HeaderUserDetail'
+
 const StudentDetail = ({ route, navigation }) => {
     const token = useContext(TokenContext);
+    const initStudent = {
+        "_id": "",
+        "class_id": "",
+        "date_of_birth": "",
+        "decrypt_pass": "",
+        "email": "",
+        "full_name": "",
+        "is_verified": "",
+        "password": "",
+        "phone": "",
+        "status": "",
+        "student_code": "",
+        "year": ''
+    }
+    const initClass = {
+        "_id": "60adfe4174ae7a46751debf",
+        "faculty": "",
+        "name": "",
+        "quantity": '',
+        "status": "",
+        "year": ''
+    }
 
-    const student = route.params.item;
-    const class_name = route.params.class_name;
+    const { _id } = route.params;
+    const [student, setStudent] = useState(initStudent)
     const [isEdit, setIsEdit] = useState(false)
-    const [status, setStatus] = useState(student.status)
     const [isLoading, setIsLoading] = useState(false);
+    const [Class, setClass] = useState(initClass)
+
+    useEffect(async () => {
+
+        await fetch(`${apiURL}/student/admin/${_id}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        }).then(res => res.json())
+            .then(async (res) => {
+                await setStudent(res.data)
+            })
+
+        return () => {
+            setStudent();
+            setClass();
+        }
+    }, [])
+
+    useEffect(async () => {
+        await fetch(`${apiURL}/class/admin/${student.class_id}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        }).then(res => res.json())
+            .then(async (res) => {
+                await setClass(res.data)
+            })
+
+    }, [student.class_id])
+
+
     const save = async () => {
         setIsEdit(false);
         setIsLoading(true)
@@ -30,10 +91,9 @@ const StudentDetail = ({ route, navigation }) => {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + token
                 },
-                body: JSON.stringify(status)
+                body: JSON.stringify(student.status)
             }).then(res => {
                 res.json()
-                console.log(res);
             }).then((res) => {
                 setIsLoading(false);
                 return Toast.show({
@@ -45,14 +105,14 @@ const StudentDetail = ({ route, navigation }) => {
                 })
             })
         }, 2000)
-
-
     }
 
     return (
         <SafeAreaView>
-            <CustomHeaderText navigation={navigation} >Chi tiết sinh viên</CustomHeaderText>
-            <LoadingModal isVisible={isLoading} />
+            {/* <CustomHeaderText navigation={navigation} >Chi tiết sinh viên</CustomHeaderText> */}
+            <HeaderUserDetail
+                onBackPress={() => navigation.goBack()}
+            />
             <View style={{ marginTop: 30, alignItems: 'center' }}>
 
                 <View style={{ width: '90%', marginLeft: '10%' }}>
@@ -70,7 +130,7 @@ const StudentDetail = ({ route, navigation }) => {
                     </CustomVIew>
                     <CustomVIew>
                         <Text>Lớp sinh hoạt:</Text>
-                        <CustomInput value={class_name} />
+                        <CustomInput value={Class.name} />
                     </CustomVIew>
                     <CustomVIew>
                         <Text>Số điện thoại:</Text>
@@ -86,8 +146,8 @@ const StudentDetail = ({ route, navigation }) => {
                             mode='dropdown'
                             itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
                             enabled={isEdit}
-                            selectedValue={status}
-                            onValueChange={val => setStatus(val)}
+                            selectedValue={student.status}
+                            onValueChange={val => setStudent({ ...student, status: val })}
                         >
                             <Picker.Item label='Active' value='active' />
                             <Picker.Item label='Disable' value='disable' />

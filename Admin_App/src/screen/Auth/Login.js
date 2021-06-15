@@ -7,17 +7,19 @@ import Spinkit from 'react-native-spinkit';
 import { Checkbox } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 import LoadingModal from '../../components/LoadingModal';
 import { authUrl } from '../../config/config'
 import styles from '../../style/style'
 import Button from '../../components/Button'
-import { TextInput, Password } from '../../components/TextInput'
+import TextInput from '../../components/TextInput'
+import Password from '../../components/Password'
 import Text from '../../components/Text'
 const img = require('../../../assets/public/img/online-course.png')
+import SubmitButton from '../../components/SubmitButton'
+
 export default Login = ({ token, setToken }) => {
     const [account, setAccount] = useState({ phone: '', password: '' })
-    let [error, setError] = useState({ phone: false, password: false });
+    const [error, setError] = useState({ phone: false, password: false });
     const [isLoading, SetIsLoading] = useState(false);
     const [savePassword, setSavePassword] = useState(false)
 
@@ -77,7 +79,7 @@ export default Login = ({ token, setToken }) => {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            {isLoading && <Modal isVisible={true}
+            {/* {isLoading && <Modal isVisible={true}
                 backdropColor='#0598FC'
                 backdropOpacity={1}
                 animationIn='fadeInDown'
@@ -89,7 +91,7 @@ export default Login = ({ token, setToken }) => {
                         <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}> Đang đăng nhập</Text>
                     </View>
                 </View>
-            </Modal>}
+            </Modal>} */}
             <View style={{ height: '40%', borderBottomLeftRadius: 120, backgroundColor: '#0598FC', justifyContent: 'space-around', alignItems: 'center' }}>
                 <Icon name='user-cog' size={56} color='#FFFFFF' />
             </View>
@@ -122,7 +124,13 @@ export default Login = ({ token, setToken }) => {
                             <Text>Nhớ mật khẩu</Text>
                         </View>
                     </View>
-                    <Button onPress={() => onLoginPress()}>Đăng nhập</Button>
+                    <SubmitButton
+                        isProcessing={isLoading}
+                        onPress={() => onLoginPress()}
+                        textProcessing='Đang xử lý...'
+                    >
+                        Đăng nhập
+                    </SubmitButton>
 
                     <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
                         <Text >Ứng dụng quản lý học vụ</Text>

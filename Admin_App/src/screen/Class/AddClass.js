@@ -9,6 +9,7 @@ import { yearList, facultyList, apiURL } from '../../config/config'
 import TokenContext from '../../Context/TokenContext'
 import LoadingModal from '../../components/LoadingModal'
 import Button from '../../components/Button'
+import SubmitButton from '../../components/SubmitButton'
 
 const AddClass = ({ navigation }) => {
     const token = useContext(TokenContext)

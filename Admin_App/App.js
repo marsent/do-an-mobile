@@ -20,7 +20,7 @@ import { TokenProvider } from './src/Context/TokenContext'
 
 const App = () => {
 
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDhjZDU5ZDFiYzNmODYzNzQ4ZDliNzQiLCJwaG9uZSI6IjAxMjM0NTY3ODkiLCJpYXQiOjE2MjM3NDU0NTN9.OPXyMNhipk3F8n4iLkrLLuatsewwWuAVXqcLyXBc2BE');
   if (!token) return <Login token={token} setToken={setToken} />
   return (
     <NavigationContainer>
@@ -42,10 +42,5 @@ const App = () => {
   )
 };
 
-import { YellowBox } from 'react-native';
-
-YellowBox.ignoreWarnings([
-  'Non-serializable values were found in the navigation state',
-]);
 
 export default App;

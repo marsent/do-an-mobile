@@ -1,9 +1,8 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { View, TextInput, Button, TouchableOpacity } from 'react-native';
+import { View, Button } from 'react-native';
 import HeaderText from '../../components/HeaderText';
 import { Picker } from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { createStackNavigator } from '@react-navigation/stack';
 import Modal from 'react-native-modal';
 
@@ -17,6 +16,10 @@ import ExamDetail from './ExamDetail';
 import LoadingDataModal from '../../components/LoadingDataModal';
 import FlatList from '../../components/FlatList';
 import CustomButton from '../../components/Button';
+import Search from '../../components/Search'
+import CardView from '../../components/CardView'
+
+
 const ExamList = ({ navigation }) => {
     const token = useContext(TokenContext);
     const [typeFilter, setTypeFilter] = useState('tất cả');
@@ -27,35 +30,54 @@ const ExamList = ({ navigation }) => {
     const [dumpType, setDumpType] = useState('tất cả')
     const [keyWord, setKeyWord] = useState('')
     useEffect(async () => {
-        setLoadingDataModal(true)
-        await fetch(`${apiURL}/exam/admin`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json()).then(res => {
-            setLoadingDataModal(false)
-            setExamList(res.data)
-            setDataExam(res.data)
-        })
-
+        try {
+            await fetch(`${apiURL}/exam/admin`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json()).then(res => {
+                setDataExam(res.data)
+                setExamList(res.data)
+            })
+        } catch (err) {
+            console.log('Error get examList: ', err);
+        }
+        return () => {
+            setDataExam();
+            setExamList()
+        }
     }, [])
 
-    useEffect(() => handlerSearch(), [keyWord])
     useEffect(() => handlerSearch(), [typeFilter])
+    useEffect(() => handlerSearch(), [keyWord])
+
+
 
     const handlerSearch = async () => {
+
+        await setLoadingDataModal(true)
         await setExamList(dataExam)
-        await setExamList(prevList => {
-            return prevList.filter(exam => {
-                if (typeFilter === 'tất cả') {
-                    return exam.name.includes(keyWord)
-                }
-                return exam.name.includes(keyWord) && exam.for === typeFilter
-            })
-        })
+        await setTimeout(async () => {
+            try {
+                await setExamList(prevList => {
+                    return prevList.filter(exam => {
+                        if (typeFilter === 'tất cả') {
+                            return exam.name.includes(keyWord)
+                        }
+                        return exam.name.includes(keyWord) && exam.for === typeFilter
+                    })
+                })
+                setLoadingDataModal(false)
+            }
+            catch (err) {
+                console.log('Error Search  : ', err)
+            }
+        }, 1000)
+
+
     }
 
     const toggleModal = async () => {
@@ -68,38 +90,27 @@ const ExamList = ({ navigation }) => {
             <HeaderText navigation={navigation}>Danh sách bài thi</HeaderText>
             <View style={{ flex: 1 }} >
                 <View style={[styles.container]}>
-                    <View style={[styles.inputView,]}>
-                        {/* Search bar */}
-                        <View style={{ flexDirection: 'row', borderRadius: 20, marginTop: 20 }}>
-                            <TextInput
-                                style={[styles.input, { textAlign: 'center', margin: 0, width: '90%', borderTopRightRadius: 0, borderBottomRightRadius: 0, borderRightWidth: 0 }]}
-                                placeholder='Tên bài thi'
-                                value={keyWord}
-                                onChangeText={text => { setKeyWord(text) }}
-                            />
-                            <TouchableOpacity
-                                style={{ width: '10%', alignItems: 'center', backgroundColor: '#F8FAFD', borderTopRightRadius: 20, borderBottomRightRadius: 20, borderColor: '#E9EEF4', borderLeftWidth: 0 }}
-                                onPress={() => { setModalVisible(true) }}
-                            >
-                                <View style={{ flex: 1, justifyContent: 'space-around' }}>
-                                    <Icon name='sort-down' size={24} color='#495057' />
-                                </View>
-                            </TouchableOpacity>
-                        </View>
+
+                    <View style={{ width: '90%', marginTop: 10 }} >
+                        <Search
+                            placeholder='Tên bài thi'
+                            value={keyWord}
+                            onEndEditing={setKeyWord}
+                            onFilter={() => { setModalVisible(true) }}
+                        />
+
                     </View>
                     {/* List exam */}
                     <View style={{
                         flex: 1, width: '100%', marginTop: 20,
                     }}>
-                        <View style={{ flex: 1, width: '100%', marginTop: 20, borderWidth: 1 }}>
-                            <LoadingDataModal visible={loadingDataModal} />
-                            {!loadingDataModal && <FlatList data={examList} Component={ExamItem} navigation={navigation} />}
-                        </View>
+                        <LoadingDataModal visible={loadingDataModal} />
+                        {!loadingDataModal && <FlatList data={examList} Component={ExamItem} navigation={navigation} />}
                     </View>
                 </View>
             </View >
             {/* modal */}
-            < Modal isVisible={isModalVisible}
+            {isModalVisible && < Modal isVisible={true}
                 backdropOpacity={.8}
             >
                 <View style={{ backgroundColor: 'white', padding: 5, borderRadius: 20, alignItems: 'center' }}>
@@ -120,28 +131,22 @@ const ExamList = ({ navigation }) => {
                     <View style={{ marginBottom: 10, flexDirection: 'row' }}>
                         <CustomButton onPress={async () => {
                             await toggleModal();
-                            if (typeFilter != dumpType) {
-                                await setLoadingDataModal(true)
-                                await setTypeFilter(dumpType)
-                                await setTimeout(async () => await setLoadingDataModal(false), 1000)
-                            }
+                            await setTypeFilter(dumpType)
+
                         }} style={{ width: 80, marginRight: 5 }} >Lưu</CustomButton>
                         <CustomButton onPress={toggleModal} style={{ width: 80, marginLeft: 5 }} >Hủy</CustomButton>
                     </View>
 
                 </View>
-            </Modal >
+            </Modal >}
         </View >
 
     );
 };
 
 const ExamItem = ({ item, navigation }) => {
-
     return (
-        <View style={{
-            marginVertical: 20, marginHorizontal: 10, elevation: 2, padding: 8, alignItems: 'center', borderColor: '#E5E6EA'
-        }}>
+        <CardView onPress={() => navigation.navigate('ExamDetail', { _id: item._id })}>
             <View style={{ width: '95%' }} >
                 <Text>Tên bài thi: {item.name}</Text>
                 <Text>Số lương câu hỏi: {item.questions.length}</Text>
@@ -149,12 +154,10 @@ const ExamItem = ({ item, navigation }) => {
                 <Text>Loại: {item.for}</Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
-                    <Button title='Chi tiết'
-                        onPress={() => navigation.navigate('ExamDetail', { item })}
-                    />
+
                 </View>
             </View>
-        </View>
+        </CardView>
 
     )
 }

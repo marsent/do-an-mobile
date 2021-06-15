@@ -6,33 +6,62 @@ import { RadioButton } from 'react-native-paper'
 import styles from '../../style/style';
 import { apiURL } from '../../config/config';
 import TokenContext from '../../Context/TokenContext';
-
+import LoadingDataModal from '../../components/LoadingDataModal';
 const ExamDetail = ({ route, navigation }) => {
     const token = useContext(TokenContext);
-    const exam = route.params.item;
-    const [className, setClassName] = useState('');
-    if (exam.for == 'class') {
-
-        useEffect(async () => {
-            await fetch(`${apiURL}/class/admin/${exam.class_id}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    }
-                }).then(res => res.json())
-                .then(res => {
-                    console.log(res);
-                    setClassName(res.data.name)
-                })
-        }, [])
+    const { _id } = route.params;
+    const initExam = {
+        "student_ids": [],
+        "status": "",
+        "_id": "",
+        "name": "",
+        "year": "",
+        "faculty": "",
+        "year": "",
+        "time": "",
+        "questions": []
     }
+    const [exam, setExam] = useState(initExam)
+    const [Class, setClass] = useState();
+    const [isLoadingData, setIsLoadingData] = useState(false)
+
+    useEffect(async () => {
+        setIsLoadingData(true)
+        await fetch(`${apiURL}/exam/admin/${_id}`,
+            {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json())
+            .then(async (res) => {
+                await setExam(res.data)
+                await setIsLoadingData(false)
+            })
+
+
+        // await fetch(`${apiURL}/class/admin/${exam.class_id}`,
+        //     {
+        //         method: 'GET',
+        //         headers: {
+        //             Accept: 'application/json',
+        //             'Content-Type': 'application/json',
+        //             'Authorization': 'Bearer ' + token
+        //         }
+        //     }).then(res => res.json())
+        //     .then(res => {
+        //         console.log(res);
+        //         setClassName(res.data.name)
+        //     })
+    }, [])
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <CustomHeaderText navigation={navigation} >Chi tiết giảng viên</CustomHeaderText>
-            <ScrollView>
+            <CustomHeaderText navigation={navigation} >Chi tiết bài thi</CustomHeaderText>
+            <LoadingDataModal visible={isLoadingData} />
+            {!isLoadingData && <ScrollView style={{ flex: 1 }} >
                 <View style={{ marginTop: 30, alignItems: 'center' }}>
 
                     <View style={{ width: '90%', marginLeft: '10%' }}>
@@ -60,7 +89,7 @@ const ExamDetail = ({ route, navigation }) => {
 
                     </View>
 
-                    <View style={{ width: '90%' }}>
+                    <View style={{ width: '95%', marginTop: 20 }}>
                         <View style={{ alignItems: 'center' }}>
                             {exam.questions.map((val, index) => {
                                 return (
@@ -87,7 +116,7 @@ const ExamDetail = ({ route, navigation }) => {
                     </View>
 
                 </View>
-            </ScrollView>
+            </ScrollView>}
         </SafeAreaView >
     );
 };

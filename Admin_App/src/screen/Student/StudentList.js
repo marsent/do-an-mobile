@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, TextInput, Button, TouchableOpacity } from 'react-native';
+import { View, Button, } from 'react-native';
 import HeaderText from '../../components/HeaderText';
 import { Picker } from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { createStackNavigator } from '@react-navigation/stack';
 import Modal from 'react-native-modal';
 
 const Stack = createStackNavigator();
 
-import { yearList, facultyList, apiURL } from '../../config/config';
+import { yearList, apiURL } from '../../config/config';
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
 import StudentDetail from './StudentDetail';
@@ -16,6 +15,9 @@ import LoadingDataModal from '../../components/LoadingDataModal'
 import FlatList from '../../components/FlatList'
 import CustomButton from '../../components/Button'
 import Text from '../../components/Text'
+import Search from '../../components/Search'
+import { TouchableOpacity } from 'react-native';
+
 
 const ClassListContext = React.createContext()
 
@@ -59,37 +61,46 @@ const StudentList = ({ navigation }) => {
             await setLoadingDataModal(false)
 
         })
-
+        return () => {
+            setStudentList();
+            setDataStudent();
+            setClassList();
+            setKeyWord();
+            setFilterData();
+            setDumpfilter();
+        }
     }, [])
 
     useEffect(() => handlerSearch(), [keyWord])
     useEffect(() => handlerSearch(), [filterData])
 
     const handlerSearch = async () => {
+        setLoadingDataModal(true)
         await setStudentList(dataStudent)
-        console.log(keyWord);
-        console.log(filterData);
-        if (filterData.year == 'all' && filterData.class == 'all') {
-            await setStudentList(prevList => {
-                return prevList.filter(student => {
-                    return student.full_name.includes(keyWord) || student.email.includes(keyWord)
+        await setTimeout(async () => {
+            if (filterData.year == 'all' && filterData.class == 'all') {
+                await setStudentList(prevList => {
+                    return prevList.filter(student => {
+                        return student.full_name.includes(keyWord) || student.email.includes(keyWord)
+                    })
                 })
-            })
-        }
-        if (filterData.year != 'all' && filterData.class != 'all') {
-            await setStudentList(prevList => {
-                return prevList.filter(student => {
-                    return (student.full_name.includes(keyWord) || student.email.includes(keyWord)) && (student.class_id == filterData.class && student.year == filterData.year)
+            }
+            if (filterData.year != 'all' && filterData.class != 'all') {
+                await setStudentList(prevList => {
+                    return prevList.filter(student => {
+                        return (student.full_name.includes(keyWord) || student.email.includes(keyWord)) && (student.class_id == filterData.class && student.year == filterData.year)
+                    })
                 })
-            })
-        }
-        if (filterData.year != 'all' || filterData.class != 'all') {
-            await setStudentList(prevList => {
-                return prevList.filter(student => {
-                    return (student.full_name.includes(keyWord) || student.email.includes(keyWord)) && (student.class_id == filterData.class || student.year == filterData.year)
+            }
+            if (filterData.year != 'all' || filterData.class != 'all') {
+                await setStudentList(prevList => {
+                    return prevList.filter(student => {
+                        return (student.full_name.includes(keyWord) || student.email.includes(keyWord)) && (student.class_id == filterData.class || student.year == filterData.year)
+                    })
                 })
-            })
-        }
+            }
+            setLoadingDataModal(false)
+        }, 1000)
     }
 
     const toggleModal = async () => {
@@ -102,23 +113,14 @@ const StudentList = ({ navigation }) => {
             <HeaderText navigation={navigation}>Danh sách sinh viên</HeaderText>
             <View style={{ flex: 1 }} >
                 <View style={[styles.container]}>
-                    <View style={[styles.inputView,]}>
-                        {/* Search bar */}
-                        <View style={{ display: 'flex', flexDirection: 'row', borderRadius: 20, marginTop: 20 }}>
-                            <TextInput
-                                style={[styles.input, { textAlign: 'center', margin: 0, width: '90%', borderTopRightRadius: 0, borderBottomRightRadius: 0, borderRightWidth: 0 }]}
-                                placeholder='Tên sinh viên hoặc email'
-                                onChangeText={text => setKeyWord(text)}
-                            />
-                            <TouchableOpacity
-                                style={{ borderWidth: 1, width: '10%', alignItems: 'center', backgroundColor: '#F8FAFD', borderTopRightRadius: 20, borderBottomRightRadius: 20, borderColor: '#E9EEF4', borderLeftWidth: 0 }}
-                                onPress={() => { setModalVisible(true) }}
-                            >
-                                <View style={{ flex: 1, justifyContent: 'space-around' }}>
-                                    <Icon name='sort-down' size={24} color='#495057' />
-                                </View>
-                            </TouchableOpacity>
-                        </View>
+                    <View style={{ width: '90%', marginTop: 10 }} >
+                        <Search
+                            placeholder='Tên sinh viên hoặc email'
+                            value={keyWord}
+                            onEndEditing={setKeyWord}
+                            onFilter={() => { setModalVisible(true) }}
+                        />
+
                     </View>
                     {/* List student */}
                     <View style={{ flex: 1, width: '100%', marginTop: 20, }}>
@@ -134,7 +136,7 @@ const StudentList = ({ navigation }) => {
                 </View>
             </View>
             {/* modal */}
-            <Modal isVisible={isModalVisible}
+            {isModalVisible && <Modal isVisible={true}
                 backdropOpacity={.8}
             >
                 <View style={{ borderWidth: 1, backgroundColor: 'white', padding: 5, borderRadius: 20, alignItems: 'center' }}>
@@ -145,9 +147,7 @@ const StudentList = ({ navigation }) => {
                     <View style={{ marginBottom: 10, flexDirection: 'row' }}>
                         <CustomButton onPress={async () => {
                             await toggleModal();
-                            await setLoadingDataModal(true)
                             await setFilterData(dumpFilter)
-                            await setTimeout(async () => await setLoadingDataModal(false), 1000)
 
                         }}
                             style={{ width: 80, marginRight: 5 }} >Lưu</CustomButton>
@@ -155,7 +155,7 @@ const StudentList = ({ navigation }) => {
                     </View>
 
                 </View>
-            </Modal>
+            </Modal>}
         </View >
 
     );
@@ -163,16 +163,17 @@ const StudentList = ({ navigation }) => {
 
 const StudentItem = ({ item, navigation }) => {
     const classList = useContext(ClassListContext)
-    const token = useContext(TokenContext)
     const { _id, name, class_id, year, full_name, student_code, email } = item
     const [classObj, setClassObj] = useState({});
     useEffect(async () => {
         await setClassObj(classList.filter(val => val._id == class_id)[0])
-    }, [])
+    }, [classList])
     return (
-        <View style={{
-            marginVertical: 20, marginHorizontal: 10, elevation: 2, padding: 8, alignItems: 'center', borderColor: '#E5E6EA'
-        }}>
+        <TouchableOpacity style={{
+            marginVertical: 20, marginHorizontal: 10, elevation: 2, padding: 8, alignItems: 'center', borderRadius: 15
+        }}
+            onPress={() => navigation.navigate('StudentDetail', { _id })}
+        >
             <View style={{ width: '95%' }} >
                 <Text>Mã sinh viên: {student_code}</Text>
                 <Text>Họ tên: {full_name}</Text>
@@ -181,12 +182,12 @@ const StudentItem = ({ item, navigation }) => {
                 <Text>Lớp sinh hoạt:{classObj.name} </Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
-                    <Button title='Chi tiết'
-                        onPress={() => navigation.navigate('StudentDetail', { item: item, class_name: className })}
-                    />
+                    {/* <Button title='Chi tiết'
+                        onPress={() => navigation.navigate('StudentDetail', { _id })}
+                    /> */}
                 </View>
             </View>
-        </View>
+        </TouchableOpacity>
 
     )
 }

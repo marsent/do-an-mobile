@@ -1,24 +1,24 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { View, TextInput, Button, TouchableOpacity } from 'react-native';
+import { View, Button } from 'react-native';
 import HeaderText from '../../components/HeaderText';
 import { Picker } from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { createStackNavigator } from '@react-navigation/stack';
-import { BoxShadow } from 'react-native-shadow'
 import Modal from 'react-native-modal';
 
 const Stack = createStackNavigator();
 
-import { yearList, facultyList, apiURL } from '../../config/config';
+import { facultyList, apiURL } from '../../config/config';
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
 import Text from '../../components/Text'
 import LectureDetail from './LectureDetail';
 import LoadingDataModal from '../../components/LoadingDataModal'
 import FlatList from '../../components/FlatList';
-import LoadingModal from '../../components/LoadingModal';
 import CustomButton from '../../components/Button'
+import Search from '../../components/Search'
+import { TouchableOpacity } from 'react-native';
+
 const LectureList = ({ navigation }) => {
 
     const token = useContext(TokenContext);
@@ -26,13 +26,12 @@ const LectureList = ({ navigation }) => {
     const [lectureList, setLectureList] = useState([]);
     const [dataLecture, setDataLecture] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
-    const [faculty, setFaculty] = useState('infomation_technology');
-    const [dumpFaculty, setDumpFaculty] = useState('infomation_technology')
+    const [faculty, setFaculty] = useState('all');
+    const [dumpFaculty, setDumpFaculty] = useState('all')
     const [loadingDataModal, setLoadingDataModal] = useState(false);
     const [keyWord, setKeyWord] = useState('');
 
     useEffect(async () => {
-        setLoadingDataModal(true);
         await fetch(`${apiURL}/lecture/admin`, {
             method: 'GET',
             headers: {
@@ -41,30 +40,35 @@ const LectureList = ({ navigation }) => {
                 'Authorization': 'Bearer ' + token
             }
         }).then(res => res.json()).then(async (res) => {
-            await setLectureList(res.data)
             await setDataLecture(res.data)
-            await setLoadingDataModal(false)
+            await setLectureList(res.data)
         })
 
-    }, [])
+    }, [navigation])
 
     useEffect(() => handlerSearch(), [keyWord])
     useEffect(() => handlerSearch(), [faculty])
 
     const handlerSearch = async () => {
-        setLectureList(dataLecture);
-        if (faculty != 'all') {
+        await setLoadingDataModal(true)
+        await setLectureList(dataLecture);
+        await setTimeout(async () => {
+            if (faculty != 'all') {
+                console.log(2);
+                await setLectureList(prevList => {
+                    return prevList.filter(lecture => {
+                        return (lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)) && (lecture.faculty == faculty)
+                    })
+                })
+            }
             await setLectureList(prevList => {
                 return prevList.filter(lecture => {
-                    return (lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)) && (lecture.faculty == faculty)
+                    return lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)
                 })
             })
-        }
-        await setLectureList(prevList => {
-            return prevList.filter(lecture => {
-                return lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)
-            })
-        })
+            await setLoadingDataModal(false)
+        }, 1000)
+
     }
 
     const toggleModal = async () => {
@@ -78,23 +82,15 @@ const LectureList = ({ navigation }) => {
             <HeaderText navigation={navigation}>Danh sách giảng viên</HeaderText>
             <View style={{ flex: 1 }} >
                 <View style={[styles.container]}>
-                    <View style={[styles.inputView,]}>
-                        {/* Search bar */}
-                        <View style={{ display: 'flex', flexDirection: 'row', borderRadius: 20, marginTop: 20 }}>
-                            <TextInput
-                                style={[styles.input, { textAlign: 'center', margin: 0, width: '90%', borderTopRightRadius: 0, borderBottomRightRadius: 0, borderRightWidth: 0 }]}
-                                placeholder='Tên giảng viên hoặc email'
-                                onChangeText={text => setKeyWord(text)}
-                            />
-                            <TouchableOpacity
-                                style={{ borderWidth: 1, width: '10%', alignItems: 'center', backgroundColor: '#F8FAFD', borderTopRightRadius: 20, borderBottomRightRadius: 20, borderColor: '#E9EEF4', borderLeftWidth: 0 }}
-                                onPress={() => { setModalVisible(true) }}
-                            >
-                                <View style={{ flex: 1, justifyContent: 'space-around' }}>
-                                    <Icon name='sort-down' size={24} color='#495057' />
-                                </View>
-                            </TouchableOpacity>
-                        </View>
+                    {/* Search bar */}
+                    <View style={{ width: '90%', marginTop: 10 }} >
+                        <Search
+                            placeholder='Tên giảng viên hoặc email'
+                            value={keyWord}
+                            onEndEditing={setKeyWord}
+                            onFilter={() => { setModalVisible(true) }}
+                        />
+
                     </View>
                     {/* List lecture */}
                     <View style={{ flex: 1, width: '100%', marginTop: 20, }}>
@@ -104,7 +100,7 @@ const LectureList = ({ navigation }) => {
                 </View>
             </View>
             {/* modal */}
-            <Modal isVisible={modalVisible}
+            {modalVisible && <Modal isVisible={true}
                 backdropOpacity={.8}
             >
                 <View style={{ borderWidth: 1, backgroundColor: 'white', padding: 5, borderRadius: 20, alignItems: 'center' }}>
@@ -116,11 +112,12 @@ const LectureList = ({ navigation }) => {
                         <CustomButton onPress={async () => {
                             await toggleModal();
                             await setFaculty(dumpFaculty)
+
                         }} style={{ width: 80, marginRight: 5 }} >Lưu</CustomButton>
                         <CustomButton onPress={toggleModal} style={{ width: 80, marginLeft: 5 }} >Hủy</CustomButton>
                     </View>
                 </View>
-            </Modal>
+            </Modal>}
         </View >
 
     );
@@ -129,29 +126,32 @@ const LectureList = ({ navigation }) => {
 const LectureItem = ({ item, navigation }) => {
     const { _id, full_name, faculty, email } = item
     return (
-        <View style={{
-            marginVertical: 20, marginHorizontal: 10, elevation: 2, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: '#E5E6EA'
-        }}>
+        <TouchableOpacity style={{
+
+            marginVertical: 20, marginHorizontal: 10, elevation: 2, padding: 8, alignItems: 'center', borderRadius: 15
+        }}
+            onPress={() => navigation.navigate('LectureDetail', { _id })}
+        >
             <View style={{ width: '95%' }} >
                 <Text>Họ tên: {full_name}</Text>
                 <Text>Email: {email}</Text>
                 <Text>Khoa: {faculty}</Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
-                    <Button title='Chi tiết'
+                    {/* <Button title='Chi tiết'
                         onPress={() => navigation.navigate('LectureDetail', { item })}
-                    />
+                    /> */}
                 </View>
             </View>
-        </View>
+        </TouchableOpacity >
 
     )
 }
 
 const FacultyPicker = ({ onValueChange, faculty }) => {
-    return (<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+    return (<View style={{ width: '90%' }}>
         <Text >Khoa:</Text>
-        <Picker style={{ width: '45%' }}
+        <Picker
             onValueChange={val => onValueChange(val)}
             selectedValue={faculty}
         >

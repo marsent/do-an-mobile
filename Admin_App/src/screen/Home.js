@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { View, Text, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 
 import styles from '../style/style'
 
@@ -16,25 +17,27 @@ export default Home = ({ route, navigation }) => {
     const { setToken } = route.params
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <HeaderText>Trang chủ</HeaderText>
-            <View style={[styles.container, { marginTop: '15%', }]}>
-                <ViewRowGroup>
-                    <CustomTouchOpacity src={img.notification} onPress={() => navigation.navigate('Quản lý thông báo', { navigation })}>Thông báo</CustomTouchOpacity>
-                    <CustomTouchOpacity src={img.exam} onPress={() => navigation.navigate('Quản lý đề thi', { navigation })}>Đề thi</CustomTouchOpacity>
-                </ViewRowGroup>
+        <Animatable.View style={{ flex: 1 }} animation='fadeInDown'>
+            <SafeAreaView style={{ flex: 1 }}>
+                <HeaderText>Trang chủ</HeaderText>
+                <View style={[styles.container, { marginTop: '15%', }]}>
+                    <ViewRowGroup>
+                        <CustomTouchOpacity src={img.notification} onPress={() => navigation.navigate('Quản lý thông báo', { navigation })}>Thông báo</CustomTouchOpacity>
+                        <CustomTouchOpacity src={img.exam} onPress={() => navigation.navigate('Quản lý đề thi', { navigation })}>Đề thi</CustomTouchOpacity>
+                    </ViewRowGroup>
 
-                <ViewRowGroup>
-                    <CustomTouchOpacity src={img.student} onPress={() => navigation.navigate('Quản lý sinh viên', { navigation })} >Sinh viên</CustomTouchOpacity>
-                    <CustomTouchOpacity src={img.lecture} onPress={() => navigation.navigate('Quản lý giảng viên', { navigation })}>Giảng viên</CustomTouchOpacity>
-                </ViewRowGroup>
+                    <ViewRowGroup>
+                        <CustomTouchOpacity src={img.student} onPress={() => navigation.navigate('Quản lý sinh viên', { navigation })} >Sinh viên</CustomTouchOpacity>
+                        <CustomTouchOpacity src={img.lecture} onPress={() => navigation.navigate('Quản lý giảng viên', { navigation })}>Giảng viên</CustomTouchOpacity>
+                    </ViewRowGroup>
 
-                <ViewRowGroup>
-                    <CustomTouchOpacity src={img.class} onPress={() => navigation.navigate('Quản lý lớp học', { navigation })} >Lớp</CustomTouchOpacity>
-                    <CustomTouchOpacity src={img.logout} onPress={() => setToken('')} >Đăng xuất</CustomTouchOpacity>
-                </ViewRowGroup>
-            </View>
-        </SafeAreaView>
+                    <ViewRowGroup>
+                        <CustomTouchOpacity src={img.class} onPress={() => navigation.navigate('Quản lý lớp học', { navigation })} >Lớp</CustomTouchOpacity>
+                        <CustomTouchOpacity src={img.logout} onPress={() => setToken('')} >Đăng xuất</CustomTouchOpacity>
+                    </ViewRowGroup>
+                </View>
+            </SafeAreaView>
+        </Animatable.View>
     )
 }
 

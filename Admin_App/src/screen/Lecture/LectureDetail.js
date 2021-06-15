@@ -1,14 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { SafeAreaView, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { Picker } from '@react-native-picker/picker';
 
 import styles from '../../style/style'
-
+import { apiURL } from '../../config/config';
+import TokenContext from '../../Context/TokenContext'
+import Text from '../../components/Text'
+import Button from '../../components/Button'
+import { Avatar } from 'react-native-paper';
+import HeaderUserDetail from '../../components/HeaderUserDetail'
 const LectureDetail = ({ route, navigation }) => {
-    const lecture = route.params.item;
+    const token = useContext(TokenContext);
+    const { _id } = route.params;
+    const initLecture = {
+        "_id": "",
+        "date_of_birth": "",
+        "email": "",
+        "faculty": "computer_science",
+        "full_name": "",
+        "password": "",
+        "phone": "",
+        "status": ""
+    }
+
+    const [lecture, setLecture] = useState(initLecture)
     const [isEdit, setIsEdit] = useState(false)
-    const [status, setStatus] = useState(lecture.status)
+
+    useEffect(async () => {
+
+        await fetch(`${apiURL}/lecture/admin/${_id}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        }).then(res => res.json())
+            .then(async (res) => {
+                await setLecture(res.data)
+            })
+
+        return () => {
+            setLecture()
+        }
+    }, [])
+
     const save = () => {
 
 
@@ -16,51 +53,55 @@ const LectureDetail = ({ route, navigation }) => {
     }
 
     return (
-        <SafeAreaView>
-            <CustomHeaderText navigation={navigation} >Chi tiết giảng viên</CustomHeaderText>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
+            {/* <CustomHeaderText navigation={navigation} >Chi tiết giảng viên</CustomHeaderText> */}
+            <HeaderUserDetail
+                src={require('../../../assets/public/img/profile.png')}
+                onBackPress={() => navigation.goBack()}
+            />
 
-            <View style={{ marginTop: 30, alignItems: 'center' }}>
+            <View style={{ alignItems: 'center' }}>
 
                 <View style={{ width: '90%', marginLeft: '10%' }}>
-                    <CustomVIew>
-                        <CustomText>Họ tên:</CustomText>
+                    <CustomView>
+                        <Text>Họ tên:</Text>
                         <CustomInput value={lecture.full_name} />
-                    </CustomVIew>
-                    <CustomVIew>
-                        <CustomText>Ngày sinh:</CustomText>
+                    </CustomView>
+                    <CustomView>
+                        <Text>Ngày sinh:</Text>
                         <CustomInput value={lecture.date_of_birth.split('T')[0]} />
-                    </CustomVIew>
-                    <CustomVIew>
-                        <CustomText>Số điện thoại:</CustomText>
+                    </CustomView>
+                    <CustomView>
+                        <Text>Số điện thoại:</Text>
                         <CustomInput value={lecture.phone} />
-                    </CustomVIew>
-                    <CustomVIew>
-                        <CustomText>Email:</CustomText>
+                    </CustomView>
+                    <CustomView>
+                        <Text>Email:</Text>
                         <CustomInput value={lecture.email} />
-                    </CustomVIew>
-                    <CustomVIew>
-                        <CustomText>Trạng thái:</CustomText>
+                    </CustomView>
+                    <CustomView>
+                        <Text>Trạng thái:</Text>
                         <Picker style={{ width: '40%', marginRight: '23%' }}
                             mode='dropdown'
                             itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
                             enabled={isEdit}
-                            selectedValue={status}
-                            onValueChange={val => setStatus(val)}
+                            selectedValue={lecture.status}
+                            onValueChange={val => setLecture({ ...lecture, status: val })}
                         >
                             <Picker.Item label='Active' value='active' />
                             <Picker.Item label='Disable' value='disable' />
                         </Picker>
-                    </CustomVIew>
+                    </CustomView>
 
 
                 </View>
                 <View style={{ marginBottom: 10 }}>
                     {!isEdit ?
-                        <CustomButton onPress={() => setIsEdit(true)} >Chỉnh sửa</CustomButton>
+                        <Button onPress={() => setIsEdit(true)} >Chỉnh sửa</Button>
                         :
                         <View style={{ display: 'flex', flexDirection: 'row' }}>
-                            <CustomButton style={{ marginRight: 5 }} onPress={() => save()}>Cập nhật</CustomButton>
-                            <CustomButton style={{ marginLeft: 5 }} onPress={() => setIsEdit(false)}>Hủy</CustomButton>
+                            <Button style={{ marginRight: 5 }} onPress={() => save()}>Cập nhật</Button>
+                            <Button style={{ marginLeft: 5 }} onPress={() => setIsEdit(false)}>Hủy</Button>
                         </View>
                     }
                 </View>
@@ -69,14 +110,8 @@ const LectureDetail = ({ route, navigation }) => {
     );
 };
 
-const CustomText = ({ children, size = 18, color = '#22272E' }) => {
-    return (
-        <Text style={{ fontSize: size, fontFamily: 'Inter', color: color }}>
-            {children}
-        </Text>
-    )
-}
-const CustomVIew = ({ children }) => {
+
+const CustomView = ({ children }) => {
 
     return <View style={{
         display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'
@@ -95,15 +130,7 @@ const CustomInput = ({ value, onChangeText, edit }) => {
 
 }
 
-const CustomButton = ({ children, onPress, style }) => {
-    return (
-        <TouchableOpacity style={[{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', borderRadius: 30, elevation: 5, paddingVertical: 5, width: 130 }, style]}
-            onPress={onPress}
-        >
-            <CustomText color='#FFFFFF'>{children}</CustomText>
-        </TouchableOpacity >
-    )
-}
+
 
 const CustomHeaderText = ({ children, navigation }) => {
 
