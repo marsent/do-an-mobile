@@ -1,4 +1,4 @@
-rootProject.name = 'fontend'
+rootProject.name = 'Student'
 include ':@react-native-picker_picker'
 project(':@react-native-picker_picker').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-picker/picker/android')
 include ':@react-native-picker_picker'

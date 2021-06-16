@@ -1,19 +1,18 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {StyleSheet, View, Text, ScrollView, Button} from 'react-native';
 // import {Button, } from 'react-native-paper';
-import information from '../ClassManagement/informationOfStudent';
-import listStudent from '../ClassManagement/listStudent';
+
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import TokenContext from '../../Context/TokenContext';
-
+import listStudent from '../ClassManagement/listStudent';
 function listClass({navigation}) {
   const token = useContext(TokenContext);
   const [classList, setClassList] = useState([]);
 
   useEffect(async () => {
-    //setError({ username: usernameValidator(username), password: passwordValidator(password) })
+    setError({ username: usernameValidator(username), password: passwordValidator(password) })
     await fetch('http://quocha.xyz/api/class/admin', {
       method: 'GET',
       headers: {
@@ -27,7 +26,6 @@ function listClass({navigation}) {
         setClassList(res.data);
       });
   });
-
   return (
     <View style={styles.Container}>
       <ScrollView style={styles.NotiView}>
@@ -51,49 +49,10 @@ function listClass({navigation}) {
         ))}
       </ScrollView>
     </View>
+  
   );
 }
-const Stack = createStackNavigator();
-const App = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Thông tin lớp học"
-          component={listClass}
-          options={{
-            headerTitle: 'Thông tin lớp học',
-            headerTintColor: '#FEFEFE',
-            headerTitleAlign: 'center',
-            headerStyle: {
-              backgroundColor: '#4B75F2',
-            },
-          }}></Stack.Screen>
-        <Stack.Screen
-          name="Danh sách lớp"
-          component={listStudent}
-          options={{
-            headerTintColor: '#FEFEFE',
-            headerTitleAlign: 'center',
 
-            headerStyle: {
-              backgroundColor: '#4B75F2',
-            },
-          }}></Stack.Screen>
-        <Stack.Screen
-          name="Thông tin sinh viên"
-          component={information}
-          options={{
-            headerTintColor: '#FEFEFE',
-            headerTitleAlign: 'center',
-            headerStyle: {
-              backgroundColor: '#4B75F2',
-            },
-          }}></Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -154,4 +113,4 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
 });
-export default App;
+export default listClass;

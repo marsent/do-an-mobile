@@ -8,16 +8,19 @@ import { Picker } from '@react-native-picker/picker';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import TokenContext from '../../helpers/TokenContext';
+import {ExamProvider} from '../../helpers/ExamContext';
+import {addDays, format, getDate, isSameDay, startOfWeek, parseJSON} from 'date-fns';
+
 
 export default function OnlineExam({navigation}){
-    // const notification_data = [
+    // const edata = [
     //     {
     //         ID : "123",
-    //         Name : "Domo 1",
-    //         Content: "Content 1",
-    //         Date_created:"01/01/2021",
-    //         Update_date:"01/01/2021",
-    //         Status:"1"
+    //         name : "Domo 1",
+    //     },
+    //     {
+    //         ID : "456",
+    //         name : "Domo 2",
     //     }
     // ];
     // const [count, setCount] = useState(0);
@@ -27,7 +30,7 @@ export default function OnlineExam({navigation}){
     const [examList, setExamList] = useState([]);
     useEffect(async () => {
     //setError({ username: usernameValidator(username), password: passwordValidator(password) })
-        await fetch('http://quocha.xyz/api/class/admin', {
+        await fetch('http://quocha.xyz/api/exam/admin', {
         method: 'GET',
         headers: {
             Accept: 'application/json',
@@ -42,12 +45,13 @@ export default function OnlineExam({navigation}){
     });
     const [modalVisible, setModalVisible] = useState(false);
     const [examID,setExamID]=useState([]);
-    const examDetail = () => {
-        setExamID(item.ID);
-        setModalVisible(!modalVisible);
-    };
+    // const examDetail = () => {
+    //     setExamID(item.ID);
+    //     setModalVisible(!modalVisible);
+    // };
     return (
-       <SafeAreaView style={styles.Container}>
+    <ExamProvider value={examID.name}>
+      <SafeAreaView style={styles.Container}>
            <Modal
                 animationType="fade"
                 transparent={true}
@@ -66,13 +70,15 @@ export default function OnlineExam({navigation}){
                             <Text>{examID.Content}</Text>
                             <TouchableOpacity
                                     style={[styles.button]}
-                                    onPress={() => {navigation.navigate('MainExam'); setModalVisible(!modalVisible)}}>
+                                    onPress={() => {navigation.navigate('MainExam',{data: examID}); setModalVisible(!modalVisible)}}>
                                     <Text style={styles.textStyle}>Làm bài</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
             </Modal>
+        
             <ScrollView style={styles.NotiView}>
+                {/* <Text>{token}</Text> */}
                 {examList.map((item, i)=>(
                     <TouchableOpacity key={i} style={styles.NotiText}  onPress={() => {
                         setExamID(item);
@@ -80,12 +86,13 @@ export default function OnlineExam({navigation}){
                     }}>
                     <View > 
                         <Text style={styles.TitleText}>{item.name} </Text>
+                        {/* <Text style={styles.Notification_date}>{format(parseJSON(item.updatedAt),'Pp')} </Text> */}
                     </View> 
                     </TouchableOpacity>
                 ))}
             </ScrollView>
-
         </SafeAreaView>
+    </ExamProvider>
     );
 }
 

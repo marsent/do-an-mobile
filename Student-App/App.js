@@ -8,7 +8,7 @@ import AccountDetail from './src/components/accountDetail';
 import MainTabScreen from '././src/screen/Main';
 import {Provider as PaperProvider} from 'react-native-paper';
 import {BottomNavigation, Text, Appbar} from 'react-native-paper';
-
+import mainExam from './src/components/OnlineExam/mainExam';
 import { 
   NavigationContainer, 
   DefaultTheme as NavigationDefaultTheme,
@@ -22,7 +22,8 @@ import {TokenProvider} from './src/helpers/TokenContext';
 
 const App = () => {
   const [token, setToken] = useState('');
-  if (!token) return <Login token={token} setToken={setToken} />;
+  
+  //if (!token) return <Login token={token} setToken={setToken} />;
   return(
     <TokenProvider value={token}>
       <NavigationContainer>

@@ -34,6 +34,7 @@ function Notification() {
       Status: '0',
     },
   ];
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <SafeAreaView style={styles.Container}>
       <ScrollView style={styles.NotiView}>
@@ -45,14 +46,6 @@ function Notification() {
           </View>
         ))}
       </ScrollView>
-    </SafeAreaView>
-  );
-}
-const Stack = createStackNavigator();
-function App() {
-  const [modalVisible, setModalVisible] = useState(false);
-  return (
-    <NavigationContainer>
       <Modal
         animationType="slide"
         transparent={true}
@@ -74,29 +67,58 @@ function App() {
           </View>
         </View>
       </Modal>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Danh sách thông báo"
-          component={Notification}
-          options={{
-            headerTintColor: '#FEFEFE',
-            headerTitleAlign: 'center',
-            headerRight: () => (
-              <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(true);
-                }}>
-                <Image style={styles.image} source={Image1} />
-              </TouchableOpacity>
-            ),
-            headerStyle: {
-              backgroundColor: '#4B75F2',
-            },
-          }}></Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
+    </SafeAreaView>
   );
 }
+// const Stack = createStackNavigator();
+// function App() {
+//   const [modalVisible, setModalVisible] = useState(false);
+//   return (
+//     <NavigationContainer>
+//       <Modal
+//         animationType="slide"
+//         transparent={true}
+//         backdrop={true}
+//         position="center"
+//         visible={modalVisible}
+//         onRequestClose={() => {
+//           Alert.alert('Modal has been closed.');
+//           setModalVisible(!modalVisible);
+//         }}>
+//         <View style={styles.centeredView}>
+//           <View style={styles.modalView}>
+//             <CreateNotification />
+//             <Button
+//               style={[styles.button, styles.buttonClose]}
+//               title="Tạo thông báo"
+//               onPress={() => setModalVisible(!modalVisible)}
+//             />
+//           </View>
+//         </View>
+//       </Modal>
+//       <Stack.Navigator>
+//         <Stack.Screen
+//           name="Danh sách thông báo"
+//           component={Notification}
+//           options={{
+//             headerTintColor: '#FEFEFE',
+//             headerTitleAlign: 'center',
+//             headerRight: () => (
+//               <TouchableOpacity
+//                 onPress={() => {
+//                   setModalVisible(true);
+//                 }}>
+//                 <Image style={styles.image} source={Image1} />
+//               </TouchableOpacity>
+//             ),
+//             headerStyle: {
+//               backgroundColor: '#4B75F2',
+//             },
+//           }}></Stack.Screen>
+//       </Stack.Navigator>
+//     </NavigationContainer>
+//   );
+// }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -168,4 +190,4 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
-export default App;
+export default Notification;
