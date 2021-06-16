@@ -191,6 +191,9 @@ export default AddExam = ({ navigation }) => {
                     {/* Name exam */}
                     <View style={{ width: '90%' }}>
                         <TextInput
+                            isFocus={true}
+                            outLine={true}
+                            style={{ borderRadius: 5 }}
                             placeholder='Tên bài thi'
                             onChangeText={text => setNameExam(text)}
                             value={nameExam}
@@ -202,6 +205,7 @@ export default AddExam = ({ navigation }) => {
                     {type === 'class' ? (
                         <View style={{ width: '90%', marginTop: 20, marginBottom: 20 }}>
                             <Picker
+                                style={{ borderRadius: 5 }}
                                 placeholder='Lớp'
                                 displayValue={classId != '_000' ?
                                     classList.find(element => element._id == classId).name : ''

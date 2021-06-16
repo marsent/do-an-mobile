@@ -32,19 +32,28 @@ const LectureList = ({ navigation }) => {
     const [keyWord, setKeyWord] = useState('');
 
     useEffect(async () => {
-        await fetch(`${apiURL}/lecture/admin`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json()).then(async (res) => {
-            await setDataLecture(res.data)
-            await setLectureList(res.data)
-        })
-
-    }, [navigation])
+        try {
+            await fetch(`${apiURL}/lecture/admin`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json()).then(async (res) => {
+                await setDataLecture(res.data)
+                await setLectureList(res.data)
+            })
+        }
+        catch (err) {
+            console.log('Get lerture list error: ', err);
+        }
+        console.log(facultyList);
+        return () => {
+            setLectureList();
+            setDataLecture();
+        }
+    }, [])
 
     useEffect(() => handlerSearch(), [keyWord])
     useEffect(() => handlerSearch(), [faculty])

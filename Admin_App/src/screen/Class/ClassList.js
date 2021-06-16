@@ -2,7 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, Button } from 'react-native';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker'
+import { createStackNavigator } from '@react-navigation/stack';
 
+const Stack = createStackNavigator();
+
+import ClassDetail from './ClassDetail'
 import { apiURL, facultyList, yearList } from '../../config/config'
 import styles from '../../style/style'
 import HeaderText from '../../components/HeaderText'
@@ -11,7 +15,8 @@ import LoadingDataModal from '../../components/LoadingDataModal'
 import FlatList from '../../components/FlatList'
 import Text from '../../components/Text'
 import CustomButton from '../../components/Button'
-import { Search } from '../../components/TextInput'
+import Search from '../../components/Search'
+import CardView from '../../components/CardView'
 
 
 const ClassList = ({ navigation }) => {
@@ -26,18 +31,22 @@ const ClassList = ({ navigation }) => {
 
     useEffect(async () => {
         setLoadingDataModal(true)
-        await fetch(`${apiURL}/class/admin`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json()).then(async (res) => {
-            await setClassList(res.data)
-            await setDataClass(res.data)
-            await setLoadingDataModal(false)
-        })
+        try {
+            await fetch(`${apiURL}/class/admin`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json()).then(async (res) => {
+                await setClassList(res.data)
+                await setDataClass(res.data)
+                await setLoadingDataModal(false)
+            })
+        } catch (err) {
+            console.log('Error get classList: ', err);
+        }
     }, [])
 
     useEffect(() => handlerSearch(), [keyWord])
@@ -45,26 +54,30 @@ const ClassList = ({ navigation }) => {
 
     const handlerSearch = async () => {
         setClassList(dataClass);
-        if (filterData.faculty == 'all' && filterData.year == 'all') {
-            await setClassList(prevList => {
-                return prevList.filter(classObj => {
-                    return classObj.name.includes(keyWord)
+        try {
+            if (filterData.faculty == 'all' && filterData.year == 'all') {
+                await setClassList(prevList => {
+                    return prevList.filter(classObj => {
+                        return classObj.name.includes(keyWord)
+                    })
                 })
-            })
-        }
-        else if (filterData.faculty != 'all' && filterData.year != 'all') {
-            await setClassList(prevList => {
-                return prevList.filter(classObj => {
-                    return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year && classObj.faculty == filterData.faculty)
+            }
+            else if (filterData.faculty != 'all' && filterData.year != 'all') {
+                await setClassList(prevList => {
+                    return prevList.filter(classObj => {
+                        return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year && classObj.faculty == filterData.faculty)
+                    })
                 })
-            })
-        }
-        else if (filterData.faculty != 'all' || filterData.year != 'all') {
-            await setClassList(prevList => {
-                return prevList.filter(classObj => {
-                    return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year || classObj.faculty == filterData.faculty)
+            }
+            else if (filterData.faculty != 'all' || filterData.year != 'all') {
+                await setClassList(prevList => {
+                    return prevList.filter(classObj => {
+                        return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year || classObj.faculty == filterData.faculty)
+                    })
                 })
-            })
+            }
+        } catch (err) {
+            console.log('Error Search :', err);
         }
     }
 
@@ -131,9 +144,9 @@ const ClassItem = ({ item, navigation }) => {
 
 
     return (
-        <View style={{
-            marginVertical: 20, marginHorizontal: 10, elevation: 2, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: '#E5E6EA'
-        }}>
+        <CardView
+            onPress={() => navigation.navigate('ClassDetail', { _id: item._id })}
+        >
             <View style={{ width: '95%' }} >
                 <Text>Tên lớp: {item.name}</Text>
                 <Text>Năm: {item.year}</Text>
@@ -145,7 +158,7 @@ const ClassItem = ({ item, navigation }) => {
                     /> */}
                 </View>
             </View>
-        </View>
+        </CardView>
 
     )
 }
@@ -186,6 +199,20 @@ const YearPicker = ({ onValueChange, dumpFilter, filterData }) => {
     </View>)
 }
 
+const MainScreen = () => {
+
+    return (
+        <Stack.Navigator
+            initialRouteName="ClassList"
+            headerMode='none'
+            mode='modal'
+        >
+            <Stack.Screen name='ClassList' component={ClassList} />
+            <Stack.Screen name="ClassDetail" component={ClassDetail} />
+        </Stack.Navigator>
+    )
+
+}
 
 
-export default ClassList;
+export default MainScreen;

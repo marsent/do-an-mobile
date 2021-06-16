@@ -20,10 +20,20 @@ const AddStudent = ({ navigation }) => {
     const [error, setError] = useState(initError);
     const [classList, setClassList] = useState([]);
     const [isLoading, setIsLoading] = useState(false)
-
+    const [completed, setCompleted] = useState(false);
+    useEffect(async () => {
+        await yearList.unshift('Năm học')
+        setCompleted(true)
+        return () => {
+            setAccount();
+            setError();
+            setClassList();
+        }
+    }, [])
 
     useEffect(async () => {
-        setClassList([{ _id: '_000', name: 'Lớp sinh hoạt' }])
+        await setAccount({ ...account, class_id: '_000' })
+        await setClassList([{ _id: '_000', name: 'Lớp sinh hoạt' }])
         await fetch(`${apiURL}/class/admin${account.year != 'Năm học' ? '/?year=' + account.year : ''}`, {
             method: 'GET',
             headers: {
@@ -33,9 +43,8 @@ const AddStudent = ({ navigation }) => {
             }
         }).then(res => res.json()).then(async (res) => {
             await setClassList(prev => prev.concat(res.data))
-
-
         })
+
     }, [account.year])
 
 
@@ -90,7 +99,7 @@ const AddStudent = ({ navigation }) => {
         <View style={{ flex: 1 }}>
 
             <HeaderText navigation={navigation}>Thêm Sinh Viên</HeaderText>
-            <ScrollView style={{ flex: 1, marginTop: 10 }} >
+            {completed && <ScrollView style={{ flex: 1, marginTop: 10 }} >
 
                 <View style={[{ alignItems: 'center', flex: 1, marginBottom: 10 }]}>
 
@@ -182,7 +191,7 @@ const AddStudent = ({ navigation }) => {
                         textProcessing='Đang xử lý...'
                         onPress={onSubmitPress}>Thêm tài khoản</SubmitButton>
                 </View>
-            </ScrollView>
+            </ScrollView>}
             <Toast ref={(ref) => Toast.setRef(ref)} />
 
         </View>

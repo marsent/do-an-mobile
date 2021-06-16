@@ -1,6 +1,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Button } from 'react-native';
+import { View } from 'react-native';
 import HeaderText from '../../components/HeaderText';
 import { Picker } from '@react-native-picker/picker';
 import { createStackNavigator } from '@react-navigation/stack';

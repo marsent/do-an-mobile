@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Picker as PickerBase } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
@@ -21,7 +21,16 @@ const AddStudent = ({ navigation }) => {
     const [error, setError] = useState(initError);
     const [show, setShow] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
+    const [completed, setCompleted] = useState(false);
 
+    useEffect(async () => {
+        await facultyList.unshift('Khoa')
+        await setCompleted(true)
+        return () => {
+            setAccount();
+            setError()
+        }
+    }, [])
 
 
     const onSubmitPress = async () => {
@@ -75,7 +84,7 @@ const AddStudent = ({ navigation }) => {
         <View style={{ flex: 1 }}>
 
             <HeaderText navigation={navigation}>Thêm Giảng Viên</HeaderText>
-            <ScrollView style={{ marginTop: 30 }} >
+            {completed && <ScrollView style={{ marginTop: 30 }} >
 
                 <View style={[{ alignItems: 'center', marginBottom: 10 }]}>
 
@@ -147,7 +156,7 @@ const AddStudent = ({ navigation }) => {
                         textProcessing='Đang xử lý...'
                         onPress={onSubmitPress}>Thêm tài khoản</SubmitButton>
                 </View>
-            </ScrollView>
+            </ScrollView>}
             <Toast ref={(ref) => Toast.setRef(ref)} />
 
         </View >

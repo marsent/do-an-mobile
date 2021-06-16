@@ -5,7 +5,7 @@ import Spinkit from 'react-native-spinkit';
 import Button from './Button'
 import Text from './Text'
 const SubmitButton = ({
-    isProcessing = false, children, onPress, textProcessing = false, textColor = '#0598FC', btnStyle }) => {
+    isProcessing = false, children, onPress, textProcessing = 'Đang xử lý ...', textColor = '#0598FC', btnStyle }) => {
 
     if (isProcessing) return (
         <View style={{ alignItems: 'center' }} >

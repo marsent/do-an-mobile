@@ -26,6 +26,7 @@ const StudentList = ({ navigation }) => {
 
     const token = useContext(TokenContext);
 
+
     const [studentList, setStudentList] = useState([]);
     const [dataStudent, setDataStudent] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
@@ -34,33 +35,39 @@ const StudentList = ({ navigation }) => {
     const [keyWord, setKeyWord] = useState('');
     const [filterData, setFilterData] = useState({ year: 'all', class: 'all' });
     const [dumpFilter, setDumpfilter] = useState({ year: 'all', class: 'all' });
+    const [completed, setCompleted] = useState(false)
     useEffect(async () => {
         await setLoadingDataModal(true)
+        try {
+            await fetch(`${apiURL}/student/admin`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json()).then(async (res) => {
 
-        await fetch(`${apiURL}/student/admin`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json()).then(async (res) => {
+                await setStudentList(res.data)
+                await setDataStudent(res.data)
+            })
+            await fetch(`${apiURL}/class/admin`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json()).then(async (res) => {
+                await setClassList(res.data)
+                await setLoadingDataModal(false)
 
-            await setStudentList(res.data)
-            await setDataStudent(res.data)
-        })
-        await fetch(`${apiURL}/class/admin`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json()).then(async (res) => {
-            await setClassList(res.data)
-            await setLoadingDataModal(false)
-
-        })
+            })
+            await setCompleted(true)
+        } catch (err) {
+            console.log("Error get data: ", err);
+        }
+        setCompleted(true)
         return () => {
             setStudentList();
             setDataStudent();
@@ -125,8 +132,8 @@ const StudentList = ({ navigation }) => {
                     {/* List student */}
                     <View style={{ flex: 1, width: '100%', marginTop: 20, }}>
                         <View style={{ flex: 1, width: '100%', marginTop: 20 }}>
-                            <LoadingDataModal visible={loadingDataModal} />
-                            {!loadingDataModal &&
+                            {(loadingDataModal && !completed) && < LoadingDataModal visible={true} />}
+                            {(!loadingDataModal && completed) &&
                                 <ClassListContext.Provider value={classList}>
                                     <FlatList data={studentList} Component={StudentItem} navigation={navigation} />
                                 </ClassListContext.Provider>
@@ -164,10 +171,18 @@ const StudentList = ({ navigation }) => {
 const StudentItem = ({ item, navigation }) => {
     const classList = useContext(ClassListContext)
     const { _id, name, class_id, year, full_name, student_code, email } = item
-    const [classObj, setClassObj] = useState({});
+    const initClass = {
+        "quantity": 0,
+        "status": "",
+        "_id": "",
+        "name": "",
+        "year": "",
+        "faculty": "",
+    }
+    const [Class, setClass] = useState(initClass);
     useEffect(async () => {
-        await setClassObj(classList.filter(val => val._id == class_id)[0])
-    }, [classList])
+        await setClass(classList.filter(val => val._id == class_id)[0])
+    }, [])
     return (
         <TouchableOpacity style={{
             marginVertical: 20, marginHorizontal: 10, elevation: 2, padding: 8, alignItems: 'center', borderRadius: 15
@@ -179,7 +194,7 @@ const StudentItem = ({ item, navigation }) => {
                 <Text>Họ tên: {full_name}</Text>
                 <Text>Email: {email}</Text>
                 <Text>Năm học: {year}</Text>
-                <Text>Lớp sinh hoạt:{classObj.name} </Text>
+                <Text>Lớp sinh hoạt:{Class.name ? Class.name : null} </Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
                     {/* <Button title='Chi tiết'

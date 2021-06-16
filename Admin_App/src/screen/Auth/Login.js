@@ -44,36 +44,36 @@ export default Login = ({ token, setToken }) => {
     }
     const onLoginPress = async () => {
         await SetIsLoading(true)
-        await setTimeout(async () => {
-            await fetch(authUrl, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    phone: account.phone,
-                    password: account.password
-                })
-            }).then(async (res) => {
-                return await res.json()
+
+        await fetch(authUrl, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                phone: account.phone,
+                password: account.password
             })
-                .then(async (res) => {
-                    await SetIsLoading(false)
+        }).then(async (res) => {
+            return await res.json()
+        })
+            .then(async (res) => {
+                await SetIsLoading(false)
 
-                    if (res.error == 4000) {
-                        return setError(res.messages);
-                    }
-                    if (res.error == 7000) {
-                        return setError({ messages: 'Tài khoản hoặc mật khẩu không chính xác' })
-                    }
-                    await setError({ phone: false, password: false })
-                    setToken(res.data.token)
-                    return await SetIsLoading(false)
+                if (res.error == 4000) {
+                    return setError(res.messages);
+                }
+                if (res.error == 7000) {
+                    return setError({ messages: 'Tài khoản hoặc mật khẩu không chính xác' })
+                }
+                await setError({ phone: false, password: false })
+                setToken(res.data.token)
+                return await SetIsLoading(false)
 
 
-                })
-        }, 2000)
+            })
+
         handlerSavePassword()
     }
 

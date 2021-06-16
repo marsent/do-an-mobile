@@ -1,21 +1,19 @@
 import React, { useContext, useState } from 'react';
-import { ScrollView, View, TextInput, Text, TouchableOpacity } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { ScrollView, View } from 'react-native';
+import { Picker as PickerBase } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
 
 
 import styles from '../../style/style'
-import { yearList, facultyList, apiURL } from '../../config/config'
 import TokenContext from '../../Context/TokenContext'
-import LoadingModal from '../../components/LoadingModal'
-import Button from '../../components/Button'
-import SubmitButton from '../../components/SubmitButton'
-
+import { yearList, facultyList, apiURL } from '../../config/config'
+import { LoadingModal, Button, TextInput, Picker, Text, SubmitButton } from '../../components'
 const AddClass = ({ navigation }) => {
     const token = useContext(TokenContext)
-    const obj = { name: '', year: '2022', faculty: 'information_systems' }
-    const [classObj, setClassObj] = useState(obj)
-    const [error, setError] = useState({ name: '' });
+    const initClass = { name: '', year: 'Năm học', faculty: 'Khoa' }
+    const initError = { name: false, year: false, faculty: false }
+    const [classObj, setClassObj] = useState(initClass)
+    const [error, setError] = useState(initError);
     const [isLoading, setIsLoading] = useState(false)
 
 
@@ -36,7 +34,7 @@ const AddClass = ({ navigation }) => {
 
                     if (res.error == 4000) return setError(res.messages)
                     if (res.error == 7000) {
-                        setError(obj)
+                        setError(initError)
                         return Toast.show({
                             type: 'error',
                             position: 'top',
@@ -46,8 +44,8 @@ const AddClass = ({ navigation }) => {
                             autoHide: true,
                         })
                     }
-                    await setError(obj)
-                    await setClassObj(obj);
+                    await setError(initError)
+                    await setClassObj(initClass);
                     return Toast.show({
                         type: 'success',
                         position: 'top',
@@ -64,61 +62,64 @@ const AddClass = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             <HeaderText navigation={navigation} >Thêm Lớp</HeaderText>
-            <LoadingModal isVisible={isLoading} />
 
             <ScrollView style={{ marginTop: 30 }}>
-                <View style={[styles.container]}>
-                    <View style={[styles.inputView, { marginBottom: 20 }]}>
-                        {/* Class Name */}
-                        <View>
-                            <TextInput
-                                style={[styles.input, !error.name ? null : styles.borderErr]}
-                                placeholder='Tên lớp'
-                                value={classObj.name}
-                                onChangeText={text => setClassObj({ ...classObj, name: text })} />
-                            {!error.name ? null : <Text style={styles.textErr}>{error.name}</Text>}
-                        </View>
-                        {/* Year */}
-                        <View style={[styles.viewPicker, { width: '70%', marginLeft: 10 }]}>
-                            <Text style={{ fontFamily: 'Inter', fontSize: 16 }}>Năm học:</Text>
-                            <Picker
-                                selectedValue={classObj.year}
-                                onValueChange={(val, index) => {
-                                    setClassObj({ ...classObj, year: val })
-                                }}
-                                style={{ width: '50%' }}
-                            >
-                                {yearList.map(y => <Picker.Item
+                <View style={[{ alignItems: 'center', marginBottom: 10 }]}>
+                    {/* Class Name */}
+                    <View style={{ width: '90%' }}>
+                        <TextInput
+                            outLine={true}
+                            style={{ borderRadius: 5 }}
+                            placeholder='Tên lớp'
+                            value={classObj.name}
+                            onChangeText={text => setClassObj({ ...classObj, name: text })}
+                            errorMessage={error.name}
+                        />
+                    </View>
+                    {/* Year */}
+                    <View style={{ width: '90%', marginTop: 20 }}>
+                        <Picker
+                            style={{ borderRadius: 5 }}
+                            placeholder='Năm học'
+                            displayValue={classObj.year != 'Năm học' ? classObj.year : null}
+                            selectedValue={classObj.year}
+                            onValueChange={val => {
+                                setClassObj({ ...classObj, year: val })
+                            }}
+                            errorMessage={error.year}
+                        >
+                            {yearList.map(y =>
+                                <PickerBase.Item
                                     label={y.toString()}
                                     value={y.toString()}
-                                    key={y.toString()} />)}
-                            </Picker>
-                        </View>
-
-                        {/* Faculty */}
-                        <View style={[styles.viewPicker, { width: '70%', marginLeft: 10 }]}>
-                            <Text style={{ fontFamily: 'Inter', marginRight: '20%', fontSize: 16 }}>Khoa:</Text>
-                            <Picker
-                                selectedValue={classObj.faculty}
-                                onValueChange={(val, index) => {
-                                    setClassObj({ ...classObj, faculty: val })
-                                }}
-                                style={{ width: '80%' }}
-                            >
-                                {facultyList.map(val => <Picker.Item
-                                    label={val.toString()}
-                                    value={val.toString()}
-                                    key={val.toString()} />)}
-                            </Picker>
-                        </View>
-
+                                    key={y.toString()} />
+                            )}
+                        </Picker>
                     </View>
 
-                    <View>
+                    {/* Faculty */}
+                    <View style={{ width: '90%', marginTop: 20, marginBottom: 20 }}>
+                        <Picker
+                            style={{ borderRadius: 5 }}
 
-                        <Button onPress={onSubmitPress}
-                        >Thêm lớp</Button>
+                            placeholder='Khoa'
+                            displayValue={classObj.faculty != 'Khoa' ? classObj.faculty : ''
+                            }
+                            selectedValue={classObj.faculty}
+                            onValueChange={(val, index) => setClassObj({ ...classObj, faculty: val })}
+                            errorMessage={error.faculty}
+                        >
+                            {facultyList.map(val => <PickerBase.Item
+                                label={val}
+                                value={val}
+                                key={val} />)}
+                        </Picker>
                     </View>
+
+                    <SubmitButton
+                        isProcessing={isLoading}
+                        onPress={onSubmitPress} >Thêm lớp</SubmitButton>
+
 
                 </View>
             </ScrollView>
