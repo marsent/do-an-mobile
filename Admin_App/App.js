@@ -11,7 +11,7 @@ import ExamManagement from './src/screen/Exam/ExamManagement';
 import ClassManagement from './src/screen/Class/ClassManagement';
 import Home from './src/screen/Home'
 import { createStackNavigator } from '@react-navigation/stack';
-
+import SplashScreen from 'react-native-splash-screen'
 // Create drawer tabNav
 const Stack = createStackNavigator();
 
@@ -19,6 +19,10 @@ const Stack = createStackNavigator();
 import { TokenProvider } from './src/Context/TokenContext'
 
 const App = () => {
+
+  useEffect(()=>{
+    SplashScreen.hide()
+  })
 
   const [token, setToken] = useState('');
   if (!token) return <Login token={token} setToken={setToken} />

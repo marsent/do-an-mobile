@@ -34,6 +34,9 @@ export default Login = ({ token, setToken }) => {
     }, [])
     useEffect(async () => {
         await handlerSavePassword()
+    }, [account])
+    useEffect(async () => {
+        await handlerSavePassword()
     }, [savePassword])
     const handlerSavePassword = async () => {
         if (savePassword) {
@@ -73,12 +76,10 @@ export default Login = ({ token, setToken }) => {
 
 
             })
-
-        handlerSavePassword()
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
             {/* {isLoading && <Modal isVisible={true}
                 backdropColor='#0598FC'
                 backdropOpacity={1}
