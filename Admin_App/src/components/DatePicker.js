@@ -3,13 +3,34 @@ import React, { useState, useEffect } from 'react'
 import { View, TouchableOpacity, TextInput } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Icon from 'react-native-vector-icons/FontAwesome5'
+import * as Animatable from 'react-native-animatable'
 
 import styles from '../style/style'
+import { mainWhite, errorColor, mainGray } from '../style/color'
 import Text from './Text'
-const DatePicker = ({ onPick, style, leftIcon = false, placeholder, mode = 'date', errorMessage = false }) => {
+
+const fadeIn = {
+    from: {
+        top: 25,
+    },
+    to: {
+        top: 0,
+    },
+};
+
+const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode = 'date', errorMessage = false, outLineColor = mainGray }) => {
     const [show, setShow] = useState(false)
     const [date, setDate] = useState('');
-    const [dayText, setDateText] = useState('')
+    const [dateText, setDateText] = useState('')
+    const [borderColor, setBorderColor] = useState(outLineColor);
+    useEffect(() => {
+        if (errorMessage) {
+            setBorderColor(errorColor)
+        } else {
+            setBorderColor(outLineColor)
+        }
+
+    }, [errorMessage])
     useEffect(() => {
         if (date) {
             let tmp = new Date(date)
@@ -23,9 +44,19 @@ const DatePicker = ({ onPick, style, leftIcon = false, placeholder, mode = 'date
         }
     }, [date])
     return (
-        <View>
+        <View style={{ paddingTop: 13 }}>
+            {(label && !dateText == false) && <Animatable.View
+                animation={fadeIn}
+                duration={500}
+                style={{ position: 'absolute', top: 0, marginLeft: !leftIcon ? 15 : 50, backgroundColor: mainWhite, zIndex: 1 }}
+            >
+                <Text
+                    size={16}
+                    color={borderColor}
+                >{label}</Text>
+            </Animatable.View>}
             <TouchableOpacity
-                style={[{ flex: 1, flexDirection: 'row', alignItems: 'center', borderRadius: 30, elevation: 1, }, style, !errorMessage ? null : styles.borderErr]}
+                style={[{ flex: 1, flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderWidth: 1, borderColor: borderColor }, style, !errorMessage ? null : styles.borderErr]}
                 onPress={() => setShow(true)}
             >
                 <View style={{ marginLeft: 15 }}>
@@ -33,8 +64,9 @@ const DatePicker = ({ onPick, style, leftIcon = false, placeholder, mode = 'date
                 </View>
                 <TextInput style={[{ flex: 1, marginLeft: 10, fontFamily: 'Inter', fontSize: 16, color: '#22262e' }]}
                     editable={false}
+                    placeholderTextColor={borderColor}
                     placeholder={placeholder}
-                    value={dayText}
+                    value={dateText}
                 />
                 {
                     show && (<DateTimePicker

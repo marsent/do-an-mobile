@@ -9,6 +9,7 @@ import Modal from 'react-native-modal';
 const Stack = createStackNavigator();
 
 import { facultyList, apiURL } from '../../config/config';
+import { LectureUtils } from '../../utils'
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
 import Text from '../../components/Text'
@@ -32,15 +33,11 @@ const LectureList = ({ navigation }) => {
     const [keyWord, setKeyWord] = useState('');
 
     useEffect(async () => {
+        const query = {
+            token: token,
+        }
         try {
-            await fetch(`${apiURL}/lecture/admin`, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(async (res) => {
+            LectureUtils.getAllLecture(query).then(async (res) => {
                 await setDataLecture(res.data)
                 await setLectureList(res.data)
             })

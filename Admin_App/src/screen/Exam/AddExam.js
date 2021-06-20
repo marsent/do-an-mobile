@@ -1,6 +1,6 @@
 import { Picker as PickerBase } from '@react-native-picker/picker'
 import React, { useState, useContext, useEffect } from 'react'
-import { View, ScrollView, TextInput as TextInputBase, TouchableOpacity } from 'react-native'
+import { View, ScrollView, TextInput as TextInputBase, TouchableOpacity, SafeAreaView } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DocumentPicker from 'react-native-document-picker'
 import RNFS from 'react-native-fs';
@@ -8,18 +8,34 @@ import { RadioButton, Checkbox } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
 import Spinkit from 'react-native-spinkit'
 
-import HeaderText from '../../components/HeaderText'
 import styles from '../../style/style'
+import { ExamUtils, ClassUtils } from '../../utils'
+
 import TokenContext from '../../Context/TokenContext'
 import { apiURL, yearList } from '../../config/config'
-import Text from '../../components/Text'
-import Button from '../../components/Button'
-import TextInput from '../../components/TextInput'
-import Picker from '../../components/Picker'
+import {
+    HeaderText,
+    Text,
+    Button,
+    TextInput,
+    Picker
+} from '../../components'
+import { mainWhite } from '../../style/color'
+
+
+
 export default AddExam = ({ navigation }) => {
 
     const token = useContext(TokenContext)
     const initError = { name: false, class_id: false }
+    const initClass = {
+        "quantity": 0,
+        "status": "",
+        "_id": "",
+        "name": "",
+        "year": "",
+        "faculty": "",
+    }
     const [type, setType] = useState('all');
     const [questions, setQuestions] = useState([]);
     const [uploadExam, setUploadExam] = useState(false);
@@ -28,33 +44,14 @@ export default AddExam = ({ navigation }) => {
     const [fileStudent, setFileStudent] = useState('');
     const [nameExam, setNameExam] = useState('');
     const [classList, setClassList] = useState([]);
-    const [classId, setClassId] = useState('_000');
+    const [classId, setClassId] = useState('');
     const [time, setTime] = useState(15);
     const [error, setError] = useState(initError);
     const [previewQuestions, setPrevewQuestions] = useState(false);
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
+    const [Class, setClass] = useState(initClass)
     // get Class List
-    useEffect(async () => {
-        setClassList([{ _id: '_000', name: 'Lớp làm bài' }])
-        try {
-            await fetch(`${apiURL}/class/admin/`, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(async (res) => {
-                await setClassList(prev => prev.concat(res.data))
-            })
-        } catch (err) {
-            console.log('Error get classList: ', err);
-        }
-        return () => {
-            setClassList()
-            setIsLoading(false)
-        }
-    }, [])
+
     const handlerUploadExam = async () => {
         try {
             const res = await DocumentPicker.pick({
@@ -75,7 +72,6 @@ export default AddExam = ({ navigation }) => {
             }
         }
     }
-
     const uploadStudentList = async () => {
         try {
             const res = await DocumentPicker.pick({
@@ -96,10 +92,29 @@ export default AddExam = ({ navigation }) => {
             }
         }
     }
-
+    useEffect(async () => {
+        try {
+            await ClassUtils.getAllClass({ token })
+                .then(async (res) => {
+                    await setClassList(res.data)
+                    if (res.data.length > 0) {
+                        await setClassId(res.data[1]._id)
+                    }
+                })
+        } catch (err) {
+            console.log('Error get classList: ', err);
+        }
+        return () => {
+            setClassList()
+            setIsLoading(false)
+        }
+    }, [])
+    useEffect(async () => {
+        await setClass(classList.find(element => element._id == classId))
+    }, [classId])
     const handlerSubmit = async (e) => {
         setIsLoading(true)
-        const value = {
+        const exam = {
             name: nameExam,
             for: type,
             questions: questions,
@@ -107,20 +122,11 @@ export default AddExam = ({ navigation }) => {
             time: time,
         }
         if (type == 'class' && classId != '_000') {
-            value.class_id = classId
+            exam.class_id = classId
         }
-        console.log(value);
         try {
             await setTimeout(async () => {
-                await fetch(`${apiURL}/exam/admin`, {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify(value)
-                }).then(res => res.json())
+                ExamUtils.createExam({ token: token, exam: exam })
                     .then(res => {
                         console.log(res);
                         setIsLoading(false)
@@ -157,43 +163,33 @@ export default AddExam = ({ navigation }) => {
             console.log('Error submit exam: ', err);
         }
     }
-
     return (
-        <View >
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderText navigation={navigation}  >Tạo bài thi</HeaderText>
-            <ScrollView >
-                <View style={[styles.container, { marginTop: 0 }]}>
+            <ScrollView style={{ marginTop: 30 }}>
+                <View style={{ flex: 1, alignItems: 'center' }}>
 
                     {/* Type Exam for */}
-                    <View style={{ width: '90%', flexDirection: 'column', justifyContent: 'flex-start' }}>
-                        <RadioButton.Group value={type} onValueChange={val => setType(val)}>
-                            <View style={[styles.viewRadioGroup, { width: '90%', marginBottom: 10 }]}>
-                                <Text>Loại cuộc thi:</Text>
-                                <View style={[styles.viewRadio]}>
-                                    <Text >All</Text>
-                                    <RadioButton value='all' />
-                                </View>
-
-                                <View style={[styles.viewRadio]}>
-                                    <Text >Lớp</Text>
-                                    <RadioButton value='class' />
-                                </View>
-
-                                <View style={[styles.viewRadio]}>
-                                    <Text >Nhóm</Text>
-                                    <RadioButton disabled={true} value='group' />
-                                </View>
-
-                            </View>
-                        </RadioButton.Group>
+                    <View style={{ width: '90%' }}>
+                        <Picker
+                            label='Loại bài thi'
+                            placeholder='Loại bài thi'
+                            displayValue={type}
+                            selectedValue={type}
+                            onValueChange={val => setType(val)}
+                        >
+                            <PickerBase.Item label="Tát cả sinh viên" value='all' />
+                            <PickerBase.Item label='Lớp' value='class' />
+                            <PickerBase.Item enabled={false} label='Nhóm' value='group' />
+                        </Picker>
                     </View>
-
                     {/* Name exam */}
                     <View style={{ width: '90%' }}>
                         <TextInput
+                            label='Tên bài thi'
                             isFocus={true}
                             outLine={true}
-                            style={{ borderRadius: 5 }}
+
                             placeholder='Tên bài thi'
                             onChangeText={text => setNameExam(text)}
                             value={nameExam}
@@ -202,14 +198,11 @@ export default AddExam = ({ navigation }) => {
 
                     </View>
                     {/* TypeExam */}
-                    {type === 'class' ? (
-                        <View style={{ width: '90%', marginTop: 20, marginBottom: 20 }}>
+                    {type === 'class' &&
+                        <View style={{ width: '90%', marginBottom: 15 }}>
                             <Picker
-                                style={{ borderRadius: 5 }}
                                 placeholder='Lớp'
-                                displayValue={classId != '_000' ?
-                                    classList.find(element => element._id == classId).name : ''
-                                }
+                                displayValue={Class.name}
                                 selectedValue={classId}
                                 onValueChange={(val, index) => setClassId(val)}
                                 errorMessage={error.class_id}
@@ -219,9 +212,9 @@ export default AddExam = ({ navigation }) => {
                                     value={val._id}
                                     key={val._id} />)}
                             </Picker>
-                        </View>
+                        </View>}
 
-                    ) : type === 'group' ? <View>
+                    {type === 'group' && <View>
                         {uploadStudent ? (
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Text>{fileStudent}</Text>
@@ -232,12 +225,10 @@ export default AddExam = ({ navigation }) => {
                                     <Icon name='times' />
                                 </TouchableOpacity>
                             </View>
-                        ) : <Button title='Chọn file danh sách sinh viên' onPress={uploadStudentList} />
-                        }
-
+                        ) : <Button title='Chọn file danh sách sinh viên' onPress={uploadStudentList} />}
                     </View>
-                        : null
                     }
+
                     {/* Time */}
                     <View style={{ width: '90%', díplay: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <Text  >Thời gian làm bài: </Text>
@@ -287,7 +278,8 @@ export default AddExam = ({ navigation }) => {
                     <Toast ref={(ref) => Toast.setRef(ref)} />
                 </View>
 
-                {previewQuestions && questions.length > 0 ? (
+                {
+                    (previewQuestions && questions.length > 0) &&
                     <View style={{ alignItems: 'center', marginBottom: 50 }}>
                         {questions.map((val, index) => {
                             return (
@@ -311,11 +303,10 @@ export default AddExam = ({ navigation }) => {
                             )
                         })}
                     </View>
-                )
-                    : null}
+                }
 
-            </ScrollView>
-        </View >
+            </ScrollView >
+        </SafeAreaView >
     )
 }
 function examFromat(csv) {

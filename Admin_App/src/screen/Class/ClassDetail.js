@@ -133,6 +133,7 @@ const ClassDetail = ({ route, navigation }) => {
                             </View>
                             <View style={{ flex: 1 }}>
                                 <TextInput
+                                    outLine={false}
                                     type='flat'
                                     editable={false}
                                     value={Class.year.toString()} />
@@ -145,6 +146,7 @@ const ClassDetail = ({ route, navigation }) => {
                             </View>
                             <View style={{ flex: 1 }}>
                                 <TextInput
+                                    outLine={false}
                                     type='flat'
                                     editable={false}
                                     value={Class.faculty} />
@@ -157,6 +159,7 @@ const ClassDetail = ({ route, navigation }) => {
                             </View>
                             <View style={{ flex: 1 }}>
                                 <TextInput
+                                    outLine={false}
                                     type='flat'
                                     editable={false}
                                     value={Class.quantity.toString()} />

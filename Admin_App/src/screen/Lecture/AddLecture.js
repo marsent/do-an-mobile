@@ -1,11 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, SafeAreaView } from 'react-native';
 import { Picker as PickerBase } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
 
 
 import HeaderText from '../../components/HeaderText'
 import { apiURL, facultyList } from '../../config/config'
+import { LectureUtils } from '../../utils'
 import TokenContext from '../../Context/TokenContext'
 import TextInput from '../../components/TextInput'
 import DatePicker from '../../components/DatePicker'
@@ -14,7 +15,7 @@ import SubmitButton from '../../components/SubmitButton'
 import Text from '../../components/Text'
 
 const AddStudent = ({ navigation }) => {
-    const initAccount = { email: '', phone: '', full_name: '', date_of_birth: '', faculty: '' }
+    const initAccount = { email: '', phone: '', full_name: '', date_of_birth: '', faculty: facultyList[0] }
     const initError = { email: false, phone: false, full_name: false, date_of_birth: false, faculty: false }
     const token = useContext(TokenContext)
     const [account, setAccount] = useState(initAccount);
@@ -24,7 +25,6 @@ const AddStudent = ({ navigation }) => {
     const [completed, setCompleted] = useState(false);
 
     useEffect(async () => {
-        await facultyList.unshift('Khoa')
         await setCompleted(true)
         return () => {
             setAccount();
@@ -37,16 +37,9 @@ const AddStudent = ({ navigation }) => {
         setIsLoading(true);
         await setTimeout(async () => {
             try {
-                await fetch(`${apiURL}/lecture/admin`, {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify(account)
-                }).then(res => res.json())
+                LectureUtils.createLecture({ token: token, lecture: account })
                     .then(res => {
+                        console.log(res);
                         setIsLoading(false)
                         if (res.error == 4000) return setError(res.messages)
                         if (res.error == 7000) {
@@ -81,16 +74,18 @@ const AddStudent = ({ navigation }) => {
 
     return (
 
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
 
             <HeaderText navigation={navigation}>Thêm Giảng Viên</HeaderText>
             {completed && <ScrollView style={{ marginTop: 30 }} >
 
-                <View style={[{ alignItems: 'center', marginBottom: 10 }]}>
+                <View style={[{ alignItems: 'center', marginBottom: 15 }]}>
 
                     {/* Email */}
-                    <View style={{ width: '90%' }}>
+                    <View style={{ width: '90%', marginBottom: 15 }}>
                         <TextInput
+                            label='Email'
+                            outLine={true} isFocus={true}
                             leftIcon='envelope'
                             placeholder='Email'
                             value={account.email}
@@ -101,8 +96,10 @@ const AddStudent = ({ navigation }) => {
                     </View>
 
                     {/* Phone */}
-                    <View style={{ width: '90%', marginTop: 25 }} >
+                    <View style={{ width: '90%', marginBottom: 15 }} >
                         <TextInput
+                            label='Phone'
+                            outLine={true} isFocus={true}
                             leftIcon='mobile'
                             placeholder='Số điện thoại'
                             value={account.phone}
@@ -112,8 +109,11 @@ const AddStudent = ({ navigation }) => {
                     </View>
 
                     {/* Full name */}
-                    <View style={{ width: '90%', marginTop: 25 }} >
+                    <View style={{ width: '90%', marginBottom: 15 }} >
                         <TextInput
+                            label='Họ tên'
+                            outLine={true}
+                            isFocus={true}
                             leftIcon='user'
                             placeholder='Họ tên'
                             value={account.full_name}
@@ -123,8 +123,9 @@ const AddStudent = ({ navigation }) => {
                     </View>
 
                     {/* Date of Birth */}
-                    <View style={{ width: '90%', marginTop: 20 }}>
+                    <View style={{ width: '90%', marginBottom: 15 }}>
                         <DatePicker
+                            label='Ngày sinh'
                             placeholder='Ngày sinh'
                             leftIcon='birthday-cake'
                             mode='date'
@@ -135,12 +136,12 @@ const AddStudent = ({ navigation }) => {
 
                     {/* Faculty */}
 
-                    <View style={{ width: '90%', marginTop: 20, marginBottom: 20 }}>
+                    <View style={{ width: '90%', marginBottom: 20 }}>
                         <Picker
+                            label='Khoa'
                             leftIcon='chalkboard-teacher'
                             placeholder='Khoa'
-                            displayValue={account.faculty != 'Khoa' ? account.faculty : ''
-                            }
+                            displayValue={account.faculty}
                             selectedValue={account.faculty}
                             onValueChange={(val, index) => setAccount({ ...account, faculty: val })}
                             errorMessage={error.faculty}
@@ -159,7 +160,7 @@ const AddStudent = ({ navigation }) => {
             </ScrollView>}
             <Toast ref={(ref) => Toast.setRef(ref)} />
 
-        </View >
+        </SafeAreaView >
     );
 };
 

@@ -9,6 +9,7 @@ import Modal from 'react-native-modal';
 const Stack = createStackNavigator();
 
 import { apiURL } from '../../config/config';
+import { ExamUtils } from '../../utils'
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
 import Text from '../../components/Text'
@@ -31,17 +32,11 @@ const ExamList = ({ navigation }) => {
     const [keyWord, setKeyWord] = useState('')
     useEffect(async () => {
         try {
-            await fetch(`${apiURL}/exam/admin`, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(res => {
-                setDataExam(res.data)
-                setExamList(res.data)
-            })
+            await ExamUtils.getAllExam({ token: token })
+                .then(res => {
+                    setDataExam(res.data)
+                    setExamList(res.data)
+                })
         } catch (err) {
             console.log('Error get examList: ', err);
         }

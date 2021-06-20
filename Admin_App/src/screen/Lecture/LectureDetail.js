@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message'
 
 import styles from '../../style/style'
 import { apiURL } from '../../config/config';
+import { LectureUtils } from '../../utils'
 import TokenContext from '../../Context/TokenContext'
 import {
     Text,
@@ -36,14 +37,7 @@ const LectureDetail = ({ route, navigation }) => {
     useEffect(async () => {
         try {
             setIsLoading(true)
-            await fetch(`${apiURL}/lecture/admin/${_id}`, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json())
+            await LectureUtils.getLectureById({ token: token, id: _id })
                 .then(async (res) => {
                     await setLecture(res.data)
                 })
@@ -113,6 +107,7 @@ const LectureDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
                                 type='flat'
                                 editable={false}
                                 value={lecture.full_name} />
@@ -124,9 +119,10 @@ const LectureDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
                                 type='flat'
                                 editable={false}
-                                value={lecture.date_of_birth.split('T')[0]} />
+                                value={lecture.date_of_birth.split('T')[0].split('-').reverse().join('/')} />
                         </View>
                     </CustomView>
                     <CustomView>
@@ -135,6 +131,7 @@ const LectureDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
                                 type='flat'
                                 editable={false}
                                 value={lecture.phone} />
@@ -146,6 +143,8 @@ const LectureDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
+                                multiline={true}
                                 type='flat'
                                 editable={false}
                                 value={lecture.email} />

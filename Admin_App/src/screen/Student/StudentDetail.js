@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message'
 
 import { apiURL } from '../../config/config';
+import { StudentUtils, ClassUtils } from '../../utils'
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
 import {
@@ -49,18 +50,12 @@ const StudentDetail = ({ route, navigation }) => {
     const [isProcessing, setIsProcessing] = useState(false)
     useEffect(async () => {
         setIsLoading(true)
-        await fetch(`${apiURL}/student/admin/${_id}`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json())
+        await StudentUtils.getStudentById({ token: token, id: _id })
             .then(async (res) => {
+                console.log(res);
                 await setStudent(res.data)
+                setIsLoading(false)
             })
-        setIsLoading(false)
         return () => {
             setStudent();
             setClass();
@@ -78,8 +73,9 @@ const StudentDetail = ({ route, navigation }) => {
         }).then(res => res.json())
             .then(async (res) => {
                 await setClass(res.data)
+                setIsLoading(false)
             })
-        setIsLoading(false)
+
     }, [student.class_id])
 
 
@@ -134,6 +130,8 @@ const StudentDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
+                                editable={false}
                                 type='flat'
                                 value={student.student_code} />
                         </View>
@@ -144,6 +142,8 @@ const StudentDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
+                                editable={false}
                                 type='flat'
                                 value={student.full_name} />
                         </View>
@@ -154,8 +154,10 @@ const StudentDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
+                                editable={false}
                                 type='flat'
-                                value={student.date_of_birth.split('T')[0]} />
+                                value={student.date_of_birth.split('T')[0].split('-').reverse().join('/')} />
                         </View>
                     </CustomVIew>
                     <CustomVIew>
@@ -164,6 +166,10 @@ const StudentDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
+                                editable={false}
+                                multiline={true}
+
                                 type='flat'
                                 value={Class.name} />
                         </View>
@@ -174,6 +180,8 @@ const StudentDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
+                                editable={false}
                                 type='flat'
                                 value={student.phone} />
                         </View>
@@ -184,6 +192,10 @@ const StudentDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                outLine={false}
+                                editable={false}
+                                multiline={true}
+
                                 type='flat'
                                 value={student.email} />
                         </View>

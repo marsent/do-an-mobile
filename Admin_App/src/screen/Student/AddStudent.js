@@ -6,60 +6,91 @@ import Toast from 'react-native-toast-message';
 import HeaderText from '../../components/HeaderText'
 
 import { apiURL, yearList } from '../../config/config'
+import { mainWhite } from '../../style/color';
+import { StudentUtils } from '../../utils'
 import TokenContext from '../../Context/TokenContext'
 import TextInput from '../../components/TextInput'
 import DatePicker from '../../components/DatePicker'
 import Picker from '../../components/Picker'
 import SubmitButton from '../../components/SubmitButton'
-
 const AddStudent = ({ navigation }) => {
-    const initAccount = { email: '', phone: '', full_name: '', date_of_birth: '', year: 'Năm học', class_id: '_000' }
-    const initError = { email: false, phone: false, full_name: false, date_of_birth: false, year: false, class_id: false }
+    const initAccount = {
+        email: '',
+        phone: '',
+        full_name: '',
+        date_of_birth: '',
+        year: new Date().getFullYear().toString(),
+        class_id: ''
+    }
+    const initError = {
+        email: false,
+        phone: false,
+        full_name: false,
+        date_of_birth: false,
+        year: false,
+        class_id: false
+    }
+    const initClass = {
+        "quantity": 0,
+        "status": "",
+        "_id": "",
+        "name": "",
+        "year": "",
+        "faculty": "",
+    }
     const token = useContext(TokenContext)
     const [account, setAccount] = useState(initAccount);
     const [error, setError] = useState(initError);
     const [classList, setClassList] = useState([]);
     const [isLoading, setIsLoading] = useState(false)
     const [completed, setCompleted] = useState(false);
+    const [Class, setClass] = useState(initClass)
     useEffect(async () => {
-        await yearList.unshift('Năm học')
         setCompleted(true)
         return () => {
+            setYearList();
             setAccount();
             setError();
             setClassList();
         }
     }, [])
-
     useEffect(async () => {
-        await setAccount({ ...account, class_id: '_000' })
-        await setClassList([{ _id: '_000', name: 'Lớp sinh hoạt' }])
-        await fetch(`${apiURL}/class/admin${account.year != 'Năm học' ? '/?year=' + account.year : ''}`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json()).then(async (res) => {
-            await setClassList(prev => prev.concat(res.data))
-        })
-
-    }, [account.year])
-
-
-    const onSubmitPress = async () => {
-        await setIsLoading(true)
-        await setTimeout(async () => {
-            await fetch(`${apiURL}/student/admin`, {
-                method: 'POST',
+        try {
+            await fetch(`${apiURL}/class/admin/?year=${account.year}`, {
+                method: 'GET',
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify(account)
-            }).then(res => res.json()).then(res => {
+                }
+            }).then(res => res.json()).then(async (res) => {
+                await setClassList(res.data);
+                if (res.data.length > 0) {
+                    await setAccount({ ...account, class_id: res.data[0]._id })
+                } else {
+                    await setAccount({ ...account, class_id: '' })
+
+                }
+
+            })
+        }
+        catch (err) {
+            console.log('Get classList error :', err);
+        }
+    }, [account.year])
+    useEffect(async () => {
+        if (account.class_id != '') {
+            await setClass(classList.find(element => element._id == account.class_id))
+        }
+        else {
+            setClass(initClass)
+        }
+    }, [account.class_id])
+
+    const onSubmitPress = async () => {
+        await setIsLoading(true)
+        await setTimeout(async () => {
+            StudentUtils.createStudent({ token: token }).then(res => {
                 console.log(res);
                 setIsLoading(false)
                 if (res.error == 4000) {
@@ -93,10 +124,9 @@ const AddStudent = ({ navigation }) => {
         }, 1000)
 
     }
-
     return (
 
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: mainWhite }}>
 
             <HeaderText navigation={navigation}>Thêm Sinh Viên</HeaderText>
             {completed && <ScrollView style={{ flex: 1, marginTop: 10 }} >
@@ -106,6 +136,9 @@ const AddStudent = ({ navigation }) => {
                     {/* Email */}
                     <View style={{ width: '90%', marginTop: 1 }}>
                         <TextInput
+                            label='Email'
+                            outLine={true}
+                            isFocus={true}
                             leftIcon='envelope'
                             placeholder='Email'
                             value={account.email}
@@ -115,8 +148,11 @@ const AddStudent = ({ navigation }) => {
                     </View>
 
                     {/* Phone */}
-                    <View style={{ width: '90%', marginTop: 25 }}>
+                    <View style={{ width: '90%', marginBottom: 10 }}>
                         <TextInput
+                            label='Phone'
+                            outLine={true}
+                            isFocus={true}
                             leftIcon='mobile'
                             placeholder='Số điện thoại'
                             value={account.phone}
@@ -126,8 +162,11 @@ const AddStudent = ({ navigation }) => {
                     </View>
 
                     {/* Full nme */}
-                    <View style={{ width: '90%', marginTop: 25 }}>
+                    <View style={{ width: '90%', marginBottom: 10 }}>
                         <TextInput
+                            label='Họ tên'
+                            outLine={true}
+                            isFocus={true}
                             leftIcon='user'
                             placeholder='Họ tên'
                             value={account.full_name}
@@ -139,8 +178,9 @@ const AddStudent = ({ navigation }) => {
                     </View>
 
                     {/* Date of Birth */}
-                    <View style={{ width: '90%', marginTop: 20 }}>
+                    <View style={{ width: '90%', marginBottom: 10 }}>
                         <DatePicker
+                            label='Ngày sinh'
                             placeholder='Ngày sinh'
                             leftIcon='birthday-cake'
                             mode='date'
@@ -149,8 +189,9 @@ const AddStudent = ({ navigation }) => {
                         />
                     </View>
                     {/* Year */}
-                    <View style={{ width: '90%', marginTop: 20 }}>
+                    <View style={{ width: '90%', marginBottom: 10 }}>
                         <Picker
+                            label='Năm học'
                             leftIcon='calendar-alt'
                             placeholder='Năm học'
                             displayValue={account.year != 'Năm học' ? account.year : null}
@@ -169,21 +210,23 @@ const AddStudent = ({ navigation }) => {
                         </Picker>
                     </View>
                     {/* Class  */}
-                    <View style={{ width: '90%', marginTop: 20, marginBottom: 20 }}>
+                    <View style={{ width: '90%', marginBottom: 20 }}>
                         <Picker
+                            label='Lớp sinh hoạt'
                             leftIcon='chalkboard'
                             placeholder='Lớp sinh hoạt'
-                            displayValue={account.class_id != '_000' ?
-                                classList.find(element => element._id == account.class_id).name : ''
-                            }
+                            displayValue={Class.name}
                             selectedValue={account.class_id}
                             onValueChange={(val, index) => setAccount({ ...account, class_id: val })}
                             errorMessage={error.class_id}
                         >
-                            {classList.map(val => <PickerBase.Item
+                            {classList.length > 0 ? classList.map(val => <PickerBase.Item
                                 label={val.name}
                                 value={val._id}
-                                key={val._id} />)}
+                                key={val._id} />) : <PickerBase.Item
+                                label='Không có lớp '
+                                value=''
+                            />}
                         </Picker>
                     </View>
                     <SubmitButton

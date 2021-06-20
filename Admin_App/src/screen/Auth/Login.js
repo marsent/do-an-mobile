@@ -16,7 +16,9 @@ import Password from '../../components/Password'
 import Text from '../../components/Text'
 const img = require('../../../assets/public/img/online-course.png')
 import SubmitButton from '../../components/SubmitButton'
-
+import { mainWhite } from '../../style/color';
+import Picker from '../../components/Picker';
+import { Picker as PickerBase } from '@react-native-picker/picker'
 export default Login = ({ token, setToken }) => {
     const [account, setAccount] = useState({ phone: '', password: '' })
     const [error, setError] = useState({ phone: false, password: false });
@@ -48,74 +50,74 @@ export default Login = ({ token, setToken }) => {
     const onLoginPress = async () => {
         await SetIsLoading(true)
 
-        await fetch(authUrl, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                phone: account.phone,
-                password: account.password
+        try {
+            await fetch(authUrl, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    phone: account.phone,
+                    password: account.password
+                })
+            }).then(async (res) => {
+                return await res.json()
             })
-        }).then(async (res) => {
-            return await res.json()
-        })
-            .then(async (res) => {
-                await SetIsLoading(false)
+                .then(async (res) => {
+                    await SetIsLoading(false)
 
-                if (res.error == 4000) {
-                    return setError(res.messages);
-                }
-                if (res.error == 7000) {
-                    return setError({ messages: 'Tài khoản hoặc mật khẩu không chính xác' })
-                }
-                await setError({ phone: false, password: false })
-                setToken(res.data.token)
-                return await SetIsLoading(false)
+                    if (res.error == 4000) {
+                        return setError(res.messages);
+                    }
+                    if (res.error == 7000) {
+                        return setError({ messages: 'Tài khoản hoặc mật khẩu không chính xác' })
+                    }
+                    await setError({ phone: false, password: false })
+                    setToken(res.data.token)
+                    return await SetIsLoading(false)
 
 
-            })
+                })
+        } catch (err) {
+            console.log('Login error: ', err);
+        }
     }
 
+
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-            {/* {isLoading && <Modal isVisible={true}
-                backdropColor='#0598FC'
-                backdropOpacity={1}
-                animationIn='fadeInDown'
-                animationInTiming={1000}
-            >
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
-                    <View style={{ alignItems: 'center' }}>
-                        <Spinkit type='FadingCircleAlt' color='#FFFFF' size={50} />
-                        <Text style={{ fontFamily: 'Inter', fontSize: 18, color: '#FFFFFF' }}> Đang đăng nhập</Text>
-                    </View>
-                </View>
-            </Modal>} */}
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
+
             <View style={{ height: '40%', borderBottomLeftRadius: 120, backgroundColor: '#0598FC', justifyContent: 'space-around', alignItems: 'center' }}>
                 <Icon name='user-cog' size={56} color='#FFFFFF' />
             </View>
             <View style={{ flex: 1, marginTop: 50 }}>
                 <View style={styles.container}>
                     <View style={{ width: '85%', marginBottom: 20 }}>
+                        <View style={{ marginBottom: 15 }}>
+                            <TextInput
+                                style={{ borderRadius: 30 }}
+                                shadow={1}
+                                isFocus={true}
+                                placeholder='Tên đăng nhập'
+                                value={account.phone}
+                                onChangeText={val => setAccount({ ...account, phone: val })}
+                                leftIcon='user'
+                                errorMessage={error.phone}
+                            />
+                        </View>
+                        <View style={{ marginBottom: 10 }}>
+                            <Password
+                                isFocus={true}
+                                shadow={1}
+                                style={{ marginTop: 10 }}
+                                value={account.password}
+                                onChangeText={val => setAccount({ ...account, password: val })}
+                                errorMessage={error.password}
+                            />
+                            {error.messages && <Text size={14} style={styles.textErr}>{error.messages}</Text>}
+                        </View>
 
-                        <TextInput
-                            style={{ marginBottom: 10 }}
-                            placeholder='Tên đăng nhập'
-                            value={account.phone}
-                            onChangeText={val => setAccount({ ...account, phone: val })}
-                            leftIcon='user'
-                            errorMessage={error.phone}
-                        />
-
-                        <Password
-                            style={{ marginTop: 10 }}
-                            value={account.password}
-                            onChangeText={val => setAccount({ ...account, password: val })}
-                            errorMessage={error.password}
-                        />
-                        {error.messages && <Text size={14} style={styles.textErr}>{error.messages}</Text>}
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, marginLeft: 5 }}>
                             <Checkbox
                                 status={savePassword ? 'checked' : 'unchecked'}

@@ -9,6 +9,7 @@ import StudentManagement from './src/screen/Student/StudentManagement';
 import LecturerManagement from './src/screen/Lecture/LecturerManagement';
 import ExamManagement from './src/screen/Exam/ExamManagement';
 import ClassManagement from './src/screen/Class/ClassManagement';
+import SubjectManagement from './src/screen/Subject/SubjectManagement'
 import Home from './src/screen/Home'
 import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from 'react-native-splash-screen'
@@ -20,7 +21,7 @@ import { TokenProvider } from './src/Context/TokenContext'
 
 const App = () => {
 
-  useEffect(()=>{
+  useEffect(() => {
     SplashScreen.hide()
   })
 
@@ -38,6 +39,7 @@ const App = () => {
           <Stack.Screen name="Quản lý giảng viên" component={LecturerManagement} />
           <Stack.Screen name="Quản lý lớp học" component={ClassManagement} />
           <Stack.Screen name="Quản lý đề thi" component={ExamManagement} />
+          <Stack.Screen name="Quản lý môn học" component={SubjectManagement} />
         </Stack.Navigator>
       </TokenProvider >
     </NavigationContainer >

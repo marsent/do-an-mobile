@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Button, } from 'react-native';
+import { View, Button, TouchableOpacity } from 'react-native';
 import HeaderText from '../../components/HeaderText';
 import { Picker } from '@react-native-picker/picker';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -8,6 +8,7 @@ import Modal from 'react-native-modal';
 const Stack = createStackNavigator();
 
 import { yearList, apiURL } from '../../config/config';
+import { StudentUtils, ClassUtils } from '../../utils'
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
 import StudentDetail from './StudentDetail';
@@ -16,7 +17,6 @@ import FlatList from '../../components/FlatList'
 import CustomButton from '../../components/Button'
 import Text from '../../components/Text'
 import Search from '../../components/Search'
-import { TouchableOpacity } from 'react-native';
 
 
 const ClassListContext = React.createContext()
@@ -39,26 +39,12 @@ const StudentList = ({ navigation }) => {
     useEffect(async () => {
         await setLoadingDataModal(true)
         try {
-            await fetch(`${apiURL}/student/admin`, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(async (res) => {
+            await StudentUtils.getAllStudent({ token: token }).then(async (res) => {
 
                 await setStudentList(res.data)
                 await setDataStudent(res.data)
             })
-            await fetch(`${apiURL}/class/admin`, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(async (res) => {
+            await ClassUtils.getAllClass({ token: token }).then(async (res) => {
                 await setClassList(res.data)
                 await setLoadingDataModal(false)
 
@@ -113,6 +99,7 @@ const StudentList = ({ navigation }) => {
     const toggleModal = async () => {
         setModalVisible(!isModalVisible);
     };
+
 
     return (
 
@@ -181,7 +168,7 @@ const StudentItem = ({ item, navigation }) => {
     }
     const [Class, setClass] = useState(initClass);
     useEffect(async () => {
-        await setClass(classList.filter(val => val._id == class_id)[0])
+        await setClass(classList.find(val => val._id == class_id))
     }, [])
     return (
         <TouchableOpacity style={{
@@ -194,7 +181,7 @@ const StudentItem = ({ item, navigation }) => {
                 <Text>Họ tên: {full_name}</Text>
                 <Text>Email: {email}</Text>
                 <Text>Năm học: {year}</Text>
-                <Text>Lớp sinh hoạt:{Class.name ? Class.name : null} </Text>
+                <Text>Lớp sinh hoạt: {Class.name ? Class.name : null} </Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
                     {/* <Button title='Chi tiết'

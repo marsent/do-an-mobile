@@ -157,6 +157,7 @@ const ExamDetail = ({ route, navigation }) => {
                                 <TextInput
                                     outLine={isEdit}
                                     outlineColor={mainBlue}
+                                    isFocus={true}
                                     type='flat'
                                     editable={isEdit}
                                     value={exam.name}

@@ -33,6 +33,10 @@ export default Home = ({ route, navigation }) => {
 
                     <ViewRowGroup>
                         <CustomTouchOpacity src={img.class} onPress={() => navigation.navigate('Quản lý lớp học', { navigation })} >Lớp</CustomTouchOpacity>
+                        <CustomTouchOpacity src={img.logout} onPress={() => navigation.navigate('Quản lý môn học', { navigation })} >Môn học</CustomTouchOpacity>
+                    </ViewRowGroup>
+                    <ViewRowGroup>
+
                         <CustomTouchOpacity src={img.logout} onPress={() => setToken('')} >Đăng xuất</CustomTouchOpacity>
                     </ViewRowGroup>
                 </View>
