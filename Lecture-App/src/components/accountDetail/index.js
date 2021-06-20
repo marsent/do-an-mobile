@@ -14,11 +14,12 @@ import {
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
 import TokenContext from '../../Context/TokenContext';
+import {apiURL} from '../../config/config';
 export default function AccountDetail() {
   const token = useContext(TokenContext);
   const [info, setInfo] = useState({});
   useEffect(async () => {
-    await fetch('http://quocha.xyz/api/lecture', {
+    await fetch(`${apiURL}/lecture`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
