@@ -90,7 +90,7 @@ const AddStudent = ({ navigation }) => {
     const onSubmitPress = async () => {
         await setIsLoading(true)
         await setTimeout(async () => {
-            StudentUtils.createStudent({ token: token }).then(res => {
+            StudentUtils.createStudent({ token: token, student: account }).then(res => {
                 console.log(res);
                 setIsLoading(false)
                 if (res.error == 4000) {
