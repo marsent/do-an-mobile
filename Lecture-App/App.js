@@ -1,11 +1,7 @@
 import React, {useState} from 'react';
-import Login from './src/components/Login';
-import MainTabScreen from './src/screen/main';
+import Login from './src/screens/Login';
+import MainTabScreen from './src/navigation/main';
 import {TokenProvider} from './src/Context/TokenContext';
-import {BottomNavigation, Text} from 'react-native-paper';
-import ListClass from './src/components/ClassManagement/listClass';
-import ListNoti from './src/components/createNotification/listNoti';
-import detail from './src/components/accountDetail/index';
 import {NavigationContainer} from '@react-navigation/native';
 const App = () => {
   // const [token, setToken] = useState();

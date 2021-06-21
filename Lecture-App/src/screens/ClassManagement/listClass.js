@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
   ButtonContainer: {
     flex: 1,
     flexDirection: 'row',
-
     justifyContent: 'flex-end',
     marginTop: 20,
   },

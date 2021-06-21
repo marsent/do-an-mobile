@@ -8,11 +8,8 @@ export default function informationOfStudent() {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={styles.Container}>
-      <View style={styles.headerView}>
-        <Text style={styles.headerText}>Tạo thông báo</Text>
-      </View>
       <View style={styles.createNoti}>
-        <Text style={styles.tex}>Lớp</Text>
+        <Text style={styles.text}>Lớp</Text>
         <Picker
           style={{width: '60%'}}
           selectedValue={lop}

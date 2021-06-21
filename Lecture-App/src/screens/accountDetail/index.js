@@ -34,11 +34,6 @@ export default function AccountDetail() {
   });
   return (
     <View style={styles.Container}>
-      <View style={styles.headerView}>
-        {/* <Image style={styles.imageBack} source={Image2} /> */}
-        <Text style={styles.headerText}>Thông tin Giảng viên</Text>
-        {/* <Button style={styles.logoutButton} title="Đăng xuất"/> */}
-      </View>
       <View style={styles.inforView}>
         <View style={styles.inforText}>
           <View style={styles.avatar}>
