@@ -17,7 +17,9 @@ const App = () => {
   //   )
   // }
   // const [index, setIndex] = React.useState(0);
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState(
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGQwMDRjNzk0NDlhN2NhMDg5YTViN2MiLCJwaG9uZSI6IjAzOTU5NTI3NDEiLCJlbWFpbCI6InRodWFucHJvMjAyNUBnbWFpbC5jb20iLCJpYXQiOjE2MjQyNDU1ODV9.fX0sZNHrrTAbAdbUPAq_PSdbo5DR27W_PR_QMB2tZTI',
+  );
   // const [routes] = React.useState([
   //   {key: 'ListClass', title: 'Quản lý lớp học', icon: 'calendar-clock'},
   //   {key: 'ListNoti', title: 'Quản lý hông báo', icon: 'bell-outline'},

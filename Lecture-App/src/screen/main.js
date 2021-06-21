@@ -8,6 +8,7 @@ import detail from '../components/accountDetail/index';
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {NavigationContainer} from '@react-navigation/native';
+import classDetail from '../components/ClassManagement/listStudent';
 import {
   Modal,
   View,
@@ -67,6 +68,7 @@ const LCStacks = () => {
   return (
     <LCStack.Navigator>
       <LCStack.Screen name="Xem lớp học" component={ListClass} />
+      <LCStack.Screen name="Xem chi tiết" component={classDetail} />
     </LCStack.Navigator>
   );
 };

@@ -7,17 +7,17 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import TokenContext from '../../Context/TokenContext';
 import {apiURL, authUrl} from '../../config/config';
-import listStudent from '../ClassManagement/listStudent';
-function listClass({_id, navigation}) {
+import classDetail from '../ClassManagement/listStudent';
+function listClass({navigation}) {
   const token = useContext(TokenContext);
   const [classList, setClassList] = useState([]);
 
   useEffect(async () => {
-    setError({
-      username: usernameValidator(username),
-      password: passwordValidator(password),
-    });
-    await fetch(`${apiURL}/class/lecture`, {
+    // setError({
+    //   username: usernameValidator(username),
+    //   password: passwordValidator(password),
+    // });
+    await fetch(`${apiURL}/subject/lecture`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -30,6 +30,7 @@ function listClass({_id, navigation}) {
         setClassList(res.data);
       });
   });
+
   return (
     <View style={styles.Container}>
       <ScrollView style={styles.NotiView}>
@@ -45,7 +46,7 @@ function listClass({_id, navigation}) {
                 style={styles.button}
                 title=" Xem danh sách lớp"
                 onPress={() => {
-                  navigation.navigate('Danh sách lớp');
+                  navigation.navigate('Xem chi tiết', {_id: item._id});
                 }}
               />
             </View>
