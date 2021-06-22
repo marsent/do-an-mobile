@@ -121,7 +121,7 @@ export default AddExam = ({ navigation }) => {
             year: new Date().getFullYear(),
             time: time,
         }
-        if (type == 'class' && classId != '_000') {
+        if (type == 'class') {
             exam.class_id = classId
         }
         try {

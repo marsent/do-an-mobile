@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message';
 import { Checkbox } from 'react-native-paper'
 
 import styles from '../../style/style';
-import { mainBlue } from '../../style/color'
+import { mainBlue, mainWhite } from '../../style/color'
 import { apiURL } from '../../config/config';
 import TokenContext from '../../Context/TokenContext';
 import { LoadingDataModal, Text, TextInput, SubmitButtonDetail } from '../../components';
@@ -142,7 +142,7 @@ const ExamDetail = ({ route, navigation }) => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <CustomHeaderText navigation={navigation} >Chi tiết bài thi</CustomHeaderText>
             <LoadingDataModal visible={isLoadingData} />
             {!isLoadingData && <ScrollView style={{ flex: 1 }} >
@@ -176,6 +176,7 @@ const ExamDetail = ({ route, navigation }) => {
                                 <TextInput
                                     type='flat'
                                     editable={false}
+                                    outLine={false}
                                     value={exam.time.toString() + ' phút'} />
                             </View>
                         </CustomView>
@@ -187,6 +188,8 @@ const ExamDetail = ({ route, navigation }) => {
                                 <TextInput
                                     type='flat'
                                     editable={false}
+                                    outLine={false}
+
                                     value={exam.questions.length.toString()} />
                             </View>
                         </CustomView>
@@ -198,6 +201,8 @@ const ExamDetail = ({ route, navigation }) => {
                                 <TextInput
                                     type='flat'
                                     editable={false}
+                                    outLine={false}
+
                                     value={exam.for} />
                             </View>
                         </CustomView>
@@ -208,6 +213,8 @@ const ExamDetail = ({ route, navigation }) => {
                             <View style={{ flex: 1 }}>
                                 <TextInput
                                     type='flat'
+                                    outLine={false}
+
                                     editable={false}
                                     value={Class.name} />
                             </View>
