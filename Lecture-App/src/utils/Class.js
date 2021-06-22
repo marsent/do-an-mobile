@@ -2,7 +2,7 @@ import {apiURL} from '../config/config';
 import {headers} from './config';
 const getClassById = async ({token, id = '', select = false}) => {
   select = select ? `?select=${select}` : '';
-  let url = `${apiURL}/subject/lecture/${id}${select}`;
+  let url = `${apiURL}/subject/lecture/${id}`;
 
   return await fetch(url, {
     method: 'GET',
@@ -24,7 +24,7 @@ const getAllClass = async ({
   page = page ? `page=${page}` : '';
   select = select ? `select=${select}` : '';
 
-  let url = `${apiURL}/subject/lecture`;
+  let url = `${apiURL}/subject/lecture/?${faculty}&${limit}&${page}&${select}`;
   return await fetch(url, {
     method: 'GET',
     headers: headers(token),

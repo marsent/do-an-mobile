@@ -33,7 +33,7 @@ export default AddExam = ({navigation}) => {
     year: '',
     faculty: '',
   };
-  const [type, setType] = useState('all');
+  const [type, setType] = useState('class');
   const [questions, setQuestions] = useState([]);
   const [uploadExam, setUploadExam] = useState(false);
   const [uploadStudent, setUploadStudent] = useState(false);
@@ -47,6 +47,7 @@ export default AddExam = ({navigation}) => {
   const [previewQuestions, setPrevewQuestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [Class, setClass] = useState(initClass);
+  const [compelete, setComplete] = useState(false);
   // get Class List
 
   const handlerUploadExam = async () => {
@@ -97,13 +98,22 @@ export default AddExam = ({navigation}) => {
   };
   useEffect(async () => {
     try {
-      await ClassUtils.getAllClass({token}).then(async res => {
-        console.log(res);
-        await setClassList(res.data);
-        if (res.data.length > 0) {
-          await setClassId(res.data[1]._id);
-        }
-      });
+      await fetch(`${apiURL}/subject/lecture`, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+      })
+        .then(res => res.json())
+        .then(async res => {
+          await setClassList(res.data);
+          if (res.data.length > 0) {
+            await setClassId(res.data[1]._id);
+            setComplete(true);
+          }
+        });
     } catch (err) {
       console.log('Error get classList: ', err);
     }
@@ -112,6 +122,7 @@ export default AddExam = ({navigation}) => {
       setIsLoading(false);
     };
   }, []);
+
   useEffect(async () => {
     await setClass(classList.find(element => element._id == classId));
   }, [classId]);
@@ -124,9 +135,10 @@ export default AddExam = ({navigation}) => {
       year: new Date().getFullYear(),
       time: time,
     };
-    if (type == 'class' && classId != '_000') {
+    if (type === 'class') {
       exam.class_id = classId;
     }
+    console.log(exam.class_id);
     try {
       await setTimeout(async () => {
         ExamUtils.createExam({token: token, exam: exam}).then(res => {
@@ -164,190 +176,195 @@ export default AddExam = ({navigation}) => {
   };
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: mainWhite}}>
-      <ScrollView style={{marginTop: 30}}>
-        <View style={{flex: 1, alignItems: 'center'}}>
-          {/* Type Exam for */}
-          <View style={{width: '90%'}}>
-            <Picker
-              label="Loại bài thi"
-              placeholder="Loại bài thi"
-              displayValue={type}
-              selectedValue={type}
-              onValueChange={val => setType(val)}>
-              <PickerBase.Item label="Tát cả sinh viên" value="all" />
-              <PickerBase.Item label="Lớp" value="class" />
-              <PickerBase.Item enabled={false} label="Nhóm" value="group" />
-            </Picker>
-          </View>
-          {/* Name exam */}
-          <View style={{width: '90%'}}>
-            <TextInput
-              label="Tên bài thi"
-              isFocus={true}
-              outLine={true}
-              placeholder="Tên bài thi"
-              onChangeText={text => setNameExam(text)}
-              value={nameExam}
-              errorMessage={error.name}
-            />
-          </View>
-          {/* TypeExam */}
-          {type === 'class' && (
-            <View style={{width: '90%', marginBottom: 15}}>
+      {compelete && (
+        <ScrollView style={{marginTop: 30}}>
+          <View style={{flex: 1, alignItems: 'center'}}>
+            {/* Type Exam for */}
+            <View style={{width: '90%'}}>
               <Picker
-                placeholder="Lớp"
-                displayValue={Class.name}
-                selectedValue={classId}
-                onValueChange={(val, index) => setClassId(val)}
-                errorMessage={error.class_id}>
-                {classList.map(val => (
-                  <PickerBase.Item
-                    label={val.name}
-                    value={val._id}
-                    key={val._id}
-                  />
-                ))}
+                label="Loại bài thi"
+                placeholder="Loại bài thi"
+                displayValue={type}
+                selectedValue={type}
+                onValueChange={val => setType(val)}>
+                <PickerBase.Item label="Lớp" value="class" />
+                <PickerBase.Item label="Nhóm" value="group" />
               </Picker>
             </View>
-          )}
-
-          {type === 'group' && (
-            <View>
-              {uploadStudent ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}>
-                  <Text>{fileStudent}</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setuploadExam(false);
-                      setQuestions();
-                    }}>
-                    <Icon name="times" />
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <Button
-                  title="Chọn file danh sách sinh viên"
-                  onPress={uploadStudentList}
-                />
-              )}
+            {/* Name exam */}
+            <View style={{width: '90%'}}>
+              <TextInput
+                label="Tên bài thi"
+                isFocus={true}
+                outLine={true}
+                placeholder="Tên bài thi"
+                onChangeText={text => setNameExam(text)}
+                value={nameExam}
+              />
             </View>
-          )}
-
-          {/* Time */}
-          <View
-            style={{
-              width: '90%',
-              díplay: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <Text>Thời gian làm bài: </Text>
-            <TextInputBase
-              style={{
-                color: '#495057',
-                width: '7%',
-                fontFamily: 'Inter',
-                fontSize: 18,
-              }}
-              value={time.toString()}
-              onChangeText={text => setTime(text)}
-            />
-            <Text>phút</Text>
-          </View>
-          <View
-            style={{width: '90%', flexDirection: 'row', alignItems: 'center'}}>
-            <Text>Xem đề thi:</Text>
-            <Checkbox
-              status={previewQuestions ? 'checked' : 'unchecked'}
-              onPress={() => setPrevewQuestions(!previewQuestions)}
-            />
-          </View>
-          <View style={{marginTop: 20, marginBottom: 20}}>
-            {uploadExam ? (
-              isLoading ? (
-                <Spinkit type="FadingCircleAlt" size={50} color="#0598FC" />
-              ) : (
-                <View
-                  style={{
-                    width: '70%',
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <View style={{marginRight: 5}}>
-                    <View>
-                      <Button onPress={handlerSubmit}>Thêm đề thi</Button>
-                    </View>
-                  </View>
-                  <View>
-                    <View style={{marginLeft: 5}}>
-                      <Button
-                        onPress={() => {
-                          setUploadExam(false);
-                          setPrevewQuestions(false);
-                          setQuestions();
-                        }}>
-                        Hủy đề thi
-                      </Button>
-                    </View>
-                  </View>
-                </View>
-              )
-            ) : (
-              <View>
-                <View>
-                  <Button onPress={handlerUploadExam}>Thêm file đề thi</Button>
-                </View>
+            {/* TypeExam */}
+            {type === 'class' && (
+              <View style={{width: '90%', marginBottom: 15}}>
+                <Picker
+                  placeholder="Lớp"
+                  displayValue={Class.name}
+                  selectedValue={classId}
+                  onValueChange={(val, index) => setClassId(val)}>
+                  {classList.map(val => (
+                    <PickerBase.Item
+                      label={val.name}
+                      value={val._id}
+                      key={val._id}
+                    />
+                  ))}
+                </Picker>
               </View>
             )}
-          </View>
-          <Toast ref={ref => Toast.setRef(ref)} />
-        </View>
 
-        {previewQuestions && questions.length > 0 && (
-          <View style={{alignItems: 'center', marginBottom: 50}}>
-            {questions.map((val, index) => {
-              return (
-                <View
-                  key={index}
-                  style={{
-                    borderWidth: 1,
-                    width: '90%',
-                    marginBottom: 10,
-                    padding: 3,
-                    borderColor: '#91919a',
-                  }}>
-                  <Text size={16}>
-                    Câu {index + 1}: {val.question}
-                  </Text>
-                  <RadioButton.Group value={val.answer}>
-                    <View>
-                      {val.selection.map((question, index) => {
-                        return (
-                          <View
-                            key={index}
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                            }}>
-                            <RadioButton value={question} />
-                            <Text size={16}>{question}</Text>
-                          </View>
-                        );
-                      })}
+            {type === 'group' && (
+              <View>
+                {uploadStudent ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}>
+                    <Text>{fileStudent}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setuploadExam(false);
+                        setQuestions();
+                      }}>
+                      <Icon name="times" />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <Button
+                    title="Chọn file danh sách sinh viên"
+                    onPress={uploadStudentList}
+                  />
+                )}
+              </View>
+            )}
+
+            {/* Time */}
+            <View
+              style={{
+                width: '90%',
+                díplay: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <Text>Thời gian làm bài: </Text>
+              <TextInputBase
+                style={{
+                  color: '#495057',
+                  width: '7%',
+                  fontFamily: 'Inter',
+                  fontSize: 18,
+                }}
+                value={time.toString()}
+                onChangeText={text => setTime(text)}
+              />
+              <Text>phút</Text>
+            </View>
+            <View
+              style={{
+                width: '90%',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <Text>Xem đề thi:</Text>
+              <Checkbox
+                status={previewQuestions ? 'checked' : 'unchecked'}
+                onPress={() => setPrevewQuestions(!previewQuestions)}
+              />
+            </View>
+            <View style={{marginTop: 20, marginBottom: 20}}>
+              {uploadExam ? (
+                isLoading ? (
+                  <Spinkit type="FadingCircleAlt" size={50} color="#0598FC" />
+                ) : (
+                  <View
+                    style={{
+                      width: '70%',
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <View style={{marginRight: 5}}>
+                      <View>
+                        <Button onPress={handlerSubmit}>Thêm đề thi</Button>
+                      </View>
                     </View>
-                  </RadioButton.Group>
+                    <View>
+                      <View style={{marginLeft: 5}}>
+                        <Button
+                          onPress={() => {
+                            setUploadExam(false);
+                            setPrevewQuestions(false);
+                            setQuestions();
+                          }}>
+                          Hủy đề thi
+                        </Button>
+                      </View>
+                    </View>
+                  </View>
+                )
+              ) : (
+                <View>
+                  <View>
+                    <Button onPress={handlerUploadExam}>
+                      Thêm file đề thi
+                    </Button>
+                  </View>
                 </View>
-              );
-            })}
+              )}
+            </View>
+            <Toast ref={ref => Toast.setRef(ref)} />
           </View>
-        )}
-      </ScrollView>
+
+          {previewQuestions && questions.length > 0 && (
+            <View style={{alignItems: 'center', marginBottom: 50}}>
+              {questions.map((val, index) => {
+                return (
+                  <View
+                    key={index}
+                    style={{
+                      borderWidth: 1,
+                      width: '90%',
+                      marginBottom: 10,
+                      padding: 3,
+                      borderColor: '#91919a',
+                    }}>
+                    <Text size={16}>
+                      Câu {index + 1}: {val.question}
+                    </Text>
+                    <RadioButton.Group value={val.answer}>
+                      <View>
+                        {val.selection.map((question, index) => {
+                          return (
+                            <View
+                              key={index}
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}>
+                              <RadioButton value={question} />
+                              <Text size={16}>{question}</Text>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    </RadioButton.Group>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

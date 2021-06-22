@@ -11,6 +11,7 @@ import classDetail from '../screens/ClassManagement/listStudent';
 import createNoti from '../screens/createNotification/createNotification';
 import exam from '../screens/exam/listExam';
 import createExam from '../screens/exam/createExam';
+import test from '../screens/test/test';
 import {
   Modal,
   View,
