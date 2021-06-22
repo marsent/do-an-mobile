@@ -8,6 +8,7 @@ import {
   TextInput,
   Button,
 } from 'react-native';
+import {authUrl} from '../../config/config';
 // import {passwordValidator} from '../../helpers/passwordValidator';
 // import {usernameValidator} from '../../helpers/usernameValidator';
 // import Toast from 'react-native-toast-message';
@@ -19,7 +20,7 @@ export default Login = ({token, setToken}) => {
   const onLoginPress = async e => {
     e.preventDefault();
     //setError({ username: usernameValidator(username), password: passwordValidator(password) })
-    await fetch('http://quocha.xyz/auth/lecture/sign-in', {
+    await fetch(authUrl, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

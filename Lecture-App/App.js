@@ -1,11 +1,7 @@
 import React, {useState} from 'react';
-import Login from './src/components/Login';
-import MainTabScreen from './src/screen/main';
+import Login from './src/screens/Login';
+import MainTabScreen from './src/navigation/main';
 import {TokenProvider} from './src/Context/TokenContext';
-import {BottomNavigation, Text} from 'react-native-paper';
-import ListClass from './src/components/ClassManagement/listClass';
-import ListNoti from './src/components/createNotification/listNoti';
-import detail from './src/components/accountDetail/index';
 import {NavigationContainer} from '@react-navigation/native';
 const App = () => {
   // const [token, setToken] = useState();
@@ -17,7 +13,9 @@ const App = () => {
   //   )
   // }
   // const [index, setIndex] = React.useState(0);
-  const [token, setToken] = useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGM4NjNmMzlkZTdmNTlmMWVhMTgwM2YiLCJwaG9uZSI6IjA4ODY0NjAzMTUiLCJlbWFpbCI6IlR1YW5hbmg4NDIzQGdtYWlsLmNvbSIsImlhdCI6MTYyMzc0NTg1Nn0.puQSuBtXisPbXpLss5J1eSEHuH3G1cN_7GnOcyX3Mew');
+  const [token, setToken] = useState(
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGQwMDRjNzk0NDlhN2NhMDg5YTViN2MiLCJwaG9uZSI6IjAzOTU5NTI3NDEiLCJlbWFpbCI6InRodWFucHJvMjAyNUBnbWFpbC5jb20iLCJpYXQiOjE2MjQyNDU1ODV9.fX0sZNHrrTAbAdbUPAq_PSdbo5DR27W_PR_QMB2tZTI',
+  );
   // const [routes] = React.useState([
   //   {key: 'ListClass', title: 'Quản lý lớp học', icon: 'calendar-clock'},
   //   {key: 'ListNoti', title: 'Quản lý hông báo', icon: 'bell-outline'},

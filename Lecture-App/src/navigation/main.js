@@ -1,13 +1,17 @@
 import React, {useState} from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import Image1 from '../asset/add.png';
-import ListClass from '../components/ClassManagement/listClass';
-import ListNoti from '../components/createNotification/listNoti';
-import detail from '../components/accountDetail/index';
+import ListClass from '../screens/ClassManagement/listClass';
+import ListNoti from '../screens/createNotification/listNoti';
+import detail from '../screens/accountDetail/index';
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {NavigationContainer} from '@react-navigation/native';
+import classDetail from '../screens/ClassManagement/listStudent';
+import createNoti from '../screens/createNotification/createNotification';
+import exam from '../screens/exam/listExam';
+import createExam from '../screens/exam/createExam';
+import test from '../screens/test/test';
 import {
   Modal,
   View,
@@ -16,13 +20,12 @@ import {
   Button,
   TouchableOpacity,
 } from 'react-native';
-import CreateNotification from '../components/createNotification/createNotification';
 // import CustomTabBar from './MainStyle';
 const Tab = createMaterialBottomTabNavigator();
 const LCStack = createStackNavigator();
 const LNStack = createStackNavigator();
 const ADStack = createStackNavigator();
-
+const EXStack = createStackNavigator();
 const MainTabScreen = () => {
   return (
     <Tab.Navigator>
@@ -49,6 +52,17 @@ const MainTabScreen = () => {
         }}
       />
       <Tab.Screen
+        name="Thi Online"
+        component={EXStacks}
+        options={{
+          tabBarLabel: 'Thi Online',
+          tabBarColor: '#3891E9',
+          tabBarIcon: ({color}) => (
+            <Icon name="person-circle-outline" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Thông tin"
         component={ADStacks}
         options={{
@@ -65,40 +79,71 @@ const MainTabScreen = () => {
 
 const LCStacks = () => {
   return (
-    <LCStack.Navigator>
+    <LCStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#3891E9',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerTitleAlign: 'center',
+      }}>
       <LCStack.Screen name="Xem lớp học" component={ListClass} />
+      <LCStack.Screen name="Xem chi tiết" component={classDetail} />
     </LCStack.Navigator>
   );
 };
 const LNStacks = () => {
-  const [modalVisible, setModalVisible] = useState(false);
   return (
-    <LNStack.Navigator>
-      <LNStack.Screen
-        name="Thông báo"
-        component={ListNoti}
-        options={{
-          headerTintColor: '#FEFEFE',
-          headerTitleAlign: 'center',
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisible(true);
-              }}>
-              <Image style={styles.image} source={Image1} />
-            </TouchableOpacity>
-          ),
-          headerStyle: {
-            backgroundColor: '#4B75F2',
-          },
-        }}
-      />
+    <LNStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#3891E9',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerTitleAlign: 'center',
+      }}>
+      <LNStack.Screen name="Thông báo" component={ListNoti} />
+      <LNStack.Screen name="Tạo thông báo" component={createNoti} />
     </LNStack.Navigator>
+  );
+};
+const EXStacks = () => {
+  return (
+    <EXStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#3891E9',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerTitleAlign: 'center',
+      }}>
+      <EXStack.Screen name="Danh sách bài thi" component={exam} />
+      <EXStack.Screen name="Tạo bài thi" component={createExam} />
+    </EXStack.Navigator>
   );
 };
 const ADStacks = () => {
   return (
-    <ADStack.Navigator>
+    <ADStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#3891E9',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerTitleAlign: 'center',
+      }}>
       <ADStack.Screen name="Thông tin" component={detail} />
     </ADStack.Navigator>
   );

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {
   StyleSheet,
   View,
@@ -8,43 +8,39 @@ import {
 } from 'react-native';
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
+import TokenContext from '../../Context/TokenContext';
+import {apiURL, authUrl} from '../../config/config';
 
-function listStudent({navigation}) {
-  const listStudentData = [
-    {
-      ID: '18521467',
-      Avatar: Image1,
-      Name: 'Đào Huỳnh Minh Thuận',
-      Status: '1',
-    },
-    {
-      ID: '18521467',
-      Avatar: Image1,
-      Name: 'Đào Huỳnh Minh Thuận',
-      Status: '1',
-    },
-    {
-      ID: '18521467',
-      Avatar: Image1,
-      Name: 'Đào Huỳnh Minh Thuận',
-      Status: '1',
-    },
-  ];
+function listStudent({route, navigation}) {
+  const {_id} = route.params;
+  const [info, setInfo] = useState({});
+  const token = useContext(TokenContext);
+  useEffect(async () => {
+    // setError({
+    //   username: usernameValidator(username),
+    //   password: passwordValidator(password),
+    // });
+    await fetch(`${apiURL}/subject/lecture/${_id}`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then(res => res.json())
+      .then(res => {
+        setInfo(res.data);
+      });
+  });
   return (
     <View style={styles.Container}>
       <ScrollView style={styles.NotiView}>
-        {listStudentData.map(item => (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Thông tin sinh viên');
-            }}>
-            <View key={item.ID} style={styles.NotiText}>
-              <Avatar.Image size={24} source={Image1} />
-              <Text style={styles.ContentText}>{item.Name} </Text>
-              <Text style={styles.ContentText}>{item.ID} </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        <View style={styles.NotiText}>
+          <Avatar.Image size={24} source={Image1} />
+          <Text style={styles.ContentText}>{info.name} </Text>
+          <Text style={styles.ContentText}>{info._id} </Text>
+        </View>
       </ScrollView>
     </View>
   );

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
-import { View, TextInput as TextInputBase, ImageBackground } from 'react-native';
+import {View, TextInput as TextInputBase, ImageBackground} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import * as Animatable from 'react-native-animatable';
 
@@ -63,10 +63,10 @@ const TextInput = ({
               borderBottomWidth: outLine ? 2 : 0,
             },
             style,
-            !errorMessage ? null : { borderBottomColor: errorColor },
+            !errorMessage ? null : {borderBottomColor: errorColor},
           ]}>
           {leftIcon && (
-            <View style={{ marginLeft: 15 }}>
+            <View style={{marginLeft: 15}}>
               <Icon
                 name={leftIcon}
                 size={24}
@@ -100,7 +100,7 @@ const TextInput = ({
     );
   }
   return (
-    <View style={{ paddingTop: 11, backgroundColor: mainWhite }}>
+    <View style={{paddingTop: 11}}>
       {label && (hasFocus || !value == false) && (
         <Animatable.View
           animation={fadeIn}
@@ -133,7 +133,7 @@ const TextInput = ({
           !errorMessage ? null : styles.borderErr,
         ]}>
         {leftIcon && (
-          <View style={{ marginLeft: 15 }}>
+          <View style={{marginLeft: 15}}>
             <Icon
               name={leftIcon}
               size={24}

@@ -14,11 +14,12 @@ import {
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
 import TokenContext from '../../Context/TokenContext';
+import {apiURL} from '../../config/config';
 export default function AccountDetail() {
   const token = useContext(TokenContext);
   const [info, setInfo] = useState({});
   useEffect(async () => {
-    await fetch('http://quocha.xyz/api/lecture', {
+    await fetch(`${apiURL}/lecture`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -33,11 +34,6 @@ export default function AccountDetail() {
   });
   return (
     <View style={styles.Container}>
-      <View style={styles.headerView}>
-        {/* <Image style={styles.imageBack} source={Image2} /> */}
-        <Text style={styles.headerText}>Thông tin Giảng viên</Text>
-        {/* <Button style={styles.logoutButton} title="Đăng xuất"/> */}
-      </View>
       <View style={styles.inforView}>
         <View style={styles.inforText}>
           <View style={styles.avatar}>

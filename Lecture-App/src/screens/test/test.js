@@ -1,18 +1,42 @@
-import React, {useState} from 'react';
-import {StyleSheet, View, Text, TextInput} from 'react-native';
+import React, {useState, useEffect, useContext} from 'react';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
+  Button,
+  Text,
+} from 'react-native';
+import RNFS from 'react-native-fs';
+import TokenContext from '../../Context/TokenContext';
 import {Picker} from '@react-native-picker/picker';
-export default function informationOfStudent() {
+import {apiURL, yearList} from '../../config/config';
+const test = () => {
   const [lop, setLop] = useState('IS336.L11');
-  const [loai, setLoai] = useState('Nghỉ');
+  const token = useContext(TokenContext);
   const [text, onChangeText] = React.useState('');
-  const [modalVisible, setModalVisible] = useState(false);
+  const [mon, setMon] = useState('');
+  const [listSub, setListSub] = useState([]);
+  useEffect(async () => {
+    await fetch(`${apiURL}/subject/lecture`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then(res => res.json())
+      .then(res => {
+        setListSub(res.data);
+      });
+  });
   return (
     <View style={styles.Container}>
-      <View style={styles.headerView}>
-        <Text style={styles.headerText}>Tạo thông báo</Text>
-      </View>
       <View style={styles.createNoti}>
-        <Text style={styles.tex}>Lớp</Text>
+        <Text style={styles.text}>Lớp</Text>
         <Picker
           style={{width: '60%'}}
           selectedValue={lop}
@@ -27,28 +51,26 @@ export default function informationOfStudent() {
         <Text>Loại thông báo</Text>
         <Picker
           style={{width: '60%'}}
-          selectedValue={loai}
+          selectedValue={mon}
           onValueChange={(item, index) => {
-            setLoai(item);
-          }}>
-          <Picker.Item label="Nghỉ" value="Nghỉ" />
-          <Picker.Item label="Bù" value="Bù" />
-        </Picker>
+            setMon(item);
+          }}></Picker>
+        {listSub.map((item, i) => {
+          <View>
+            <Text>{item.name}</Text>
+          </View>;
+        })}
       </View>
       <View>
         <Text style={styles.text}>Nội dung</Text>
         <View style={styles.content}>
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeText}
-            multiline={true}
-            value={text}
-          />
+          <TextInput onChangeText={onChangeText} value={text} />
         </View>
       </View>
     </View>
   );
-}
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -97,9 +119,10 @@ const styles = StyleSheet.create({
     padding: 50,
   },
   input: {
-    height: 100,
+    height: 20,
     margin: 12,
     borderWidth: 1,
     borderRadius: 15,
   },
 });
+export default test;

@@ -6,14 +6,18 @@ import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import TokenContext from '../../Context/TokenContext';
-import listStudent from '../ClassManagement/listStudent';
+import {apiURL, authUrl} from '../../config/config';
+import classDetail from '../ClassManagement/listStudent';
 function listClass({navigation}) {
   const token = useContext(TokenContext);
   const [classList, setClassList] = useState([]);
 
   useEffect(async () => {
-    setError({ username: usernameValidator(username), password: passwordValidator(password) })
-    await fetch('http://quocha.xyz/api/class/admin', {
+    // setError({
+    //   username: usernameValidator(username),
+    //   password: passwordValidator(password),
+    // });
+    await fetch(`${apiURL}/subject/lecture`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -26,6 +30,7 @@ function listClass({navigation}) {
         setClassList(res.data);
       });
   });
+
   return (
     <View style={styles.Container}>
       <ScrollView style={styles.NotiView}>
@@ -41,7 +46,7 @@ function listClass({navigation}) {
                 style={styles.button}
                 title=" Xem danh sách lớp"
                 onPress={() => {
-                  navigation.navigate('Danh sách lớp');
+                  navigation.navigate('Xem chi tiết', {_id: item._id});
                 }}
               />
             </View>
@@ -49,7 +54,6 @@ function listClass({navigation}) {
         ))}
       </ScrollView>
     </View>
-  
   );
 }
 
@@ -101,7 +105,6 @@ const styles = StyleSheet.create({
   ButtonContainer: {
     flex: 1,
     flexDirection: 'row',
-
     justifyContent: 'flex-end',
     marginTop: 20,
   },
