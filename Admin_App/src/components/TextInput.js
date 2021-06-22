@@ -51,7 +51,7 @@ const TextInput = ({
     if (type == 'flat') {
         return (
             <View >
-                <View style={[{ flexDirection: 'row', alignItems: 'center', borderBottomColor: hasFocus ? focusColor : outlineColor, borderBottomWidth: outLine ? 2 : 0 }, style, !errorMessage ? null : { borderBottomColor: errorColor },]}>
+                <View style={[{ backgroundColor: mainWhite, flexDirection: 'row', alignItems: 'center', borderBottomColor: hasFocus ? focusColor : outlineColor, borderBottomWidth: outLine ? 2 : 0 }, style, !errorMessage ? null : { borderBottomColor: errorColor },]}>
                     {leftIcon && <View style={{ marginLeft: 15 }}>
                         <Icon name={leftIcon} size={24} color={errorMessage ? "#ED557A" : '#999999'} />
                     </View>
@@ -83,7 +83,7 @@ const TextInput = ({
                     >{placeholder}</Text>
                 </Animatable.View>
             }
-            <View style={[{ flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderColor: hasFocus ? focusColor : outlineColor, borderWidth: outLine ? 1 : hasFocus ? 1 : 0, zIndex: 0, elevation: shadow ? shadow : 0 }, style, !errorMessage ? null : styles.borderErr,]}>
+            <View style={[{ backgroundColor: mainWhite, flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderColor: hasFocus ? focusColor : outlineColor, borderWidth: outLine ? 1 : hasFocus ? 1 : 0, zIndex: 0, elevation: shadow ? shadow : 0 }, style, !errorMessage ? null : styles.borderErr,]}>
                 {leftIcon && <View style={{ marginLeft: 15 }}>
                     <Icon name={leftIcon} size={24} color={errorMessage ? "#ED557A" : hasFocus ? focusColor : '#999999'} />
                 </View>}

@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 
 
 import styles from '../../style/style';
-import { mainBlue, mainBlack } from '../../style/color'
+import { mainBlue, mainBlack, mainWhite } from '../../style/color'
 import { apiURL } from '../../config/config';
 import TokenContext from '../../Context/TokenContext';
 import { LoadingDataModal, Text, SubmitButtonDetail, TextInput } from '../../components';
@@ -104,7 +104,7 @@ const ClassDetail = ({ route, navigation }) => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <CustomHeaderText navigation={navigation} >Chi tiết lớp</CustomHeaderText>
             <LoadingDataModal visible={isLoadingData} />
             {!isLoadingData && <View style={{ flex: 1, alignItems: 'center' }} >

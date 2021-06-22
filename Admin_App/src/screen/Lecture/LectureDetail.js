@@ -16,6 +16,7 @@ import {
     SubmitButtonDetail,
     LoadingDataModal
 } from '../../components'
+import { mainWhite } from '../../style/color';
 const LectureDetail = ({ route, navigation }) => {
     const token = useContext(TokenContext);
     const { _id } = route.params;
@@ -92,7 +93,7 @@ const LectureDetail = ({ route, navigation }) => {
         }, 1000)
     }
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderUserDetail
                 src={require('../../../assets/public/img/profile.png')}
                 onBackPress={() => navigation.goBack()}

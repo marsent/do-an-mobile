@@ -21,7 +21,7 @@ import CardView from '../../components/CardView'
 
 const ClassList = ({ navigation }) => {
     const token = useContext(TokenContext);
-    const [loadingDataModal, setLoadingDataModal] = useState(false);
+    const [loadingDataModal, setLoadingDataModal] = useState(true);
     const [filterData, setFilterData] = useState({ faculty: 'all', year: 'all' })
     const [dumpFilter, setDumpFilter] = useState({ faculty: 'all', year: 'all' })
     const [keyWord, setKeyWord] = useState('');
@@ -30,7 +30,6 @@ const ClassList = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false)
 
     useEffect(async () => {
-        setLoadingDataModal(true)
         try {
             await fetch(`${apiURL}/class/admin`, {
                 method: 'GET',

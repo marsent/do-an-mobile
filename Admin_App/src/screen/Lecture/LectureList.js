@@ -19,6 +19,8 @@ import FlatList from '../../components/FlatList';
 import CustomButton from '../../components/Button'
 import Search from '../../components/Search'
 import { TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native';
+import { mainWhite } from '../../style/color';
 
 const LectureList = ({ navigation }) => {
 
@@ -29,7 +31,7 @@ const LectureList = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [faculty, setFaculty] = useState('all');
     const [dumpFaculty, setDumpFaculty] = useState('all')
-    const [loadingDataModal, setLoadingDataModal] = useState(false);
+    const [loadingDataModal, setLoadingDataModal] = useState(true);
     const [keyWord, setKeyWord] = useState('');
 
     useEffect(async () => {
@@ -45,7 +47,6 @@ const LectureList = ({ navigation }) => {
         catch (err) {
             console.log('Get lerture list error: ', err);
         }
-        console.log(facultyList);
         return () => {
             setLectureList();
             setDataLecture();
@@ -56,11 +57,9 @@ const LectureList = ({ navigation }) => {
     useEffect(() => handlerSearch(), [faculty])
 
     const handlerSearch = async () => {
-        await setLoadingDataModal(true)
         await setLectureList(dataLecture);
         await setTimeout(async () => {
             if (faculty != 'all') {
-                console.log(2);
                 await setLectureList(prevList => {
                     return prevList.filter(lecture => {
                         return (lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)) && (lecture.faculty == faculty)
@@ -84,7 +83,7 @@ const LectureList = ({ navigation }) => {
 
     return (
 
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderText navigation={navigation}>Danh sách giảng viên</HeaderText>
             <View style={{ flex: 1 }} >
                 <View style={[styles.container]}>
@@ -124,7 +123,7 @@ const LectureList = ({ navigation }) => {
                     </View>
                 </View>
             </Modal>}
-        </View >
+        </SafeAreaView >
 
     );
 };

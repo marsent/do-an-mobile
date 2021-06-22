@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Button, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, SafeAreaView } from 'react-native';
 import HeaderText from '../../components/HeaderText';
 import { Picker } from '@react-native-picker/picker';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -17,6 +17,7 @@ import FlatList from '../../components/FlatList'
 import CustomButton from '../../components/Button'
 import Text from '../../components/Text'
 import Search from '../../components/Search'
+import { mainWhite } from '../../style/color';
 
 
 const ClassListContext = React.createContext()
@@ -31,13 +32,12 @@ const StudentList = ({ navigation }) => {
     const [dataStudent, setDataStudent] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const [classList, setClassList] = useState([]);
-    const [loadingDataModal, setLoadingDataModal] = useState(false);
+    const [loadingDataModal, setLoadingDataModal] = useState(true);
     const [keyWord, setKeyWord] = useState('');
     const [filterData, setFilterData] = useState({ year: 'all', class: 'all' });
     const [dumpFilter, setDumpfilter] = useState({ year: 'all', class: 'all' });
     const [completed, setCompleted] = useState(false)
     useEffect(async () => {
-        await setLoadingDataModal(true)
         try {
             await StudentUtils.getAllStudent({ token: token }).then(async (res) => {
 
@@ -103,7 +103,7 @@ const StudentList = ({ navigation }) => {
 
     return (
 
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderText navigation={navigation}>Danh sách sinh viên</HeaderText>
             <View style={{ flex: 1 }} >
                 <View style={[styles.container]}>
@@ -150,7 +150,7 @@ const StudentList = ({ navigation }) => {
 
                 </View>
             </Modal>}
-        </View >
+        </SafeAreaView >
 
     );
 };

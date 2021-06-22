@@ -128,7 +128,6 @@ export default AddExam = ({ navigation }) => {
             await setTimeout(async () => {
                 ExamUtils.createExam({ token: token, exam: exam })
                     .then(res => {
-                        console.log(res);
                         setIsLoading(false)
                         if (res.error == 4000) return setError(res.messages)
                         if (res.error == 7000) {

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, SafeAreaView } from 'react-native';
 import { Picker as PickerBase } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
 
@@ -18,7 +18,7 @@ const AddStudent = ({ navigation }) => {
         email: '',
         phone: '',
         full_name: '',
-        date_of_birth: '',
+        date_of_birth: new Date(new Date().setFullYear(2000)).toISOString(),
         year: new Date().getFullYear().toString(),
         class_id: ''
     }
@@ -91,7 +91,6 @@ const AddStudent = ({ navigation }) => {
         await setIsLoading(true)
         await setTimeout(async () => {
             StudentUtils.createStudent({ token: token, student: account }).then(res => {
-                console.log(res);
                 setIsLoading(false)
                 if (res.error == 4000) {
                     return setError(res.messages)
@@ -124,9 +123,10 @@ const AddStudent = ({ navigation }) => {
         }, 1000)
 
     }
+
     return (
 
-        <View style={{ flex: 1, backgroundColor: mainWhite }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
 
             <HeaderText navigation={navigation}>Thêm Sinh Viên</HeaderText>
             {completed && <ScrollView style={{ flex: 1, marginTop: 10 }} >
@@ -186,6 +186,8 @@ const AddStudent = ({ navigation }) => {
                             mode='date'
                             errorMessage={error.date_of_birth}
                             onPick={val => setAccount({ ...account, date_of_birth: val.toISOString() })}
+                            dateDefault={new Date().setFullYear(2000)}
+
                         />
                     </View>
                     {/* Year */}
@@ -237,7 +239,7 @@ const AddStudent = ({ navigation }) => {
             </ScrollView>}
             <Toast ref={(ref) => Toast.setRef(ref)} />
 
-        </View>
+        </SafeAreaView>
     );
 };
 

@@ -12,11 +12,10 @@ const getExamById = async ({ token, id = '', select = false }) => {
 }
 
 const getAllExam = async ({ token, limit = false, page = false, select = false }) => {
-    faculty = faculty ? `faculty=${faculty}` : '';
     limit = limit ? `limit=${limit}` : '';
-    page = page ? `page=${page}` : '';
-    select = select ? `select=${select}` : ''
-    let url = `${apiURL}/exam/admin/?${faculty}&${limit}&${page}&${select}`
+    page = page ? `&page=${page}` : '';
+    select = select ? `&select=${select}` : ''
+    let url = `${apiURL}/exam/admin/?${limit}${page}${select}`
     return await fetch(url, {
         method: 'GET',
         headers: headers(token)

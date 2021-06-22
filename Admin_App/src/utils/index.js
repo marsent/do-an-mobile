@@ -8,5 +8,5 @@ export {
     StudentUtils,
     ClassUtils,
     ExamUtils,
-    SubjectUtils
+    SubjectUtils,
 }

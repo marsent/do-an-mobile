@@ -11,7 +11,7 @@ const Tab = createMaterialBottomTabNavigator();
 const ClassManagement = () => {
     return (
         <Tab.Navigator
-            initialRouteName="Thêm mới"
+            initialRouteName="Danh sách"
             tabBarOptions={{
                 activeTintColor: '#0598FC',
             }}

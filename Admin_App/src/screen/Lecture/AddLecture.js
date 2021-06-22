@@ -13,9 +13,16 @@ import DatePicker from '../../components/DatePicker'
 import Picker from '../../components/Picker'
 import SubmitButton from '../../components/SubmitButton'
 import Text from '../../components/Text'
+import { mainWhite } from '../../style/color';
 
 const AddStudent = ({ navigation }) => {
-    const initAccount = { email: '', phone: '', full_name: '', date_of_birth: '', faculty: facultyList[0] }
+    const initAccount = {
+        email: '',
+        phone: '',
+        full_name: '',
+        date_of_birth: new Date(new Date().setFullYear(1988)).toISOString(),
+        faculty: facultyList[0]
+    }
     const initError = { email: false, phone: false, full_name: false, date_of_birth: false, faculty: false }
     const token = useContext(TokenContext)
     const [account, setAccount] = useState(initAccount);
@@ -30,8 +37,8 @@ const AddStudent = ({ navigation }) => {
             setAccount();
             setError()
         }
-    }, [])
 
+    }, [])
 
     const onSubmitPress = async () => {
         setIsLoading(true);
@@ -39,7 +46,6 @@ const AddStudent = ({ navigation }) => {
             try {
                 LectureUtils.createLecture({ token: token, lecture: account })
                     .then(res => {
-                        console.log(res);
                         setIsLoading(false)
                         if (res.error == 4000) return setError(res.messages)
                         if (res.error == 7000) {
@@ -70,11 +76,9 @@ const AddStudent = ({ navigation }) => {
         }, 2000)
     }
 
-
-
     return (
 
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
 
             <HeaderText navigation={navigation}>Thêm Giảng Viên</HeaderText>
             {completed && <ScrollView style={{ marginTop: 30 }} >
@@ -131,6 +135,7 @@ const AddStudent = ({ navigation }) => {
                             mode='date'
                             errorMessage={error.date_of_birth}
                             onPick={val => setAccount({ ...account, date_of_birth: val.toISOString() })}
+                            dateDefault={new Date().setFullYear(1988)}
                         />
                     </View>
 
@@ -143,7 +148,7 @@ const AddStudent = ({ navigation }) => {
                             placeholder='Khoa'
                             displayValue={account.faculty}
                             selectedValue={account.faculty}
-                            onValueChange={(val, index) => setAccount({ ...account, faculty: val })}
+                            onValueChange={(val) => setAccount({ ...account, faculty: val })}
                             errorMessage={error.faculty}
                         >
                             {facultyList.map(val => <PickerBase.Item

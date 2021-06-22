@@ -18,11 +18,12 @@ const fadeIn = {
     },
 };
 
-const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode = 'date', errorMessage = false, outLineColor = mainGray }) => {
+const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode = 'date', errorMessage = false, outLineColor = mainGray, dateDefault = new Date() }) => {
     const [show, setShow] = useState(false)
-    const [date, setDate] = useState('');
+    const [date, setDate] = useState(new Date(dateDefault));
     const [dateText, setDateText] = useState('')
     const [borderColor, setBorderColor] = useState(outLineColor);
+
     useEffect(() => {
         if (errorMessage) {
             setBorderColor(errorColor)
@@ -33,18 +34,17 @@ const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode 
     }, [errorMessage])
     useEffect(() => {
         if (date) {
-            let tmp = new Date(date)
             if (mode == 'date') {
-                setDateText(`${tmp.getDate()}/${tmp.getMonth() + 1}/${tmp.getFullYear()}`)
+                setDateText(`${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`)
             }
             if (mode == 'time') {
-                setDateText(`${tmp.getHours()}:${tmp.getMinutes()}`)
+                setDateText(`${date.getHours()}:${date.getMinutes()}`)
             }
 
         }
     }, [date])
     return (
-        <View style={{ paddingTop: 13 }}>
+        <View style={{ paddingTop: 13, flex: 1 }}>
             {(label && !dateText == false) && <Animatable.View
                 animation={fadeIn}
                 duration={500}
@@ -59,10 +59,11 @@ const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode 
                 style={[{ flex: 1, flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderWidth: 1, borderColor: borderColor }, style, !errorMessage ? null : styles.borderErr]}
                 onPress={() => setShow(true)}
             >
-                <View style={{ marginLeft: 15 }}>
-                    {leftIcon && <Icon name={leftIcon} size={24} color={errorMessage ? "#ED557A" : '#999999'} />}
+                {leftIcon && <View style={{ marginLeft: 15 }}>
+                    <Icon name={leftIcon} size={24} color={errorMessage ? "#ED557A" : '#999999'} />
                 </View>
-                <TextInput style={[{ flex: 1, marginLeft: 10, fontFamily: 'Inter', fontSize: 16, color: '#22262e' }]}
+                }
+                <TextInput style={[{ flex: 1, marginLeft: 15, fontFamily: 'Inter', fontSize: 16, color: '#22262e' }]}
                     editable={false}
                     placeholderTextColor={borderColor}
                     placeholder={placeholder}
@@ -71,7 +72,7 @@ const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode 
                 {
                     show && (<DateTimePicker
                         testID="dateTimePicker"
-                        value={new Date}
+                        value={new Date(date)}
                         display="default"
                         is24Hour={true}
                         mode={mode}
@@ -79,14 +80,14 @@ const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode 
                         onChange={(event, date) => {
                             setShow(false);
                             if (event.type == 'set') {
-                                setDate(date.toISOString())
+                                setDate(date)
                                 onPick(date)
                             }
                         }}
                     />)
                 }
             </TouchableOpacity >
-            { errorMessage && <Text size={14} style={[styles.textErr]}>{errorMessage}</Text>}
+            {errorMessage && <Text size={14} style={[styles.textErr]}>{errorMessage}</Text>}
 
         </View>
     )

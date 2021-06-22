@@ -1,6 +1,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
 import HeaderText from '../../components/HeaderText';
 import { Picker } from '@react-native-picker/picker';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -8,7 +8,6 @@ import Modal from 'react-native-modal';
 
 const Stack = createStackNavigator();
 
-import { apiURL } from '../../config/config';
 import { ExamUtils } from '../../utils'
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
@@ -19,6 +18,7 @@ import FlatList from '../../components/FlatList';
 import CustomButton from '../../components/Button';
 import Search from '../../components/Search'
 import CardView from '../../components/CardView'
+import { mainWhite } from '../../style/color';
 
 
 const ExamList = ({ navigation }) => {
@@ -27,7 +27,7 @@ const ExamList = ({ navigation }) => {
     const [examList, setExamList] = useState([]);
     const [dataExam, setDataExam] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
-    const [loadingDataModal, setLoadingDataModal] = useState(false)
+    const [loadingDataModal, setLoadingDataModal] = useState(true)
     const [dumpType, setDumpType] = useState('tất cả')
     const [keyWord, setKeyWord] = useState('')
     useEffect(async () => {
@@ -81,7 +81,7 @@ const ExamList = ({ navigation }) => {
 
     return (
 
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderText navigation={navigation}>Danh sách bài thi</HeaderText>
             <View style={{ flex: 1 }} >
                 <View style={[styles.container]}>
@@ -134,7 +134,7 @@ const ExamList = ({ navigation }) => {
 
                 </View>
             </Modal >}
-        </View >
+        </SafeAreaView >
 
     );
 };

@@ -97,7 +97,8 @@ export default Login = ({ token, setToken }) => {
                         <View style={{ marginBottom: 15 }}>
                             <TextInput
                                 style={{ borderRadius: 30 }}
-                                shadow={1}
+                                shadow={3}
+                                outLine={true}
                                 isFocus={true}
                                 placeholder='Tên đăng nhập'
                                 value={account.phone}
@@ -109,7 +110,8 @@ export default Login = ({ token, setToken }) => {
                         <View style={{ marginBottom: 10 }}>
                             <Password
                                 isFocus={true}
-                                shadow={1}
+                                shadow={3}
+                                outLine={true}
                                 style={{ marginTop: 10 }}
                                 value={account.password}
                                 onChangeText={val => setAccount({ ...account, password: val })}

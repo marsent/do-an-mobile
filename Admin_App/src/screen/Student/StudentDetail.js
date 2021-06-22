@@ -16,6 +16,7 @@ import {
     HeaderUserDetail,
     LoadingDataModal
 } from '../../components'
+import { mainWhite } from '../../style/color';
 
 const StudentDetail = ({ route, navigation }) => {
     const token = useContext(TokenContext);
@@ -52,7 +53,6 @@ const StudentDetail = ({ route, navigation }) => {
         setIsLoading(true)
         await StudentUtils.getStudentById({ token: token, id: _id })
             .then(async (res) => {
-                console.log(res);
                 await setStudent(res.data)
                 setIsLoading(false)
             })
@@ -63,21 +63,16 @@ const StudentDetail = ({ route, navigation }) => {
     }, [])
 
     useEffect(async () => {
-        await fetch(`${apiURL}/class/admin/${student.class_id}`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json())
+        await ClassUtils.getClassById({ token: token, id: student.class_id })
             .then(async (res) => {
+                console.log(res.data);
                 await setClass(res.data)
-                setIsLoading(false)
             })
+        setIsLoading(false)
 
     }, [student.class_id])
 
+    console.log(Class);
 
     const save = async () => {
         setIsProcessing(true)
@@ -117,7 +112,7 @@ const StudentDetail = ({ route, navigation }) => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }} >
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }} >
             <HeaderUserDetail
                 onBackPress={() => navigation.goBack()}
             />
@@ -171,7 +166,7 @@ const StudentDetail = ({ route, navigation }) => {
                                 multiline={true}
 
                                 type='flat'
-                                value={Class.name} />
+                                value={Class.name ? Class.name : ''} />
                         </View>
                     </CustomVIew>
                     <CustomVIew>

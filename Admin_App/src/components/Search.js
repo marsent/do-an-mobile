@@ -2,12 +2,13 @@
 import React, { useState } from 'react'
 import { View, TouchableOpacity, TextInput } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome5'
+import { mainWhite } from '../style/color';
 
 
 const Search = ({ placeholder, onEndEditing, onFilter, value, style }) => {
     const [text, setText] = useState(value)
     return (
-        <View style={[{ flexDirection: 'row', alignItems: 'center', borderRadius: 30, elevation: 1, }, style]}>
+        <View style={[{ backgroundColor: mainWhite, flexDirection: 'row', alignItems: 'center', borderRadius: 30, elevation: 1, }, style]}>
             <TouchableOpacity style={{ marginLeft: 8 }}
                 onPress={() => onEndEditing(text)}
             >

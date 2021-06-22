@@ -2,7 +2,8 @@ import { apiURL } from '../config/config'
 import { headers } from './config'
 const getLectureById = async ({ token, id = '', select = false }) => {
     select = select ? `?select=${select}` : ''
-    return await fetch(`${apiURL}/lecture/admin/${id}${select}`, {
+    let url = `${apiURL}/lecture/admin/${id}${select}`
+    return await fetch(url, {
         method: 'GET',
         headers: headers(token)
     }).then(res => res.json())
@@ -12,11 +13,11 @@ const getLectureById = async ({ token, id = '', select = false }) => {
 
 const getAllLecture = async ({ token, limit = false, faculty = false, page = false, select = false }) => {
     faculty = faculty ? `faculty=${faculty}` : '';
-    limit = limit ? `limit=${limit}` : '';
-    page = page ? `page=${page}` : '';
-    select = select ? `select=${select}` : ''
+    limit = limit ? `&limit=${limit}` : '';
+    page = page ? `&page=${page}` : '';
+    select = select ? `&select=${select}` : ''
 
-    let url = `${apiURL}/lecture/admin/?${faculty}&${limit}&${page}&${select}`
+    let url = `${apiURL}/lecture/admin/?${faculty}${limit}${page}${select}`
     return await fetch(url, {
         method: 'GET',
         headers: headers(token)

@@ -11,6 +11,7 @@ const img = {
     exam: require('../../assets/public/img/planner.png'),
     class: require('../../assets/public/img/classroom.png'),
     logout: require('../../assets/public/img/logout.png'),
+    subject: require('../../assets/public/img/school.png')
 }
 
 export default Home = ({ route, navigation }) => {
@@ -22,7 +23,8 @@ export default Home = ({ route, navigation }) => {
                 <HeaderText>Trang chủ</HeaderText>
                 <View style={[styles.container, { marginTop: '15%', }]}>
                     <ViewRowGroup>
-                        <CustomTouchOpacity src={img.notification} onPress={() => navigation.navigate('Quản lý thông báo', { navigation })}>Thông báo</CustomTouchOpacity>
+                        <CustomTouchOpacity src={img.subject} onPress={() => navigation.navigate('Quản lý môn học', { navigation })} >Môn học</CustomTouchOpacity>
+                        {/* <CustomTouchOpacity src={img.notification} onPress={() => navigation.navigate('Quản lý thông báo', { navigation })}>Thông báo</CustomTouchOpacity> */}
                         <CustomTouchOpacity src={img.exam} onPress={() => navigation.navigate('Quản lý đề thi', { navigation })}>Đề thi</CustomTouchOpacity>
                     </ViewRowGroup>
 
@@ -33,12 +35,9 @@ export default Home = ({ route, navigation }) => {
 
                     <ViewRowGroup>
                         <CustomTouchOpacity src={img.class} onPress={() => navigation.navigate('Quản lý lớp học', { navigation })} >Lớp</CustomTouchOpacity>
-                        <CustomTouchOpacity src={img.logout} onPress={() => navigation.navigate('Quản lý môn học', { navigation })} >Môn học</CustomTouchOpacity>
-                    </ViewRowGroup>
-                    <ViewRowGroup>
-
                         <CustomTouchOpacity src={img.logout} onPress={() => setToken('')} >Đăng xuất</CustomTouchOpacity>
                     </ViewRowGroup>
+
                 </View>
             </SafeAreaView>
         </Animatable.View>
