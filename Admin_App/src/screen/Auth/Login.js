@@ -97,7 +97,7 @@ export default Login = ({ token, setToken }) => {
                         <View style={{ marginBottom: 15 }}>
                             <TextInput
                                 style={{ borderRadius: 30 }}
-                                shadow={3}
+                                shadow={1}
                                 outLine={true}
                                 isFocus={true}
                                 placeholder='Tên đăng nhập'
@@ -110,7 +110,7 @@ export default Login = ({ token, setToken }) => {
                         <View style={{ marginBottom: 10 }}>
                             <Password
                                 isFocus={true}
-                                shadow={3}
+                                shadow={1}
                                 outLine={true}
                                 style={{ marginTop: 10 }}
                                 value={account.password}

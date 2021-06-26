@@ -27,54 +27,87 @@ const LectureList = ({ navigation }) => {
     const token = useContext(TokenContext);
 
     const [lectureList, setLectureList] = useState([]);
-    const [dataLecture, setDataLecture] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
-    const [faculty, setFaculty] = useState('all');
-    const [dumpFaculty, setDumpFaculty] = useState('all')
+    const [faculty, setFaculty] = useState(false);
+    const [dumpFaculty, setDumpFaculty] = useState(false)
     const [loadingDataModal, setLoadingDataModal] = useState(true);
     const [keyWord, setKeyWord] = useState('');
 
     useEffect(async () => {
-        const query = {
-            token: token,
-        }
-        try {
-            LectureUtils.getAllLecture(query).then(async (res) => {
-                await setDataLecture(res.data)
-                await setLectureList(res.data)
-            })
-        }
-        catch (err) {
-            console.log('Get lerture list error: ', err);
-        }
+
+        // try {
+        //     await LectureUtils.getAllLecture({ token: token }).then(async (res) => {
+        //         await setLectureList(res.data)
+        //     })
+        //     setLoadingDataModal(false)
+        // }
+        // catch (err) {
+        //     console.log('Get lerture list error: ', err);
+        // }
         return () => {
             setLectureList();
             setDataLecture();
+            setKeyWord();
+            setDumpFaculty();
+            setFaculty();
         }
     }, [])
 
-    useEffect(() => handlerSearch(), [keyWord])
-    useEffect(() => handlerSearch(), [faculty])
+    useEffect(async () => {
+        search()
+    }, [keyWord])
+    useEffect(async () => {
+        search()
+    }, [faculty])
 
-    const handlerSearch = async () => {
-        await setLectureList(dataLecture);
-        await setTimeout(async () => {
-            if (faculty != 'all') {
-                await setLectureList(prevList => {
-                    return prevList.filter(lecture => {
-                        return (lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)) && (lecture.faculty == faculty)
-                    })
-                })
-            }
-            await setLectureList(prevList => {
-                return prevList.filter(lecture => {
-                    return lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)
-                })
-            })
-            await setLoadingDataModal(false)
-        }, 1000)
+    useEffect(async () => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            search();
+        });
+        return () => {
+            unsubscribe
+        }
+    }, [navigation])
 
+    const search = async () => {
+        await setLoadingDataModal(true)
+        const query = {
+            token: token,
+            faculty: faculty ? faculty : ''
+        }
+
+        await LectureUtils.getAllLecture(query).then(async (res) => {
+            await setLectureList(res.data.filter(val => {
+                return val.full_name.toLowerCase().includes(keyWord.toLowerCase()) ||
+                    val.email.toLowerCase().includes(keyWord.toLowerCase())
+
+            }))
+        })
+        await setLoadingDataModal(false)
     }
+
+    // useEffect(() => handlerSearch(), [keyWord])
+    // useEffect(() => handlerSearch(), [faculty])
+
+    // const handlerSearch = async () => {
+    //     await setLectureList(dataLecture);
+    //     await setTimeout(async () => {
+    //         if (faculty != 'all') {
+    //             await setLectureList(prevList => {
+    //                 return prevList.filter(lecture => {
+    //                     return (lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)) && (lecture.faculty == faculty)
+    //                 })
+    //             })
+    //         }
+    //         await setLectureList(prevList => {
+    //             return prevList.filter(lecture => {
+    //                 return lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)
+    //             })
+    //         })
+    //         await setLoadingDataModal(false)
+    //     }, 1000)
+
+    // }
 
     const toggleModal = async () => {
         setModalVisible(!modalVisible);
@@ -99,7 +132,7 @@ const LectureList = ({ navigation }) => {
                     </View>
                     {/* List lecture */}
                     <View style={{ flex: 1, width: '100%', marginTop: 20, }}>
-                        <LoadingDataModal visible={loadingDataModal} />
+                        {loadingDataModal && < LoadingDataModal visible={true} />}
                         {!loadingDataModal && <FlatList data={lectureList} Component={LectureItem} navigation={navigation} />}
                     </View>
                 </View>
@@ -143,9 +176,7 @@ const LectureItem = ({ item, navigation }) => {
                 <Text>Khoa: {faculty}</Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
-                    {/* <Button title='Chi tiết'
-                        onPress={() => navigation.navigate('LectureDetail', { item })}
-                    /> */}
+
                 </View>
             </View>
         </TouchableOpacity >
@@ -160,7 +191,7 @@ const FacultyPicker = ({ onValueChange, faculty }) => {
             onValueChange={val => onValueChange(val)}
             selectedValue={faculty}
         >
-            <Picker.Item label='All' value='all' />
+            <Picker.Item label='Tất cả' value={false} />
             {facultyList.map(faculty => {
                 return (
                     <Picker.Item label={faculty} value={faculty} key={faculty} />

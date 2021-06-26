@@ -11,11 +11,29 @@ const getExamById = async ({ token, id = '', select = false }) => {
 
 }
 
-const getAllExam = async ({ token, limit = false, page = false, select = false }) => {
+const getAllExam = async ({
+    token,
+    limit = false,
+    page = false,
+    select = false,
+    sort = false,
+    created_by = false,
+    time = false,
+    type = false,
+    class_id = false,
+    year = false,
+}) => {
     limit = limit ? `limit=${limit}` : '';
     page = page ? `&page=${page}` : '';
-    select = select ? `&select=${select}` : ''
-    let url = `${apiURL}/exam/admin/?${limit}${page}${select}`
+    select = select ? `&select=${select}` : '';
+    sort = sort ? `&sort=${sort}` : '';
+    created_by = created_by ? `&created_by=${created_by}` : '';
+    type = type ? `&for=${type}` : '';
+    time = time ? `&time=${time}` : '';
+    class_id = class_id ? `&class_id=${class_id}` : '';
+    year = year ? `&year=${year}` : '';
+
+    let url = `${apiURL}/exam/admin/?${limit}${page}${select}${sort}${created_by}${time}${class_id}${year}${type}`
     return await fetch(url, {
         method: 'GET',
         headers: headers(token)
@@ -34,8 +52,22 @@ const createExam = async ({ token, exam }) => {
     }).then(res => res.json())
 }
 
-const updateExam = async ({ token, id, status }) => {
+const updateExam = async ({ token, id, exam }) => {
     let url = `${apiURL}/exam/admin/${id}`
+    return await fetch(url,
+        {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(exam)
+        }).then(res => res.json())
+}
+
+const updateExamStatus = async ({ token, id, status }) => {
+    let url = `${apiURL}/exam/admin/status/${id}`
     return await fetch(url,
         {
             method: 'PUT',
@@ -49,4 +81,4 @@ const updateExam = async ({ token, id, status }) => {
 }
 
 
-export { getExamById, getAllExam, createExam, updateExam }
+export { getExamById, getAllExam, createExam, updateExam, updateExamStatus }

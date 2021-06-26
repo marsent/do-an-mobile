@@ -46,20 +46,19 @@ const SubjectList = ({ navigation }) => {
             token: token,
             faculty: filter.faculty ? filter.faculty : ''
         }
-
         await SubjectUtils.getAllSubject(query)
             .then(async (res) => {
-                setSubjectList(res.data)
+                await setSubjectList(res.data.filter(val => val.name.includes(keyWord) || val.subject_code.includes(keyWord)))
             })
         setLoadingDataModal(false)
 
-    }, [filter])
+    }, [keyWord || filter])
+
 
     const toggleModal = async () => {
         setModalVisible(!modalVisible);
 
     };
-
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderText navigation={navigation}>Danh sách môn học</HeaderText>
@@ -67,7 +66,7 @@ const SubjectList = ({ navigation }) => {
                 <View style={{ alignItems: 'center', flex: 1 }}>
                     <View style={{ width: '90%', marginTop: 10 }} >
                         <Search
-                            placerholder='Tên sinh viên hoặc email'
+                            placeholder='Tên hoạc mã môn học'
                             value={keyWord}
                             onEndEditing={setKeyWord}
                             onFilter={() => { setModalVisible(true) }}
@@ -111,7 +110,7 @@ const SubjectItem = ({ item, navigation }) => {
         "date_of_birth": "",
         "email": "",
         "faculty": "computer_science",
-        "full_name": "",
+        "full_name": "Không có giảng viên",
         "password": "",
         "phone": "",
         "status": ""
@@ -119,8 +118,10 @@ const SubjectItem = ({ item, navigation }) => {
     const [lecture, setLecture] = useState(initLecture)
     useEffect(async () => {
         await LectureUtils.getLectureById({ token, select: 'full_name', id: item.lecture_id })
-            .then(res => {
-                setLecture(res.data)
+            .then(async (res) => {
+                if (res.data != null) {
+                    await setLecture(res.data)
+                }
             })
     }, [])
     return (
@@ -128,8 +129,10 @@ const SubjectItem = ({ item, navigation }) => {
             <View style={{ width: '95%' }} >
                 <Text>Tên môn học: {item.name}</Text>
                 <Text>Mã môn học: {item.subject_code}</Text>
-                <Text>Lịch học: {item.schedule.map(val => val.weekday).toString().replace(',', ', ')}</Text>
-                <Text>Giảng viên: {lecture.full_name}</Text>
+                <Text>Lịch học: {item.schedule.length > 0 ?
+                    item.schedule.map(val => val.weekday).toString().replace(',', ', ') : 'Không có lịch'}</Text>
+                <Text>Giảng viên: {lecture.full_name ? lecture.full_name : ''}</Text>
+                <Text>Khoa quản lý: {item.faculty}</Text>
             </View>
         </CardView >
 

@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message'
 
 
 import styles from '../../style/style'
-import { apiURL } from '../../config/config';
+import { apiURL, facultyList } from '../../config/config';
 import { LectureUtils } from '../../utils'
 import TokenContext from '../../Context/TokenContext'
 import {
@@ -24,7 +24,7 @@ const LectureDetail = ({ route, navigation }) => {
         "_id": "",
         "date_of_birth": "",
         "email": "",
-        "faculty": "computer_science",
+        "faculty": "",
         "full_name": "",
         "password": "",
         "phone": "",
@@ -34,40 +34,43 @@ const LectureDetail = ({ route, navigation }) => {
     const [lecture, setLecture] = useState(initLecture)
     const [isEdit, setIsEdit] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const getLectureData = async () => {
+        await LectureUtils.getLectureById({ token: token, id: _id })
+            .then(async (res) => {
+                await setLecture(res.data)
+            })
+    }
     useEffect(async () => {
         try {
-            setIsLoading(true)
-            await LectureUtils.getLectureById({ token: token, id: _id })
-                .then(async (res) => {
-                    await setLecture(res.data)
-                })
+            await getLectureData();
             setIsLoading(false)
+
         } catch (err) {
             console.log("Error get lecture data: ", err);
         }
         return () => {
             setLecture()
+
         }
     }, [])
-
     const save = async () => {
         setIsProcessing(true)
-        setTimeout(async () => {
+        const query = {
+            token: token,
+            id: _id,
+            lecture: {
+                status: lecture.status,
+                faculty: lecture.faculty
+            }
+        }
+        await setTimeout(async () => {
             try {
-                await fetch(`${apiURL}/lecture/admin/${_id}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({ status: lecture.status })
-                    }).then(res => res.json())
+                await LectureUtils.updateLecture(query)
                     .then(async (res) => {
-                        setIsProcessing(false)
+
                         if (res.statusCode == 200) {
+                            await getLectureData();
                             setIsEdit(false);
                             return Toast.show({
                                 type: 'success',
@@ -76,22 +79,27 @@ const LectureDetail = ({ route, navigation }) => {
                                 visibilityTime: 2000,
                                 autoHide: true,
                             })
-
                         }
                         return Toast.show({
                             type: 'error',
                             position: 'top',
                             text1: 'Cập nhật thất bại ',
-                            visibilityTime: 2000,
-                            autoHide: true,
+                            text2: JSON.stringify(res),
+                            autoHide: false,
                         })
                     })
+                setIsProcessing(false)
             }
             catch (err) {
                 console.log("error submit error: ", err);
             }
         }, 1000)
     }
+    const handlerCancel = async () => {
+        await getLectureData();
+        setIsEdit(false)
+    }
+    console.log(lecture.status);
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderUserDetail
@@ -99,7 +107,7 @@ const LectureDetail = ({ route, navigation }) => {
                 onBackPress={() => navigation.goBack()}
             />
             <LoadingDataModal visible={isLoading} />
-            { !isLoading && <View style={{ alignItems: 'center' }}>
+            {!isLoading && <View style={{ alignItems: 'center' }}>
 
                 <View style={{ width: '90%' }}>
                     <CustomView>
@@ -153,6 +161,26 @@ const LectureDetail = ({ route, navigation }) => {
                     </CustomView>
                     <CustomView>
                         <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                            <Text>Khoa:</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <Picker
+                                mode='dropdown'
+                                itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
+                                enabled={isEdit}
+                                selectedValue={lecture.faculty}
+                                onValueChange={val => setLecture({ ...lecture, faculty: val })}
+                            >
+                                {facultyList.map(val => {
+                                    return (
+                                        <Picker.Item label={val} value={val} key={val} />
+                                    )
+                                })}
+                            </Picker>
+                        </View>
+                    </CustomView>
+                    <CustomView>
+                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
                             <Text>Trạng thái:</Text>
                         </View>
                         <View style={{ flex: 1 }}>
@@ -164,7 +192,7 @@ const LectureDetail = ({ route, navigation }) => {
                                 onValueChange={val => setLecture({ ...lecture, status: val })}
                             >
                                 <Picker.Item label='Active' value='active' />
-                                <Picker.Item label='Disable' value='disable' />
+                                <Picker.Item label='Disabled' value='disabled' />
                             </Picker>
                         </View>
                     </CustomView>
@@ -177,7 +205,7 @@ const LectureDetail = ({ route, navigation }) => {
                     isProcessing={isProcessing}
                     onEditPress={() => setIsEdit(true)}
                     onSavePress={() => save()}
-                    onCancelPress={() => setIsEdit(false)}
+                    onCancelPress={() => handlerCancel()}
                 />
 
             </View>}

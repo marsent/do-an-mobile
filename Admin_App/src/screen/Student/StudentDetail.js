@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5'
-import { Switch } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message'
 
-import { apiURL } from '../../config/config';
 import { StudentUtils, ClassUtils } from '../../utils'
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
@@ -17,7 +15,7 @@ import {
     LoadingDataModal
 } from '../../components'
 import { mainWhite } from '../../style/color';
-
+import { ScrollView } from 'react-native';
 const StudentDetail = ({ route, navigation }) => {
     const token = useContext(TokenContext);
     const initStudent = {
@@ -35,7 +33,7 @@ const StudentDetail = ({ route, navigation }) => {
         "year": ''
     }
     const initClass = {
-        "_id": "60adfe4174ae7a46751debf",
+        "_id": "",
         "faculty": "",
         "name": "",
         "quantity": '',
@@ -46,51 +44,59 @@ const StudentDetail = ({ route, navigation }) => {
     const { _id } = route.params;
     const [student, setStudent] = useState(initStudent)
     const [isEdit, setIsEdit] = useState(false)
-    const [isLoading, setIsLoading] = useState(false);
-    const [Class, setClass] = useState(initClass)
+    const [isLoading, setIsLoading] = useState(true);
+    const [classList, setClassList] = useState([])
     const [isProcessing, setIsProcessing] = useState(false)
-    useEffect(async () => {
-        setIsLoading(true)
+    const getSudentData = async () => {
         await StudentUtils.getStudentById({ token: token, id: _id })
             .then(async (res) => {
-                await setStudent(res.data)
-                setIsLoading(false)
+                console.log(res.data.status);
+                return setStudent(res.data)
             })
+    }
+    useEffect(async () => {
+        await getSudentData();
+
         return () => {
             setStudent();
-            setClass();
+            setClassList()
         }
     }, [])
 
     useEffect(async () => {
-        await ClassUtils.getClassById({ token: token, id: student.class_id })
-            .then(async (res) => {
-                console.log(res.data);
-                await setClass(res.data)
-            })
-        setIsLoading(false)
+        if (student.year) {
+            await ClassUtils.getAllClass({ token: token, year: student.year })
+                .then(res => {
+                    return setClassList(res.data)
+                })
+            setIsLoading(false)
+        }
 
-    }, [student.class_id])
+    }, [student])
 
-    console.log(Class);
+    const handlerCancel = async () => {
+        await getSudentData();
+        setIsEdit(false)
+    }
 
     const save = async () => {
         setIsProcessing(true)
+        const query = {
+
+            token: token,
+            id: student._id,
+            student: {
+                status: student.status,
+                class_id: student.class_id
+            }
+        }
         await setTimeout(async () => {
-            await fetch(`${apiURL}/student/admin/${_id}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify({ status: student.status })
-                }).then(res => res.json())
+            await StudentUtils.updateStudent(query)
                 .then(async (res) => {
                     setIsProcessing(false)
                     if (res.statusCode == 200) {
                         setIsEdit(false);
+                        await getSudentData()
                         return Toast.show({
                             type: 'success',
                             position: 'top',
@@ -98,17 +104,19 @@ const StudentDetail = ({ route, navigation }) => {
                             visibilityTime: 2000,
                             autoHide: true,
                         })
+
+
                     }
                     return Toast.show({
                         type: 'error',
                         position: 'top',
                         text1: 'Cập nhật thất bại ',
+                        text2: JSON.stringify(res.messages),
                         visibilityTime: 2000,
                         autoHide: true,
                     })
                 })
         }, 1000)
-
     }
 
     return (
@@ -117,112 +125,124 @@ const StudentDetail = ({ route, navigation }) => {
                 onBackPress={() => navigation.goBack()}
             />
             <LoadingDataModal visible={isLoading} />
-            {!isLoading && <View style={{ marginTop: 30, alignItems: 'center' }}>
-                <View style={{ width: '90%' }}>
-                    <CustomVIew  >
-                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                            <Text>Mã sinh viên:</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <TextInput
-                                outLine={false}
-                                editable={false}
-                                type='flat'
-                                value={student.student_code} />
-                        </View>
-                    </CustomVIew>
-                    <CustomVIew>
-                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                            <Text>Họ tên:</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <TextInput
-                                outLine={false}
-                                editable={false}
-                                type='flat'
-                                value={student.full_name} />
-                        </View>
-                    </CustomVIew>
-                    <CustomVIew>
-                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                            <Text>Ngày sinh:</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <TextInput
-                                outLine={false}
-                                editable={false}
-                                type='flat'
-                                value={student.date_of_birth.split('T')[0].split('-').reverse().join('/')} />
-                        </View>
-                    </CustomVIew>
-                    <CustomVIew>
-                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                            <Text>Lớp sinh hoạt:</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <TextInput
-                                outLine={false}
-                                editable={false}
-                                multiline={true}
+            {!isLoading &&
+                <ScrollView style={{ flex: 1 }} >
+                    <View style={{ alignItems: 'center' }}>
+                        <View style={{ width: '90%' }}>
+                            <CustomView  >
+                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                    <Text>Mã sinh viên:</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <TextInput
+                                        outLine={false}
+                                        editable={false}
+                                        type='flat'
+                                        value={student.student_code} />
+                                </View>
+                            </CustomView>
+                            <CustomView>
+                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                    <Text>Họ tên:</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <TextInput
+                                        outLine={false}
+                                        editable={false}
+                                        type='flat'
+                                        value={student.full_name} />
+                                </View>
+                            </CustomView>
+                            <CustomView>
+                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                    <Text>Ngày sinh:</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <TextInput
+                                        outLine={false}
+                                        editable={false}
+                                        type='flat'
+                                        value={student.date_of_birth.split('T')[0].split('-').reverse().join('/')} />
+                                </View>
+                            </CustomView>
+                            <CustomView>
+                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                    <Text>Số điện thoại:</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <TextInput
+                                        outLine={false}
+                                        editable={false}
+                                        type='flat'
+                                        value={student.phone} />
+                                </View>
+                            </CustomView>
+                            <CustomView>
+                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                    <Text>Email:</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <TextInput
+                                        outLine={false}
+                                        editable={false}
+                                        multiline={true}
 
-                                type='flat'
-                                value={Class.name ? Class.name : ''} />
-                        </View>
-                    </CustomVIew>
-                    <CustomVIew>
-                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                            <Text>Số điện thoại:</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <TextInput
-                                outLine={false}
-                                editable={false}
-                                type='flat'
-                                value={student.phone} />
-                        </View>
-                    </CustomVIew>
-                    <CustomVIew>
-                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                            <Text>Email:</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <TextInput
-                                outLine={false}
-                                editable={false}
-                                multiline={true}
+                                        type='flat'
+                                        value={student.email} />
+                                </View>
+                            </CustomView>
+                            <CustomView>
+                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                    <Text>Lớp sinh hoạt:</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Picker
+                                        mode='dropdown'
+                                        itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
+                                        enabled={isEdit}
+                                        selectedValue={student.class_id}
+                                        onValueChange={val => setStudent({ ...student, class_id: val })}
+                                    >
+                                        {classList.map(val => {
+                                            return (
+                                                <Picker.Item label={val.name} value={val._id} key={val._id} />
+                                            )
+                                        })}
+                                    </Picker>
+                                </View>
+                            </CustomView>
 
-                                type='flat'
-                                value={student.email} />
-                        </View>
-                    </CustomVIew>
-                    <CustomVIew>
-                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                            <Text>Trạng thái:</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <Picker style={{ marginRight: '23%' }}
-                                mode='dropdown'
-                                itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
-                                enabled={isEdit}
-                                selectedValue={student.status}
-                                onValueChange={val => setStudent({ ...student, status: val })}
-                            >
-                                <Picker.Item label='Active' value='active' />
-                                <Picker.Item label='Disable' value='disabled' />
-                            </Picker>
-                        </View>
-                    </CustomVIew>
+                            <CustomView>
+                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                    <Text>Trạng thái:</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Picker style={{ marginRight: '23%' }}
+                                        mode='dropdown'
+                                        itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
+                                        enabled={isEdit}
+                                        selectedValue={student.status}
+                                        onValueChange={val => setStudent({ ...student, status: val })}
+                                    >
+                                        <Picker.Item label='Active' value='active' />
+                                        <Picker.Item label='Disabled' value='disabled' />
+                                    </Picker>
+                                </View>
+                            </CustomView>
 
-                </View>
-                <SubmitButtonDetail
-                    isEdit={isEdit}
-                    isProcessing={isProcessing}
-                    onEditPress={() => setIsEdit(true)}
-                    onSavePress={() => save()}
-                    onCancelPress={() => setIsEdit(false)}
-                />
+                        </View>
+                        <SubmitButtonDetail
+                            isEdit={isEdit}
+                            isProcessing={isProcessing}
+                            onEditPress={() => setIsEdit(true)}
+                            onSavePress={() => save()}
+                            onCancelPress={() => handlerCancel()}
+                        />
 
-            </View>}
+                    </View>
+                </ScrollView>
+            }
+
             <Toast ref={(ref) => Toast.setRef(ref)} />
 
         </SafeAreaView >
@@ -230,7 +250,7 @@ const StudentDetail = ({ route, navigation }) => {
 };
 
 
-const CustomVIew = ({ children }) => {
+const CustomView = ({ children }) => {
 
     return <View style={{
         width: '100%', flexDirection: 'row', alignItems: 'center'
@@ -239,15 +259,7 @@ const CustomVIew = ({ children }) => {
     </View >
 }
 
-// const TextInput = ({ value, onChangeText, edit }) => {
-//     return <TextInput
-//         style={{ color: '#495057', width: '50%', marginRight: '10%', fontFamily: 'Inter', fontSize: 18 }}
-//         value={value}
-//         onChangeText={(text) => onChangeText(text)}
-//         editable={false}
-//     />
 
-// }
 
 const CustomHeaderText = ({ children, navigation }) => {
 

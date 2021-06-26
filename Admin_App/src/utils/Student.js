@@ -18,7 +18,6 @@ const getAllStudent = async ({ token, limit = false, year = false, class_id = fa
     limit = limit ? `&limit=${limit}` : '';
     page = page ? `&page=${page}` : '';
     select = select ? `&select=${select}` : ''
-
     let url = `${apiURL}/student/admin/?${class_id}${year}${limit}${page}${select}`
     return await fetch(url, {
         method: 'GET',
@@ -37,7 +36,7 @@ const createStudent = async ({ token, student }) => {
     }).then(res => res.json())
 }
 
-const updateStudent = async ({ token, id, status }) => {
+const updateStudent = async ({ token, id, student }) => {
     let url = `${apiURL}/student/admin/${id}`
     return await fetch(url,
         {
@@ -47,7 +46,7 @@ const updateStudent = async ({ token, id, status }) => {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             },
-            body: JSON.stringify({ status: status })
+            body: JSON.stringify(student)
         }).then(res => res.json())
 }
 

@@ -23,57 +23,58 @@ import { mainWhite } from '../../style/color';
 
 const ExamList = ({ navigation }) => {
     const token = useContext(TokenContext);
-    const [typeFilter, setTypeFilter] = useState('tất cả');
+    const [typeFilter, setTypeFilter] = useState(false);
     const [examList, setExamList] = useState([]);
-    const [dataExam, setDataExam] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const [loadingDataModal, setLoadingDataModal] = useState(true)
-    const [dumpType, setDumpType] = useState('tất cả')
+    const [dumpType, setDumpType] = useState(false)
     const [keyWord, setKeyWord] = useState('')
     useEffect(async () => {
-        try {
-            await ExamUtils.getAllExam({ token: token })
-                .then(res => {
-                    setDataExam(res.data)
-                    setExamList(res.data)
-                })
-        } catch (err) {
-            console.log('Error get examList: ', err);
-        }
+        // try {
+        //     await ExamUtils.getAllExam({ token: token })
+        //         .then(res => {
+        //             setExamList(res.data)
+        //         })
+        //     setLoadingDataModal(false)
+        // } catch (err) {
+        //     console.log('Error get examList: ', err);
+        // }
         return () => {
-            setDataExam();
-            setExamList()
+            setExamList();
+            setTypeFilter();
+            setDumpType();
+            setKeyWord();
         }
     }, [])
 
-    useEffect(() => handlerSearch(), [typeFilter])
-    useEffect(() => handlerSearch(), [keyWord])
+    useEffect(() => search(), [typeFilter])
+    useEffect(() => search(), [keyWord])
 
+    useEffect(async () => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            search();
+        });
+        return () => {
+            unsubscribe
+        }
+    }, [navigation])
 
-
-    const handlerSearch = async () => {
-
-        await setLoadingDataModal(true)
-        await setExamList(dataExam)
-        await setTimeout(async () => {
-            try {
-                await setExamList(prevList => {
-                    return prevList.filter(exam => {
-                        if (typeFilter === 'tất cả') {
-                            return exam.name.includes(keyWord)
-                        }
-                        return exam.name.includes(keyWord) && exam.for === typeFilter
-                    })
-                })
-                setLoadingDataModal(false)
-            }
-            catch (err) {
-                console.log('Error Search  : ', err)
-            }
-        }, 1000)
-
-
+    const search = async () => {
+        setLoadingDataModal(true);
+        const query = {
+            token: token,
+            type: typeFilter ? typeFilter : ''
+        }
+        await ExamUtils.getAllExam(query)
+            .then(async (res) => {
+                return setExamList(res.data.filter(val => {
+                    return val.name.toLowerCase().includes(keyWord.toLowerCase())
+                }))
+            })
+        setLoadingDataModal(false)
     }
+
+
 
     const toggleModal = async () => {
         setModalVisible(!isModalVisible);
@@ -117,7 +118,7 @@ const ExamList = ({ navigation }) => {
                             selectedValue={typeFilter}
                             onValueChange={type => setDumpType(type)}
                         >
-                            <Picker.Item label='Tất cả' value='tất cả' />
+                            <Picker.Item label='Tất cả' value={false} />
                             <Picker.Item label='All' value='all' />
                             <Picker.Item label='Lớp' value='class' />
                             <Picker.Item label='Nhóm' value='group' />

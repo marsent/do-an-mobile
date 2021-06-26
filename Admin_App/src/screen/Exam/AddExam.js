@@ -9,10 +9,10 @@ import Toast from 'react-native-toast-message'
 import Spinkit from 'react-native-spinkit'
 
 import styles from '../../style/style'
-import { ExamUtils, ClassUtils } from '../../utils'
+import { ExamUtils, ClassUtils, SubjectUtils, StudentUtils } from '../../utils'
 
 import TokenContext from '../../Context/TokenContext'
-import { apiURL, yearList } from '../../config/config'
+import { mainGray, mainGreen } from '../../style/color'
 import {
     HeaderText,
     Text,
@@ -27,7 +27,11 @@ import { mainWhite } from '../../style/color'
 export default AddExam = ({ navigation }) => {
 
     const token = useContext(TokenContext)
-    const initError = { name: false, class_id: false }
+    const initError = {
+        name: false,
+        class_id: false,
+        time: false
+    }
     const initClass = {
         "quantity": 0,
         "status": "",
@@ -35,6 +39,7 @@ export default AddExam = ({ navigation }) => {
         "name": "",
         "year": "",
         "faculty": "",
+
     }
     const [type, setType] = useState('all');
     const [questions, setQuestions] = useState([]);
@@ -44,12 +49,15 @@ export default AddExam = ({ navigation }) => {
     const [fileStudent, setFileStudent] = useState('');
     const [nameExam, setNameExam] = useState('');
     const [classList, setClassList] = useState([]);
-    const [classId, setClassId] = useState('');
-    const [time, setTime] = useState(15);
+    const [time, setTime] = useState();
     const [error, setError] = useState(initError);
     const [previewQuestions, setPrevewQuestions] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [Class, setClass] = useState(initClass)
+    const [Class, setClass] = useState(initClass);
+    const [subjectList, setSubjectList] = useState([]);
+    const [subject, setSubject] = useState([]);
+    const [studentCodeList, setStudentCodeList] = useState([]);
+    const [studentList, setStudentList] = useState([])
     // get Class List
 
     const handlerUploadExam = async () => {
@@ -82,7 +90,7 @@ export default AddExam = ({ navigation }) => {
                 .catch(err => {
                     console.log(err.message, err.code);
                 });
-            setStudentList(studentListFromat(fileContents))
+            setStudentCodeList(studentListFromat(fileContents))
             setUploadStudent(true)
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
@@ -94,11 +102,18 @@ export default AddExam = ({ navigation }) => {
     }
     useEffect(async () => {
         try {
-            await ClassUtils.getAllClass({ token })
+            await ClassUtils.getAllClass({ token: token })
                 .then(async (res) => {
                     await setClassList(res.data)
                     if (res.data.length > 0) {
-                        await setClassId(res.data[1]._id)
+                        await setClass(res.data[0])
+                    }
+                })
+            await SubjectUtils.getAllSubject({ token: token })
+                .then(async res => {
+                    await setSubjectList(res.data)
+                    if (res.data.length > 0) {
+                        await setSubject(res.data[0])
                     }
                 })
         } catch (err) {
@@ -109,11 +124,24 @@ export default AddExam = ({ navigation }) => {
             setIsLoading(false)
         }
     }, [])
+
     useEffect(async () => {
-        await setClass(classList.find(element => element._id == classId))
-    }, [classId])
+        console.log(studentCodeList);
+        if (studentCodeList && studentCodeList.length > 0) {
+            StudentUtils.getAllStudent({ token: token })
+                .then(async res => {
+                    studentCodeList.forEach(async val => {
+                        console.log(val);
+                        console.log(res.data.find(e => e.student_code == val));
+                        await setStudentList([...studentList, res.data.find(e => e.student_code == val)])
+                    })
+                })
+        }
+    }, [studentCodeList])
+
     const handlerSubmit = async (e) => {
         setIsLoading(true)
+        console.log(studentList);
         const exam = {
             name: nameExam,
             for: type,
@@ -122,68 +150,82 @@ export default AddExam = ({ navigation }) => {
             time: time,
         }
         if (type == 'class') {
-            exam.class_id = classId
+            exam.class_id = Class._id
+        }
+        if (type == 'subject') {
+            exam.subject_id = subject._id
         }
         try {
             await setTimeout(async () => {
-                ExamUtils.createExam({ token: token, exam: exam })
-                    .then(res => {
-                        setIsLoading(false)
-                        if (res.error == 4000) return setError(res.messages)
-                        if (res.error == 7000) {
-                            setError({ name: '' });
-                            return Toast.show({
-                                type: 'error',
-                                position: 'top',
-                                text1: 'Thêm đề thi thất bại',
-                                text2: 'Đề thi đã tồn tại trong cơ sở dữ liệu',
-                                visibilityTime: 2000,
-                                autoHide: true,
-                            })
-                        }
-                        setError(initError);
-                        setNameExam('');
-                        setQuestions('')
-                        setUploadExam(false)
-                        setPrevewQuestions(false)
-                        return Toast.show({
-                            type: 'success',
-                            position: 'top',
-                            text1: 'Thêm dề thi thành công',
-                            visibilityTime: 2000,
-                            autoHide: true,
+                // await ExamUtils.createExam({ token: token, exam: exam })
+                //     .then(res => {
+                //         if (res.error == 4000) return setError(res.messages)
+                //         if (res.error == 7000) {
+                //             setError({ name: '' });
+                //             return Toast.show({
+                //                 type: 'error',
+                //                 position: 'top',
+                //                 text1: 'Thêm đề thi thất bại',
+                //                 text2: 'Đề thi đã tồn tại trong cơ sở dữ liệu',
+                //                 visibilityTime: 2000,
+                //                 autoHide: true,
+                //             })
+                //         }
+                //         setError(initError);
+                //         setNameExam('');
+                //         setQuestions('')
+                //         setUploadExam(false)
+                //         setTime()
+                //         setPrevewQuestions(false)
+                //         return Toast.show({
+                //             type: 'success',
+                //             position: 'top',
+                //             text1: 'Thêm dề thi thành công',
+                //             visibilityTime: 2000,
+                //             autoHide: true,
 
 
-                        })
-                    })
+                //         })
+                //     })
+                setIsLoading(false)
+
             }, 1000)
+
+
         }
         catch (err) {
             console.log('Error submit exam: ', err);
         }
+
     }
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderText navigation={navigation}  >Tạo bài thi</HeaderText>
             <ScrollView style={{ marginTop: 30 }}>
-                <View style={{ flex: 1, alignItems: 'center' }}>
+                <View style={{ flex: 1, alignItems: 'center', }}>
 
                     {/* Type Exam for */}
-                    <View style={{ width: '90%' }}>
+                    <View style={{ width: '90%', marginBottom: 15 }}>
                         <Picker
                             label='Loại bài thi'
                             placeholder='Loại bài thi'
-                            displayValue={type}
+                            displayValue={type == 'all' ? 'Tất cả sinh viên'
+                                : type == 'class' ? 'Lớp học'
+                                    : type == 'subject' ? 'Môn học'
+                                        : 'Nhóm'
+                            }
                             selectedValue={type}
                             onValueChange={val => setType(val)}
                         >
                             <PickerBase.Item label="Tát cả sinh viên" value='all' />
                             <PickerBase.Item label='Lớp' value='class' />
-                            <PickerBase.Item enabled={false} label='Nhóm' value='group' />
+                            <PickerBase.Item label='Môn học' value='subject' />
+
+                            <PickerBase.Item label='Nhóm' value='group' />
                         </Picker>
                     </View>
                     {/* Name exam */}
-                    <View style={{ width: '90%' }}>
+                    <View style={{ width: '90%', marginBottom: 15 }}>
                         <TextInput
                             label='Tên bài thi'
                             isFocus={true}
@@ -196,49 +238,84 @@ export default AddExam = ({ navigation }) => {
                         />
 
                     </View>
+
+                    {/* Time exam */}
+                    <View style={{ width: '90%', marginBottom: 15 }}>
+                        <TextInput
+                            label='Thời gian làm bài (phút)'
+                            isFocus={true}
+                            outLine={true}
+
+                            placeholder='Thời gian làm bài (phút)'
+                            onChangeText={text => setTime(text)}
+                            value={time}
+                            errorMessage={error.time}
+                        />
+
+                    </View>
                     {/* TypeExam */}
+                    {type === 'all' && <View style={{ marginBottom: 15 }}></View>}
                     {type === 'class' &&
                         <View style={{ width: '90%', marginBottom: 15 }}>
                             <Picker
                                 placeholder='Lớp'
                                 displayValue={Class.name}
-                                selectedValue={classId}
-                                onValueChange={(val, index) => setClassId(val)}
+                                selectedValue={Class._id}
+                                onValueChange={(val, index) => setClass(val)}
                                 errorMessage={error.class_id}
                             >
                                 {classList.map(val => <PickerBase.Item
                                     label={val.name}
-                                    value={val._id}
+                                    value={val}
                                     key={val._id} />)}
                             </Picker>
                         </View>}
 
-                    {type === 'group' && <View>
-                        {uploadStudent ? (
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Text>{fileStudent}</Text>
-                                <TouchableOpacity onPress={() => {
-                                    setuploadExam(false);
-                                    setQuestions();
-                                }}>
-                                    <Icon name='times' />
-                                </TouchableOpacity>
+                    {type === 'subject' &&
+                        <View style={{ width: '90%', marginBottom: 15 }}>
+                            <Picker
+                                placeholder='Môn học'
+                                displayValue={subject.name}
+                                selectedValue={subject._id}
+                                onValueChange={(val, index) => setSubject(val)}
+                                errorMessage={error.subject}
+                            >
+                                {subjectList.map(subject => <PickerBase.Item
+                                    label={subject.name}
+                                    value={subject}
+                                    key={subject._id} />)}
+                            </Picker>
+                        </View>}
+
+                    {type === 'group' &&
+                        <View style={{ width: '90%', }} >
+                            <View style={{ paddingTop: 11, }} >
+
+                                <View
+                                    style={{ position: 'absolute', top: 0, marginLeft: 15, backgroundColor: mainWhite, borderColor: mainGray, zIndex: 100 }}
+                                >
+                                    <Text
+                                        size={14}
+                                        color={mainGray}
+                                    >Danh sách sinh viên</Text>
+                                </View>
+                                <View style={{ height: 300, borderWidth: 1, borderRadius: 5, borderColor: mainGray, paddingTop: 3, flexDirection: 'row', flexWrap: 'wrap' }}>
+                                    {!uploadStudent &&
+                                        <TouchableOpacity
+                                            style={{ flexDirection: 'row', alignItems: 'center', margin: 15, borderWidth: 1, borderColor: mainGray, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 }}
+                                            onPress={() => uploadStudentList()}
+                                        >
+                                            <Text size={14} color={mainGray} >Thêm sinh viên</Text>
+                                            <Icon size={18} name='plus-circle' color={mainGreen} style={{ marginLeft: 10 }} />
+                                        </TouchableOpacity>
+                                    }
+                                    {uploadStudent && <StudentItem />}
+
+                                </View>
                             </View>
-                        ) : <Button title='Chọn file danh sách sinh viên' onPress={uploadStudentList} />}
-                    </View>
+                        </View>
                     }
 
-                    {/* Time */}
-                    <View style={{ width: '90%', díplay: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <Text  >Thời gian làm bài: </Text>
-                        <TextInputBase
-                            style={{ color: '#495057', width: '7%', fontFamily: 'Inter', fontSize: 18 }}
-                            value={time.toString()}
-                            onChangeText={text => setTime(text)}
-                        />
-                        <Text>phút</Text>
-
-                    </View>
                     <View style={{ width: '90%', flexDirection: 'row', alignItems: 'center' }}>
                         <Text>Xem đề thi:</Text>
                         <Checkbox
@@ -308,6 +385,20 @@ export default AddExam = ({ navigation }) => {
         </SafeAreaView >
     )
 }
+
+const StudentItem = ({ full_name = 'Đào Tuấn Anh', student_code = '18520443', onPress }) => {
+
+    return (
+        <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, borderWidth: 1, borderColor: mainGray, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 }} >
+            <Text size={14} >{full_name}-{student_code}</Text>
+            <TouchableOpacity onPress={onPress}>
+                <Icon name='minus-circle' size={18} color={mainGreen} style={{ marginLeft: 10 }} />
+            </TouchableOpacity>
+        </View>
+    )
+
+}
+
 function examFromat(csv) {
     var lines = csv.split("\n");
     var result = [];
