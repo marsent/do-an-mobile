@@ -12,7 +12,7 @@ const facultyList = [
   'information_security',
 ];
 
-const apiURL = 'http://quocha.xyz/api';
+const apiURL = `http://quocha.xyz/api`;
 const authUrl = 'http://quocha.xyz/auth/lecture/sign-in';
 
 export {yearList, facultyList, apiURL, authUrl};

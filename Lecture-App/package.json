@@ -21,6 +21,7 @@
     "react-native-bubble-tabbar": "^0.1.0",
     "react-native-button": "^3.0.1",
     "react-native-document-picker": "^5.2.0",
+    "react-native-elements": "^3.4.2",
     "react-native-fontawesome": "^7.0.0",
     "react-native-fs": "^2.18.0",
     "react-native-gesture-handler": "^1.10.3",

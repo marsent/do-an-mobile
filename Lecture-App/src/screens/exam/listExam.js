@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   View,
   Text,
@@ -13,25 +13,23 @@ import {
 import TokenContext from '../../Context/TokenContext';
 import {apiURL, authUrl} from '../../config/config';
 function exam({navigation}) {
-  const listExam = [
-    {
-      ID: '123',
-      Name: 'Domo 1',
-      Content: 'Content 1',
-      Date_created: '01/01/2021',
-      Update_date: '01/01/2021',
-      Status: '1',
-    },
-    {
-      ID: '321',
-      Name: 'Domo 2',
-      Content: 'Content 2',
-      Date_created: '02/02/2021',
-      Update_date: '02/02/2021',
-      Status: '0',
-    },
-  ];
-  const [modalVisible, setModalVisible] = useState(false);
+  const token = useContext(TokenContext);
+  const [listExam, setListExam] = useState([]);
+
+  useEffect(async () => {
+    await fetch(`${apiURL}/exam/lecture`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then(res => res.json())
+      .then(res => {
+        setListExam(res.data);
+      });
+  });
   return (
     <SafeAreaView style={styles.Container}>
       <View style={styles.ButtonContainer}>
@@ -46,11 +44,18 @@ function exam({navigation}) {
       </View>
       <ScrollView style={styles.NotiView}>
         {listExam.map((item, i) => (
-          <View key={i} style={styles.NotiText}>
-            <Text style={styles.TitleText}>{item.Name} </Text>
-            <Text style={styles.ContentText}>{item.Content} </Text>
-            <Text style={styles.Notification_date}>{item.Update_date} </Text>
-          </View>
+          <TouchableOpacity
+            style={styles.Button}
+            key={i}
+            onPress={() => {
+              navigation.navigate('Xem bài kiểm tra', {_id: item._id});
+            }}>
+            <View style={styles.NotiText}>
+              <Text style={styles.TitleText}>{item.name} </Text>
+              <Text style={styles.ContentText}>{item.for} </Text>
+              <Text style={styles.Notification_date}>{item.time} </Text>
+            </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -90,14 +95,14 @@ const styles = StyleSheet.create({
     borderColor: '#BFBFBF',
   },
   TitleText: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   ContentText: {
-    fontSize: 14,
+    fontSize: 18,
   },
   Notification_date: {
-    fontSize: 10,
+    fontSize: 18,
     color: '#262626',
   },
   image: {
@@ -117,6 +122,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 10,
+  },
+  Button: {
+    paddingHorizontal: 10,
   },
 });
 export default exam;
