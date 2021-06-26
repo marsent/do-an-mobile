@@ -2,13 +2,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Toast from 'react-native-toast-message';
-
+import { Picker } from '@react-native-picker/picker'
 
 import styles from '../../style/style';
 import { mainBlue, mainBlack, mainWhite } from '../../style/color'
 import { apiURL } from '../../config/config';
 import TokenContext from '../../Context/TokenContext';
 import { LoadingDataModal, Text, SubmitButtonDetail, TextInput } from '../../components';
+import { ClassUtils } from '../../utils';
 const ClassDetail = ({ route, navigation }) => {
     const token = useContext(TokenContext);
     const { _id } = route.params;
@@ -27,16 +28,12 @@ const ClassDetail = ({ route, navigation }) => {
     const [isEdit, setIsEdit] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
     const getData = async () => {
+        const query = {
+            token: token,
+            id: _id
+        }
         try {
-            await fetch(`${apiURL}/class/admin/${_id}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    }
-                }).then(res => res.json())
+            await ClassUtils.getClassById(query)
                 .then(res => {
                     setClass(res.data)
 
@@ -59,26 +56,25 @@ const ClassDetail = ({ route, navigation }) => {
 
     const save = async () => {
         setIsProcessing(true)
+        const query = {
+            token: token,
+            id: _id,
+            Class: {
+                name: Class.name,
+                status: Class.status
+            }
+        }
         await setTimeout(async () => {
             try {
-                await fetch(`${apiURL}/class/admin/${_id}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({ name: Class.name })
-                    }).then(res => res.json())
+                await ClassUtils.updateClass(query)
                     .then(async (res) => {
-
+                        console.log(res);
                         if (res.statusCode == 400) {
                             return setError(res.messages)
                         }
                         if (res.statusCode = 200) {
                             setError(initError)
-                            await setIsEdit(!isEdit)
+                            await setIsEdit(false)
 
                             return Toast.show({
                                 type: 'success',
@@ -166,7 +162,23 @@ const ClassDetail = ({ route, navigation }) => {
                             </View>
 
                         </CustomView>
-
+                        <CustomView>
+                            <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                <Text>Trạng thái:</Text>
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Picker style={{ marginRight: '23%' }}
+                                    mode='dropdown'
+                                    itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
+                                    enabled={isEdit}
+                                    selectedValue={Class.status}
+                                    onValueChange={val => setClass({ ...Class, status: val })}
+                                >
+                                    <Picker.Item label='Active' value='active' />
+                                    <Picker.Item label='Disabled' value='disabled' />
+                                </Picker>
+                            </View>
+                        </CustomView>
                     </View>
 
 

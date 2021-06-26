@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Button } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker'
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,76 +9,106 @@ const Stack = createStackNavigator();
 import ClassDetail from './ClassDetail'
 import { apiURL, facultyList, yearList } from '../../config/config'
 import styles from '../../style/style'
-import HeaderText from '../../components/HeaderText'
 import TokenContext from '../../Context/TokenContext'
-import LoadingDataModal from '../../components/LoadingDataModal'
-import FlatList from '../../components/FlatList'
-import Text from '../../components/Text'
-import CustomButton from '../../components/Button'
-import Search from '../../components/Search'
-import CardView from '../../components/CardView'
+import {
+    HeaderText,
+    LoadingDataModal,
+    FlatList,
+    Text,
+    Button as CustomButton,
+    Search,
+    CardView,
+} from '../../components';
+
+import { mainWhite } from '../../style/color';
+import { ClassUtils } from '../../utils';
+import { keyword } from 'chalk';
 
 
 const ClassList = ({ navigation }) => {
     const token = useContext(TokenContext);
     const [loadingDataModal, setLoadingDataModal] = useState(true);
-    const [filterData, setFilterData] = useState({ faculty: 'all', year: 'all' })
-    const [dumpFilter, setDumpFilter] = useState({ faculty: 'all', year: 'all' })
+    const [filterData, setFilterData] = useState({ faculty: false, year: false })
+    const [dumpFilter, setDumpFilter] = useState({ faculty: false, year: false })
     const [keyWord, setKeyWord] = useState('');
     const [classList, setClassList] = useState([]);
-    const [dataClass, setDataClass] = useState([])
     const [modalVisible, setModalVisible] = useState(false)
 
     useEffect(async () => {
-        try {
-            await fetch(`${apiURL}/class/admin`, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(async (res) => {
-                await setClassList(res.data)
-                await setDataClass(res.data)
-                await setLoadingDataModal(false)
-            })
-        } catch (err) {
-            console.log('Error get classList: ', err);
+        // try {
+        //     await ClassUtils.getAllClass({token:token})
+        //     .then(async (res) => {
+        //         await setClassList(res.data)
+        //     })
+        //     await setLoadingDataModal(false)
+        // } catch (err) {
+        //     console.log('Error get classList: ', err);
+        // }
+        return () => {
+            setClassList();
+            setDumpFilter();
+            setFilterData();
+            setKeyWord();
+
         }
     }, [])
 
-    useEffect(() => handlerSearch(), [keyWord])
-    useEffect(() => handlerSearch(), [filterData])
-
-    const handlerSearch = async () => {
-        setClassList(dataClass);
-        try {
-            if (filterData.faculty == 'all' && filterData.year == 'all') {
-                await setClassList(prevList => {
-                    return prevList.filter(classObj => {
-                        return classObj.name.includes(keyWord)
-                    })
-                })
-            }
-            else if (filterData.faculty != 'all' && filterData.year != 'all') {
-                await setClassList(prevList => {
-                    return prevList.filter(classObj => {
-                        return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year && classObj.faculty == filterData.faculty)
-                    })
-                })
-            }
-            else if (filterData.faculty != 'all' || filterData.year != 'all') {
-                await setClassList(prevList => {
-                    return prevList.filter(classObj => {
-                        return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year || classObj.faculty == filterData.faculty)
-                    })
-                })
-            }
-        } catch (err) {
-            console.log('Error Search :', err);
+    useEffect(async () => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            search();
+        });
+        return () => {
+            unsubscribe
         }
+    }, [navigation])
+
+
+    useEffect(() => search(), [keyWord])
+    useEffect(() => search(), [filterData])
+
+
+    const search = async () => {
+        setLoadingDataModal(true)
+        const query = {
+            token: token,
+            year: filterData.year ? filterData.year : '',
+            faculty: filterData.faculty ? filterData.faculty : ''
+        }
+        await ClassUtils.getAllClass(query)
+            .then(async res => {
+                return setClassList(res.data.filter(val => val.name.toLowerCase().includes(keyWord.toLowerCase())))
+            })
+        setLoadingDataModal(false)
     }
+
+    // const handlerSearch = async () => {
+    //     setClassList(dataClass);
+    //     try {
+    //         if (filterData.faculty == 'all' && filterData.year == 'all') {
+    //             await setClassList(prevList => {
+    //                 return prevList.filter(classObj => {
+    //                     return classObj.name.includes(keyWord)
+    //                 })
+    //             })
+    //         }
+    //         else if (filterData.faculty != 'all' && filterData.year != 'all') {
+    //             await setClassList(prevList => {
+    //                 return prevList.filter(classObj => {
+    //                     return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year && classObj.faculty == filterData.faculty)
+    //                 })
+    //             })
+    //         }
+    //         else if (filterData.faculty != 'all' || filterData.year != 'all') {
+    //             await setClassList(prevList => {
+    //                 return prevList.filter(classObj => {
+    //                     return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year || classObj.faculty == filterData.faculty)
+    //                 })
+    //             })
+    //         }
+    //     } catch (err) {
+    //         console.log('Error Search :', err);
+    //     }
+    // }
 
     const toggleModal = async () => {
         setModalVisible(!modalVisible);
@@ -86,7 +116,7 @@ const ClassList = ({ navigation }) => {
     };
 
     return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderText navigation={navigation}>Danh sách lớp học</HeaderText>
             <View style={{ flex: 1 }}>
                 <View style={[styles.container]}>
@@ -94,9 +124,8 @@ const ClassList = ({ navigation }) => {
                         <Search
                             placeholder='Tên bài thi'
                             value={keyWord}
-                            onChangeText={val => setKeyWord(val)}
-                            onEndEditing={() => handlerSearch()}
-                            onSearch={() => handlerSearch()}
+                            onEndEditing={setKeyWord}
+                            onFilter={() => { setModalVisible(true) }}
                             onFilter={() => { setModalVisible(true) }}
                         />
 
@@ -135,7 +164,7 @@ const ClassList = ({ navigation }) => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -170,7 +199,7 @@ const FacultyPicker = ({ onValueChange, dumpFilter, filterData }) => {
             onValueChange={val => onValueChange({ ...dumpFilter, faculty: val })}
             selectedValue={filterData.faculty}
         >
-            <Picker.Item label='All' value='all' />
+            <Picker.Item label='Tất cả' value={false} />
             {facultyList.map(faculty => {
                 return (
                     <Picker.Item label={faculty} value={faculty} key={faculty} />
@@ -188,7 +217,7 @@ const YearPicker = ({ onValueChange, dumpFilter, filterData }) => {
             onValueChange={val => onValueChange({ ...dumpFilter, year: val })}
             selectedValue={filterData.year}
         >
-            <Picker.Item label='All' value='all' />
+            <Picker.Item label='Tất cả' value={false} />
             {yearList.map(year => {
                 return (
                     <Picker.Item label={year.toString()} value={year.toString()} key={year.toString()} />

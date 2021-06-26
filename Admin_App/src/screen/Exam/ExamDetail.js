@@ -4,12 +4,14 @@ import Icon from 'react-native-vector-icons/FontAwesome5'
 import { RadioButton } from 'react-native-paper'
 import Toast from 'react-native-toast-message';
 import { Checkbox } from 'react-native-paper'
+import { Picker } from '@react-native-picker/picker'
 
 import styles from '../../style/style';
 import { mainBlue, mainWhite } from '../../style/color'
 import { apiURL } from '../../config/config';
 import TokenContext from '../../Context/TokenContext';
 import { LoadingDataModal, Text, TextInput, SubmitButtonDetail } from '../../components';
+import { ExamUtils, ClassUtils } from '../../utils'
 const ExamDetail = ({ route, navigation }) => {
     const token = useContext(TokenContext);
     const { _id } = route.params;
@@ -23,13 +25,14 @@ const ExamDetail = ({ route, navigation }) => {
         "year": "",
         "time": "",
         "questions": [],
-        "for": ""
+        "for": "",
+        "class_id": ''
     }
     const initClass = {
         "quantity": 0,
         "status": "",
         "_id": "",
-        "name": "",
+        "name": "Không có lớp",
         "year": "",
         "faculty": "",
     }
@@ -47,47 +50,33 @@ const ExamDetail = ({ route, navigation }) => {
     const [exam, setExam] = useState(initExam)
     const [Class, setClass] = useState(initClass);
     const [error, setError] = useState(initError)
-    const [isLoadingData, setIsLoadingData] = useState(false)
+    const [isLoadingData, setIsLoadingData] = useState(true)
     const [preview, setPreview] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false)
     const getExam = async () => {
-        await fetch(`${apiURL}/exam/admin/${_id}`,
-            {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json())
+        await ExamUtils.getExamById({ token: token, id: _id })
             .then(async (res) => {
                 await setExam(res.data)
             })
     }
     useEffect(async () => {
-        await setIsLoadingData(true)
         await getExam()
         await setIsLoadingData(false)
         return () => {
             setExam()
+            setClass()
         }
     }, [])
 
     useEffect(async () => {
         if (exam.for == 'class') {
             try {
-                await fetch(`${apiURL}/class/admin/${exam.class_id}`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        }
-                    }).then(res => res.json())
+                await ClassUtils.getClassById({ token: token, id: exam.class_id })
                     .then(res => {
-                        setClass(res.data)
+                        if (res.data) {
+                            setClass(res.data)
+                        }
                     })
             }
             catch (err) {
@@ -103,36 +92,32 @@ const ExamDetail = ({ route, navigation }) => {
     }
     const save = async () => {
         setIsProcessing(true)
+        const query = {
+            token: token,
+            id: _id,
+            exam: {
+                name: exam.name
+            }
+        }
         await setTimeout(async () => {
             try {
-                await fetch(`${apiURL}/exam/admin/${_id}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({ name: exam.name })
-                    }).then(res => res.json())
-                    .then(async (res) => {
-
-                        if (res.statusCode == 400) {
-                            return setError(res.messages)
-                        }
-                        if (res.statusCode = 200) {
-                            setError(initError)
-                            await setIsEdit(!isEdit)
-
-                            return Toast.show({
-                                type: 'success',
-                                position: 'top',
-                                text1: 'Cập nhật thành công ',
-                                visibilityTime: 2000,
-                                autoHide: true,
-                            })
-                        }
+                const updateExam = await ExamUtils.updateExam(query)
+                    .then(res => res)
+                const updateStatus = await ExamUtils.updateExamStatus({ token: token, id: _id, status: exam.status })
+                    .then(res => res)
+                if (updateExam.statusCode == 200 && updateStatus.statusCode == 200) {
+                    Toast.show({
+                        type: 'success',
+                        position: 'top',
+                        text1: 'Cập nhật thành công ',
+                        visibilityTime: 2000,
+                        autoHide: true,
                     })
+                    await setIsEdit(!isEdit)
+                } else {
+                    setError(updateExam.messages)
+                }
+
             }
             catch (err) {
                 console.log('Error submit:', err);
@@ -219,6 +204,23 @@ const ExamDetail = ({ route, navigation }) => {
                                     value={Class.name} />
                             </View>
                         </CustomView>}
+                        <CustomView>
+                            <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                <Text>Trạng thái:</Text>
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Picker style={{ marginRight: '23%' }}
+                                    mode='dropdown'
+                                    itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
+                                    enabled={isEdit}
+                                    selectedValue={exam.status}
+                                    onValueChange={val => setExam({ ...exam, status: val })}
+                                >
+                                    <Picker.Item label='Active' value='active' />
+                                    <Picker.Item label='Disabled' value='disabled' />
+                                </Picker>
+                            </View>
+                        </CustomView>
                         <CustomView >
                             <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
                                 <Text>Xem câu hỏi</Text>
@@ -276,13 +278,6 @@ const ExamDetail = ({ route, navigation }) => {
 };
 
 
-// const Text = ({children, size = 18, color = '#22272E'}) => {
-//     return (
-//         <Text style={{ fontSize: size, fontFamily: 'Inter', color: color }}>
-//             {children}
-//         </Text>
-//     )
-// }
 const CustomView = ({ children }) => {
 
     return <View style={{
@@ -292,25 +287,6 @@ const CustomView = ({ children }) => {
     </View >
 }
 
-// const TextInput = ({value, onChangeText, edit, }) => {
-//     return <TextInput
-//         style={{ color: '#495057', width: '50%', marginRight: '10%', fontFamily: 'Inter', fontSize: 18, }}
-//         value={value}
-//         onChangeText={(text) => onChangeText(text)}
-//         editable={false}
-//     />
-
-// }
-
-// const CustomButton = ({ children, onPress, style }) => {
-//     return (
-//         <TouchableOpacity style={[{ backgroundColor: '#0598FC', height: 40, alignItems: 'center', borderRadius: 30, elevation: 5, paddingVertical: 5, width: 130 }, style]}
-//             onPress={onPress}
-//         >
-//             <Text color='#FFFFFF'>{children}</Text>
-//         </TouchableOpacity >
-//     )
-// }
 
 const CustomHeaderText = ({ children, navigation }) => {
 

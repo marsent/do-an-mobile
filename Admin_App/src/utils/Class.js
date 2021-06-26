@@ -12,13 +12,13 @@ const getClassById = async ({ token, id = '', select = false }) => {
 
 }
 
-const getAllClass = async ({ token, limit = false, faculty = false, page = false, select = false }) => {
+const getAllClass = async ({ token, limit = false, faculty = false, page = false, select = false, year = false }) => {
     faculty = faculty ? `faculty=${faculty}` : '';
-    limit = limit ? `limit=${limit}` : '';
-    page = page ? `page=${page}` : '';
-    select = select ? `select=${select}` : ''
-
-    let url = `${apiURL}/class/admin/?${faculty}&${limit}&${page}&${select}`
+    limit = limit ? `&limit=${limit}` : '';
+    page = page ? `&page=${page}` : '';
+    select = select ? `&select=${select}` : ''
+    year = year ? `&year=${year}` : '';
+    let url = `${apiURL}/class/admin/?${faculty}${limit}${page}${select}${year}`
     return await fetch(url, {
         method: 'GET',
         headers: headers(token)
@@ -36,8 +36,9 @@ const createClass = async ({ token, Class }) => {
     }).then(res => res.json())
 }
 
-const updateClass = async ({ token, id, name }) => {
+const updateClass = async ({ token, id, Class }) => {
     let url = `${apiURL}/class/admin/${id}`
+    console.log(Class);
     return await fetch(url,
         {
             method: 'PUT',
@@ -46,7 +47,7 @@ const updateClass = async ({ token, id, name }) => {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             },
-            body: JSON.stringify({ name: name })
+            body: JSON.stringify(Class)
         }).then(res => res.json())
 }
 

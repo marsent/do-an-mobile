@@ -35,8 +35,9 @@ const createLecture = async ({ token, lecture }) => {
     }).then(res => res.json())
 }
 
-const updateLecture = async ({ token, id, status }) => {
+const updateLecture = async ({ token, id, lecture }) => {
     let url = `${apiURL}/lecture/admin/${id}`
+
     return await fetch(url,
         {
             method: 'PUT',
@@ -45,7 +46,7 @@ const updateLecture = async ({ token, id, status }) => {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             },
-            body: JSON.stringify({ status: status })
+            body: JSON.stringify(lecture)
         }).then(res => res.json())
 }
 
