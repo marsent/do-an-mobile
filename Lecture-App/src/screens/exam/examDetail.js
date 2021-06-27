@@ -7,10 +7,12 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import {RadioButton} from 'react-native-paper';
+import {RadioButton, TextInput} from 'react-native-paper';
 import {CheckBox} from 'react-native-elements';
 import TokenContext from '../../Context/TokenContext';
-import {apiURL, authUrl} from '../../config/config';
+import {Picker} from '@react-native-picker/picker';
+import {ExamUtils, ClassUtils} from '../../utils';
+import Toast from 'react-native-toast-message';
 const examDetail = ({route}) => {
   const {_id} = route.params;
   const token = useContext(TokenContext);
@@ -25,17 +27,32 @@ const examDetail = ({route}) => {
     time: '',
     questions: [],
     for: '',
+    subject_id: '',
   });
   const [subject, setSubject] = useState({
     quantity: 0,
     status: '',
     _id: '',
-    name: '',
+    name: 'Không có',
     year: '',
     faculty: '',
   });
+  const initError = {
+    status: false,
+    _id: false,
+    name: false,
+    year: false,
+    faculty: false,
+    year: false,
+    time: false,
+    questions: [],
+    for: false,
+  };
   const [check, SetCheck] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const [error, setError] = useState(initError);
+
   const getExam = async () => {
     await fetch(`http://quocha.xyz/api/exam/lecture/${_id}`, {
       method: 'GET',
@@ -46,10 +63,11 @@ const examDetail = ({route}) => {
       },
     })
       .then(res => res.json())
-      .then(res => {
-        setexam(res.data);
+      .then(async res => {
+        await setexam(res.data);
       })
       .catch(error => console.log('error', error));
+    console.log(exam.subject_id);
   };
   useEffect(async () => {
     await setIsLoadingData(true);
@@ -61,7 +79,9 @@ const examDetail = ({route}) => {
   }, []);
   useEffect(async () => {
     if (exam.for === 'subject') {
-      await fetch(`http://quocha.xyz/api/subject/lecture/${exam.subject_id}`, {
+      const url = `http://quocha.xyz/api/subject/lecture/${exam.subject_id}`;
+      console.log(url);
+      await fetch(url, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -71,17 +91,70 @@ const examDetail = ({route}) => {
       })
         .then(res => res.json())
         .then(res => {
-          setSubject(res.data);
+          if (res.data != null) {
+            setSubject(res.data);
+          }
         })
         .catch(error => {
-          console.log('error', error);
+          console.log('error get class', error);
         });
     }
-  });
+  }, [exam]);
+  const handlerCancel = () => {
+    setUpdate(false);
+    setError(initError);
+    getExam();
+  };
+  const save = async () => {
+    // setIsProcessing(true);
+    const query = {
+      token: token,
+      id: _id,
+      exam: {
+        name: exam.name,
+      },
+    };
+    await setTimeout(async () => {
+      try {
+        const updateExam = await ExamUtils.updateExam(query).then(res => res);
+        const updateStatus = await ExamUtils.updateExamStatus({
+          token: token,
+          id: _id,
+          status: exam.status,
+        }).then(res => res);
+        if (updateExam.statusCode == 200 && updateStatus.statusCode == 200) {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            text1: 'Cập nhật thành công ',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+          await setUpdate(!update);
+        } else {
+          setError(updateExam.messages);
+        }
+      } catch (err) {
+        console.log('Error submit:', err);
+      }
+      // await setIsProcessing(false);
+    }, 1000);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerView}>
-        <Text style={styles.headerText}>{exam.name}</Text>
+        {!update ? (
+          <Text style={styles.headerText}>{exam.name}</Text>
+        ) : (
+          <TextInput
+            value={exam.name}
+            onChangeText={text => setexam({...exam, name: text})}
+            multiline={true}
+            errorMessage={error.name}
+            style={styles.headerText}
+          />
+        )}
       </View>
       <View style={styles.container1}>
         <View style={styles.ContentText}>
@@ -103,8 +176,61 @@ const examDetail = ({route}) => {
               <Text style={styles.textx}>{subject.name}</Text>
             </View>
           )}
+          {!update ? (
+            <View style={styles.SubContentText}>
+              <Text style={styles.lable}>Trạng thái:</Text>
+              <Text style={styles.textx}> {exam.status}</Text>
+            </View>
+          ) : (
+            <View style={styles.picker}>
+              <Text style={styles.lable}>Trạng thái:</Text>
+              <View style={{flex: 1.5}}>
+                <Picker
+                  // style={{width: '60%'}}
+                  mode="dropdown"
+                  itemStyle={{fontFamily: 'Inter', fontSize: 16}}
+                  enabled={true}
+                  selectedValue={exam.status}
+                  onValueChange={val => setexam({...exam, status: val})}>
+                  <Picker.Item label="Active" value="active" />
+                  <Picker.Item label="Disabled" value="disabled" />
+                </Picker>
+              </View>
+            </View>
+          )}
         </View>
       </View>
+      {exam.for === 'subject' &&
+        (!update ? (
+          <View style={styles.container1}>
+            <Button
+              title="Cập nhật bài kiểm tra"
+              // isProcessing={isProcessing}
+              onPress={() => setUpdate(true)}
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              paddingVertical: 10,
+              paddingHorizontal: 5,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <View style={{marginRight: 20}}>
+              <Button
+                title="Cập nhật"
+                onPress={() => {
+                  save();
+                }}
+              />
+            </View>
+            <View style={{marginLeft: 20}}>
+              <Button title="Hủy" onPress={handlerCancel} />
+            </View>
+          </View>
+        ))}
       <View style={styles.container1}>
         <CheckBox
           title="Xem câu hỏi"
@@ -138,6 +264,7 @@ const examDetail = ({route}) => {
           </View>
         )}
       </ScrollView>
+      <Toast ref={ref => Toast.setRef(ref)} />
     </SafeAreaView>
   );
 };
@@ -145,13 +272,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 5,
+    // paddingHorizontal: 5,
     // alignItems: 'center',
   },
   container1: {
     // flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 5,
+    // paddingHorizontal: 5,
     alignItems: 'center',
   },
   headerText: {
@@ -184,8 +311,8 @@ const styles = StyleSheet.create({
   },
   ContentText: {
     marginVertical: 5,
-    paddingVertical: 15,
-    paddingHorizontal: 15,
+    paddingVertical: 20,
+    paddingHorizontal: 0,
     width: '90%',
     backgroundColor: '#FEFEFE',
     borderRadius: 15,
@@ -227,5 +354,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  picker: {
+    // justifyContent: 'space-around',
+    fontSize: 15,
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
+    // marginBottom: '2%',
+  },
 });
+
 export default examDetail;

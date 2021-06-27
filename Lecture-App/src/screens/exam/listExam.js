@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   NotiView: {
     position: 'relative',
     marginVertical: '2%',
+    marginBottom: 60,
   },
   NotiText: {
     marginHorizontal: '2.5%',

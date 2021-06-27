@@ -14,7 +14,7 @@ const App = () => {
   // }
   // const [index, setIndex] = React.useState(0);
   const [token, setToken] = useState(
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGQwMDRjNzk0NDlhN2NhMDg5YTViN2MiLCJwaG9uZSI6IjAzOTU5NTI3NDEiLCJlbWFpbCI6InRodWFucHJvMjAyNUBnbWFpbC5jb20iLCJpYXQiOjE2MjQ1NDEwMDV9.FMttOWDU_GiIqMLDtLKCdoN5lrLNtOyrb3ysZvbhezk',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGQwMDRjNzk0NDlhN2NhMDg5YTViN2MiLCJwaG9uZSI6IjAzOTU5NTI3NDEiLCJlbWFpbCI6InRodWFucHJvMjAyNUBnbWFpbC5jb20iLCJpYXQiOjE2MjQ2OTAyOTh9.4mqQCpf54JwyxuZXD3_D0A_bnDrV375YM569RRFgsRA',
   );
   // const [routes] = React.useState([
   //   {key: 'ListClass', title: 'Quản lý lớp học', icon: 'calendar-clock'},
