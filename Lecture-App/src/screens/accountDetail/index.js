@@ -15,6 +15,8 @@ import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
 import TokenContext from '../../Context/TokenContext';
 import {apiURL} from '../../config/config';
+import {TextInput} from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 export default function AccountDetail() {
   const token = useContext(TokenContext);
   const [info, setInfo] = useState({
@@ -27,8 +29,7 @@ export default function AccountDetail() {
     faculty: '',
   });
   const [update, setUpdate] = useState(false);
-
-  useEffect(async () => {
+  const getLectureInfo = async () => {
     await fetch(`${apiURL}/lecture`, {
       method: 'GET',
       headers: {
@@ -41,9 +42,56 @@ export default function AccountDetail() {
       .then(res => {
         setInfo(res.data);
       });
-  });
+  };
+  useEffect(async () => {
+    await getLectureInfo();
+    return () => {
+      setInfo();
+    };
+  }, []);
+  const handlerCancel = () => {
+    setUpdate(false);
+    getLectureInfo();
+  };
+  const save = async () => {
+    await setTimeout(async () => {
+      await fetch(`${apiURL}/lecture`, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+        body: JSON.stringify({email: info.email, phone: info.phone}),
+      })
+        .then(res => res.json())
+        .then(res => {
+          if (res.statusCode === 200) {
+            setUpdate(false);
+            return Toast.show({
+              type: 'success',
+              position: 'top',
+              text1: 'Cập nhật thành công ',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          } else {
+            return Toast.show({
+              type: 'error',
+              position: 'top',
+              text1: 'Cập nhật thất bại ',
+              text2: JSON.stringify(res.messages),
+              autoHide: true,
+            });
+          }
+        })
+        .catch(error => {
+          console.log('Error update lecture', error);
+        });
+    }, 1000);
+  };
   return (
-    <View style={styles.Container}>
+    <SafeAreaView style={styles.Container}>
       <View style={styles.inforView}>
         <View style={styles.inforText}>
           <View style={styles.avatar}>
@@ -65,12 +113,12 @@ export default function AccountDetail() {
               </Text>
             </View>
             <View style={styles.SubContentText}>
-              <Text style={styles.lable}>Email:</Text>
-              <Text style={styles.textx}>{info.email}</Text>
-            </View>
-            <View style={styles.SubContentText}>
               <Text style={styles.lable}>Khoa:</Text>
               <Text style={styles.textx}>{info.faculty}</Text>
+            </View>
+            <View style={styles.SubContentText}>
+              <Text style={styles.lable}>Email:</Text>
+              <Text style={styles.textx}>{info.email}</Text>
             </View>
             <View style={styles.SubContentText}>
               <Text style={styles.lable}>Số điện thoại:</Text>
@@ -90,41 +138,82 @@ export default function AccountDetail() {
               </Text>
             </View>
             <View style={styles.SubContentText}>
-              <Text style={styles.lable}>Email:</Text>
-              <Text style={styles.textx}>{info.email}</Text>
-            </View>
-            <View style={styles.SubContentText}>
               <Text style={styles.lable}>Khoa:</Text>
               <Text style={styles.textx}>{info.faculty}</Text>
             </View>
-            <View style={styles.SubContentText}>
-              <Text style={styles.lable}>Số điện thoại:</Text>
-              <Text style={styles.textx}>{info.phone}</Text>
+            <View
+              style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
+              <TextInput
+                label="Email"
+                mode="outlined"
+                // multiline={true}
+                value={info.email}
+                onChangeText={text => setInfo({...info, email: text})}
+              />
+            </View>
+            <View
+              style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
+              <TextInput
+                label="Số điện thoại"
+                mode="outlined"
+                // multiline={true}
+                value={info.phone}
+                onChangeText={text => setInfo({...info, phone: text})}
+              />
             </View>
           </View>
         )}
-        <View
-          style={{
-            paddingVertical: 10,
-            paddingHorizontal: 5,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <View style={{marginRight: 20}}>
-            <Button
-              title="Cập nhật thông tin"
-              // onPress={() => {
-              //   save();
-              // }}
-            />
+        {!update ? (
+          <View style={styles.container1}>
+            <View style={{marginBottom: 10}}>
+              <Button
+                title="Cập nhật thông tin"
+                onPress={() => {
+                  setUpdate(!update);
+                }}
+              />
+            </View>
+            <View style={{marginBottom: 10}}>
+              <Button title="Đổi mật khẩu" />
+            </View>
+            <View style={{marginBottom: 10}}>
+              <Button
+                title="Đăng xuất"
+                // isProcessing={isProcessing}
+                // onPress={() => setUpdate(true)}
+              />
+            </View>
           </View>
-          <View style={{marginLeft: 20}}>
-            <Button title="Đăng xuất" />
+        ) : (
+          <View
+            style={{
+              paddingVertical: 10,
+              paddingHorizontal: 5,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <View style={{marginRight: 20}}>
+              <Button
+                title="Lưu thay đổi"
+                onPress={() => {
+                  save();
+                }}
+              />
+            </View>
+            <View style={{marginLeft: 20}}>
+              <Button
+                title="Hủy"
+                onPress={() => {
+                  handlerCancel();
+                }}
+              />
+            </View>
           </View>
-        </View>
+        )}
       </View>
-    </View>
+      <Toast ref={ref => Toast.setRef(ref)} />
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
@@ -211,5 +300,11 @@ const styles = StyleSheet.create({
   textx: {
     flex: 5,
     fontSize: 16,
+  },
+  container1: {
+    // flex: 1,
+    paddingVertical: 10,
+    // paddingHorizontal: 5,
+    alignItems: 'center',
   },
 });
