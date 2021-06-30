@@ -18,7 +18,7 @@ const fadeIn = {
     },
 };
 
-const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode = 'date', errorMessage = false, outLineColor = mainGray, dateDefault = new Date() }) => {
+const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode = 'date', errorMessage = false, outLineColor = mainGray, dateDefault = new Date(), editable = true }) => {
     const [show, setShow] = useState(false)
     const [date, setDate] = useState(new Date(dateDefault));
     const [dateText, setDateText] = useState('')
@@ -57,7 +57,10 @@ const DatePicker = ({ label, onPick, style, leftIcon = false, placeholder, mode 
             </Animatable.View>}
             <TouchableOpacity
                 style={[{ flex: 1, flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderWidth: 1, borderColor: borderColor }, style, !errorMessage ? null : styles.borderErr]}
-                onPress={() => setShow(true)}
+                onPress={() => {
+                    if (editable) return setShow(true);
+                    return
+                }}
             >
                 {leftIcon && <View style={{ marginLeft: 15 }}>
                     <Icon name={leftIcon} size={24} color={errorMessage ? "#ED557A" : '#999999'} />

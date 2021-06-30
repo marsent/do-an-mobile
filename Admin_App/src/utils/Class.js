@@ -12,13 +12,15 @@ const getClassById = async ({ token, id = '', select = false }) => {
 
 }
 
-const getAllClass = async ({ token, limit = false, faculty = false, page = false, select = false, year = false }) => {
+const getAllClass = async ({ token, limit = false, faculty = false, page = false, select = false, year = false, sort = false }) => {
     faculty = faculty ? `faculty=${faculty}` : '';
     limit = limit ? `&limit=${limit}` : '';
     page = page ? `&page=${page}` : '';
     select = select ? `&select=${select}` : ''
     year = year ? `&year=${year}` : '';
-    let url = `${apiURL}/class/admin/?${faculty}${limit}${page}${select}${year}`
+    sort = sort ? `&sort=${sort}` : '';
+
+    let url = `${apiURL}/class/admin/?${faculty}${limit}${page}${select}${year}${sort}`
     return await fetch(url, {
         method: 'GET',
         headers: headers(token)

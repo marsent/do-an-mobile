@@ -3,10 +3,12 @@ import * as StudentUtils from './Student'
 import * as ClassUtils from './Class'
 import * as ExamUtils from './Exam'
 import * as SubjectUtils from './Subject'
+import * as AnswerUtils from './Answer'
 export {
     LectureUtils,
     StudentUtils,
     ClassUtils,
     ExamUtils,
     SubjectUtils,
+    AnswerUtils
 }

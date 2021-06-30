@@ -12,7 +12,7 @@ const facultyList = [
   'information_security',
 ];
 
-const apiURL = 'http://localhost:3000/api';
-const authUrl = 'http://localhost:3000/auth/admin/sign-in';
+const apiURL = 'http://quocha.xyz/api';
+const authUrl = 'http://quocha.xyz/auth/admin/sign-in';
 
 export { yearList, facultyList, apiURL, authUrl };

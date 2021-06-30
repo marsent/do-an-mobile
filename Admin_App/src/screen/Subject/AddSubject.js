@@ -12,6 +12,11 @@ import { yearList, facultyList, apiURL } from '../../config/config'
 import { LoadingModal, Button, TextInput, Picker, Text, SubmitButton, HeaderText, DatePicker } from '../../components'
 import { mainGray, mainWhite } from '../../style/color';
 import { SubjectUtils, LectureUtils, } from '../../utils'
+
+const getDate = (date, min = 1) => {
+    return new Date(new Date(date).setMinutes(new Date(date).getMinutes() + min))
+}
+
 const AddSubject = ({ navigation }) => {
     const token = useContext(TokenContext)
     const initError = {
@@ -19,14 +24,18 @@ const AddSubject = ({ navigation }) => {
         faculty: false,
         subject_code: false,
         schedule: false,
-        lecture_id: false
+        lecture_id: false,
+        register_at: false,
+        end_register_at: false
     }
     const initSubject = {
         name: '',
         faculty: facultyList[0],
         subject_code: '',
         schedule: [],
-        lecture_id: ''
+        lecture_id: '',
+        register_at: getDate(new Date()),
+        end_register_at: getDate(new Date().setDate(new Date().getDate() + 1))
     }
     const initLecture = {
         "_id": "",
@@ -52,8 +61,9 @@ const AddSubject = ({ navigation }) => {
     const [error, setError] = useState(initError);
     const [showModal, setShowModal] = useState(initShowModal);
     const [lectureList, setLectureList] = useState([]);
-    const [lecture, setLecture] = useState(initLecture)
-    const [isLoading, setIsLoading] = useState(false)
+    const [lecture, setLecture] = useState(initLecture);
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         return () => {
             setError();
@@ -89,34 +99,40 @@ const AddSubject = ({ navigation }) => {
     }, [schedule])
 
     const onSubmitPress = async () => {
-        await SubjectUtils.createSubject({ token: token, subject: subject })
-            .then(res => {
-                if (res.statusCode == 200) {
-                    setSubject(initSubject)
-                    return Toast.show({
-                        type: 'success',
-                        position: 'top',
-                        text1: 'Thêm môn học thành công',
-                        visibilityTime: 2000,
-                        autoHide: true,
-                    })
-                }
-                else if (res.statusCode == 400) {
-                    if (res.error == 7000) {
-                        Toast.show({
-                            type: 'error',
+        setIsLoading(true);
+        await setTimeout(async () => {
+            await SubjectUtils.createSubject({ token: token, subject: subject })
+                .then(res => {
+                    console.log(res);
+                    if (res.statusCode == 200) {
+                        setSubject(initSubject)
+                        return Toast.show({
+                            type: 'success',
                             position: 'top',
-                            text1: 'Thêm môn học không thành công',
-                            text2: 'Môn học đã tồn tại trong hệ thống',
+                            text1: 'Thêm môn học thành công',
                             visibilityTime: 2000,
                             autoHide: true,
                         })
                     }
-                    else if (res.error == 4000) {
-                        setError(res.messages)
+                    else if (res.statusCode == 400) {
+                        if (res.error == 7000) {
+                            Toast.show({
+                                type: 'error',
+                                position: 'top',
+                                text1: 'Thêm môn học không thành công',
+                                text2: 'Môn học đã tồn tại trong hệ thống',
+                                visibilityTime: 2000,
+                                autoHide: true,
+                            })
+                        }
+                        else if (res.error == 4000) {
+                            setError(res.messages)
+                        }
                     }
-                }
-            })
+                })
+        })
+        setIsLoading(false)
+
     }
 
     const findWeekday = (weekday) => {
@@ -195,6 +211,26 @@ const AddSubject = ({ navigation }) => {
                         </Picker>
                     </View>
 
+                    <View style={{ width: '90%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, flexWrap: 'wrap' }}>
+                        <View style={{ flex: .49 }}>
+                            <View>
+                                <DatePicker label='Ngày đăng kí'
+                                    dateDefault={subject.register_at}
+                                    onPick={val => setSubject({ ...subject, resgisterAt: getDate(val).toISOString() })}
+                                    errorMessage={error.register_at}
+                                />
+                            </View>
+                        </View>
+                        <View style={{ flex: .49 }}>
+                            <View>
+                                <DatePicker label='Ngày kết thúc'
+                                    dateDefault={subject.end_register_at}
+                                    onPick={val => setSubject({ ...subject, end_register_at: getDate(val, 2).toISOString() })}
+                                    errorMessage={error.end_register_at}
+                                />
+                            </View>
+                        </View>
+                    </View>
 
                     <View style={{ paddingTop: 11, }} >
 

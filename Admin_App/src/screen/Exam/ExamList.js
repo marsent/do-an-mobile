@@ -63,7 +63,8 @@ const ExamList = ({ navigation }) => {
         setLoadingDataModal(true);
         const query = {
             token: token,
-            type: typeFilter ? typeFilter : ''
+            type: typeFilter ? typeFilter : '',
+            sort: '-updatedAt'
         }
         await ExamUtils.getAllExam(query)
             .then(async (res) => {
