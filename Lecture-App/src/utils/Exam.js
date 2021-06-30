@@ -39,8 +39,21 @@ const createExam = async ({token, exam}) => {
   }).then(res => res.json());
 };
 
-const updateExam = async ({token, id, status}) => {
+const updateExam = async ({token, id, exam}) => {
   let url = `${apiURL}/exam/lecture/${id}`;
+  return await fetch(url, {
+    method: 'PUT',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + token,
+    },
+    body: JSON.stringify(exam),
+  }).then(res => res.json());
+};
+
+const updateExamStatus = async ({token, id, status}) => {
+  let url = `${apiURL}/exam/lecture/status/${id}`;
   return await fetch(url, {
     method: 'PUT',
     headers: {
@@ -52,4 +65,4 @@ const updateExam = async ({token, id, status}) => {
   }).then(res => res.json());
 };
 
-export {getExamById, getAllExam, createExam, updateExam};
+export {getExamById, getAllExam, createExam, updateExam, updateExamStatus};

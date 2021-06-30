@@ -12,6 +12,7 @@ import createNoti from '../screens/createNotification/createNotification';
 import exam from '../screens/exam/listExam';
 import createExam from '../screens/exam/createExam';
 import test from '../screens/test/test';
+import examDetail from '../screens/exam/examDetail';
 import {
   Modal,
   View,
@@ -58,7 +59,7 @@ const MainTabScreen = () => {
           tabBarLabel: 'Thi Online',
           tabBarColor: '#3891E9',
           tabBarIcon: ({color}) => (
-            <Icon name="person-circle-outline" color={color} size={26} />
+            <Icons name="add-task" color={color} size={26} />
           ),
         }}
       />
@@ -128,6 +129,7 @@ const EXStacks = () => {
       }}>
       <EXStack.Screen name="Danh sách bài thi" component={exam} />
       <EXStack.Screen name="Tạo bài thi" component={createExam} />
+      <EXStack.Screen name="Xem bài kiểm tra" component={examDetail} />
     </EXStack.Navigator>
   );
 };

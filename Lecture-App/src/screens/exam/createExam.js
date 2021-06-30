@@ -24,8 +24,8 @@ import {mainWhite} from '../../style/color';
 
 export default AddExam = ({navigation}) => {
   const token = useContext(TokenContext);
-  const initError = {name: false, class_id: false};
-  const initClass = {
+  const initError = {name: false, subject_id: false};
+  const initsubject = {
     quantity: 0,
     status: '',
     _id: '',
@@ -33,22 +33,22 @@ export default AddExam = ({navigation}) => {
     year: '',
     faculty: '',
   };
-  const [type, setType] = useState('class');
+  const [type, setType] = useState('subject');
   const [questions, setQuestions] = useState([]);
   const [uploadExam, setUploadExam] = useState(false);
   const [uploadStudent, setUploadStudent] = useState(false);
   const [fileExam, setFileExam] = useState('');
   const [fileStudent, setFileStudent] = useState('');
   const [nameExam, setNameExam] = useState('');
-  const [classList, setClassList] = useState([]);
-  const [classId, setClassId] = useState('');
+  const [subjectList, setsubjectList] = useState([]);
+  const [subjectId, setsubjectId] = useState('');
   const [time, setTime] = useState(15);
   const [error, setError] = useState(initError);
   const [previewQuestions, setPrevewQuestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [Class, setClass] = useState(initClass);
+  const [subject, setsubject] = useState(initsubject);
   const [compelete, setComplete] = useState(false);
-  // get Class List
+  // get subject List
 
   const handlerUploadExam = async () => {
     try {
@@ -108,24 +108,24 @@ export default AddExam = ({navigation}) => {
       })
         .then(res => res.json())
         .then(async res => {
-          await setClassList(res.data);
+          await setsubjectList(res.data);
           if (res.data.length > 0) {
-            await setClassId(res.data[1]._id);
+            await setsubjectId(res.data[1]._id);
             setComplete(true);
           }
         });
     } catch (err) {
-      console.log('Error get classList: ', err);
+      console.log('Error get subjectList: ', err);
     }
     return () => {
-      setClassList();
+      setsubjectList();
       setIsLoading(false);
     };
   }, []);
 
   useEffect(async () => {
-    await setClass(classList.find(element => element._id == classId));
-  }, [classId]);
+    await setsubject(subjectList.find(element => element._id == subjectId));
+  }, [subjectId]);
   const handlerSubmit = async e => {
     setIsLoading(true);
     const exam = {
@@ -135,10 +135,10 @@ export default AddExam = ({navigation}) => {
       year: new Date().getFullYear(),
       time: time,
     };
-    if (type === 'class') {
-      exam.class_id = classId;
+    if (type === 'subject') {
+      exam.subject_id = subjectId;
     }
-    console.log(exam.class_id);
+    console.log(exam.subject_id);
     try {
       await setTimeout(async () => {
         ExamUtils.createExam({token: token, exam: exam}).then(res => {
@@ -187,7 +187,7 @@ export default AddExam = ({navigation}) => {
                 displayValue={type}
                 selectedValue={type}
                 onValueChange={val => setType(val)}>
-                <PickerBase.Item label="Lớp" value="class" />
+                <PickerBase.Item label="Lớp" value="subject" />
                 <PickerBase.Item label="Nhóm" value="group" />
               </Picker>
             </View>
@@ -200,17 +200,19 @@ export default AddExam = ({navigation}) => {
                 placeholder="Tên bài thi"
                 onChangeText={text => setNameExam(text)}
                 value={nameExam}
+                errorMessage={error.name}
               />
             </View>
             {/* TypeExam */}
-            {type === 'class' && (
+            {type === 'subject' && (
               <View style={{width: '90%', marginBottom: 15}}>
                 <Picker
                   placeholder="Lớp"
-                  displayValue={Class.name}
-                  selectedValue={classId}
-                  onValueChange={(val, index) => setClassId(val)}>
-                  {classList.map(val => (
+                  displayValue={subject.name}
+                  selectedValue={subjectId}
+                  onValueChange={(val, index) => setsubjectId(val)}
+                  errorMessage={error.subject_id}>
+                  {subjectList.map(val => (
                     <PickerBase.Item
                       label={val.name}
                       value={val._id}
