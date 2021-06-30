@@ -10,14 +10,16 @@ import {
   Modal,
   Button,
   Image,
+  Pressable,
 } from 'react-native';
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
 import TokenContext from '../../Context/TokenContext';
 import {apiURL} from '../../config/config';
 import {TextInput} from 'react-native-paper';
+import {Input} from 'react-native-elements';
 import Toast from 'react-native-toast-message';
-export default function AccountDetail() {
+export default function AccountDetail({route}) {
   const token = useContext(TokenContext);
   const [info, setInfo] = useState({
     status: '',
@@ -27,8 +29,14 @@ export default function AccountDetail() {
     full_name: '',
     date_of_birth: '',
     faculty: '',
+    password: '',
   });
   const [update, setUpdate] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [updatePassword, setUpdatePassword] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const [error, setError] = useState('');
+  const [error1, setError1] = useState('');
   const getLectureInfo = async () => {
     await fetch(`${apiURL}/lecture`, {
       method: 'GET',
@@ -90,8 +98,95 @@ export default function AccountDetail() {
         });
     }, 1000);
   };
+
+  const confirm = async () => {
+    if (confirmPass === updatePassword) {
+      setError('');
+      await setTimeout(async () => {
+        await fetch(`${apiURL}/lecture`, {
+          method: 'PUT',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+          },
+          body: JSON.stringify({password: info.password}),
+        })
+          .then(res => res.json())
+          .then(res => {
+            console.log(res.statusCode);
+            if (res.statusCode === 200) {
+              setModalVisible(false);
+              setError1('');
+              return Toast.show({
+                type: 'success',
+                position: 'top',
+                text1: 'Cập nhật thành công ',
+                visibilityTime: 1000,
+                autoHide: true,
+              });
+            } else {
+              setError1(JSON.stringify(res.messages));
+            }
+          })
+          .catch(error => {
+            console.log('Error update lecture', error);
+          });
+      }, 10);
+    } else {
+      setError('ngu');
+    }
+  };
   return (
     <SafeAreaView style={styles.Container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View
+              style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
+              <Input
+                label="Mật khẩu mới"
+                secureTextEntry={true}
+                onChangeText={text => {
+                  setInfo({...info, password: text});
+                  setUpdatePassword(text);
+                }}
+                errorStyle={{color: 'red'}}
+                errorMessage={error1}
+              />
+            </View>
+            <View
+              style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
+              <Input
+                label="Xác nhận mật khẩu mới"
+                // multiline={true}
+                secureTextEntry={true}
+                onChangeText={text => setConfirmPass(text)}
+                errorStyle={{color: 'red'}}
+                errorMessage={error}
+              />
+            </View>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => confirm()}>
+              <Text style={styles.textStyle}>Cập nhật</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose, {marginTop: 10}]}
+              onPress={() => setModalVisible(!modalVisible)}>
+              <Text style={styles.textStyle}>Hủy</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.inforView}>
         <View style={styles.inforText}>
           <View style={styles.avatar}>
@@ -148,6 +243,7 @@ export default function AccountDetail() {
                 mode="outlined"
                 // multiline={true}
                 value={info.email}
+                secureTextEntry={true}
                 onChangeText={text => setInfo({...info, email: text})}
               />
             </View>
@@ -174,14 +270,15 @@ export default function AccountDetail() {
               />
             </View>
             <View style={{marginBottom: 10}}>
-              <Button title="Đổi mật khẩu" />
+              <Button
+                title="Đổi mật khẩu"
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                }}
+              />
             </View>
             <View style={{marginBottom: 10}}>
-              <Button
-                title="Đăng xuất"
-                // isProcessing={isProcessing}
-                // onPress={() => setUpdate(true)}
-              />
+              <Button title="Đăng xuất" onPress={() => {}} />
             </View>
           </View>
         ) : (
@@ -306,5 +403,46 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     // paddingHorizontal: 5,
     alignItems: 'center',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });

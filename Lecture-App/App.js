@@ -29,11 +29,6 @@ const App = () => {
   if (!token) return <Login token={token} setToken={setToken} />;
   return (
     <TokenProvider value={token}>
-      {/* <BottomNavigation
-        navigationState={{index, routes}}
-        onIndexChange={setIndex}
-        renderScene={renderScene}
-      /> */}
       <NavigationContainer>
         <MainTabScreen />
       </NavigationContainer>
