@@ -1,4 +1,5 @@
 import {addDays, format, getDate, isSameDay, startOfWeek} from 'date-fns';
+import { enGB, eo, ru, vi } from 'date-fns/locale';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
@@ -16,6 +17,10 @@ const WeekCalendar: React.FC<Props> = ({date, onChange}) => {
   }, [date]);
 
   return (
+  <View>
+    <Text style={{fontSize:22, marginLeft: '1.25%'}}>Tháng {format(date, 'MMMMM', {
+        locale: vi
+      })}</Text>
     <View style={styles.container}>
       {week.map((weekDay) => {
         const textStyles = [styles.label];
@@ -42,7 +47,7 @@ const WeekCalendar: React.FC<Props> = ({date, onChange}) => {
           </View>
         );
       })}
-    </View>
+    </View></View>
   );
 };
 
@@ -100,7 +105,9 @@ export const getWeekDays = (date: Date): WeekDay[] => {
   for (let i = 0; i < 7; i++) {
     const date = addDays(start, i);
     final.push({
-      formatted: format(date, 'EEE'),
+      formatted: format(date, 'EEEEEE', {
+        locale: vi
+      }),
       date,
       day: getDate(date),
     });
