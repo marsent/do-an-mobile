@@ -11,13 +11,14 @@ const getSubjectById = async ({ token, id = '', select = false }) => {
 
 }
 
-const getAllSubject = async ({ token, limit = false, faculty = false, page = false, select = false }) => {
+const getAllSubject = async ({ token, limit = false, faculty = false, page = false, select = false, sort = false }) => {
     faculty = faculty ? `faculty=${faculty}` : '';
     limit = limit ? `&limit=${limit}` : '';
     page = page ? `&page=${page}` : '';
     select = select ? `&select=${select}` : ''
+    sort = sort ? `&sort=${sort}` : '';
 
-    let url = `${apiURL}/subject/admin/?${faculty}${limit}${page}${select}`
+    let url = `${apiURL}/subject/admin/?${faculty}${limit}${page}${select}${sort}`
     return await fetch(url, {
         method: 'GET',
         headers: headers(token)

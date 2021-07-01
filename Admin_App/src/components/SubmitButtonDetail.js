@@ -15,11 +15,11 @@ const SubmitButtonDetail = ({ isProcessing = false, isEdit = false, onEditPress,
                 </View>
                 :
                 !isEdit ?
-                    <Button onPress={onEditPress} >Chỉnh sửa</Button>
+                    <Button style={{ elevation: 0 }} onPress={onEditPress} >Chỉnh sửa</Button>
                     :
                     <View style={{ display: 'flex', flexDirection: 'row' }}>
-                        <Button style={{ marginRight: 5 }} onPress={onSavePress}>Cập nhật</Button>
-                        <Button style={{ marginLeft: 5 }} onPress={onCancelPress}>Hủy</Button>
+                        <Button style={{ marginRight: 5, elevation: 0 }} onPress={onSavePress}>Cập nhật</Button>
+                        <Button style={{ marginLeft: 5, elevation: 0 }} onPress={onCancelPress}>Hủy</Button>
                     </View>
             }
 

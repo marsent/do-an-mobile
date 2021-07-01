@@ -39,20 +39,35 @@ const SubjectList = ({ navigation }) => {
             setSubjectList()
         }
     }, [])
-
     useEffect(async () => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            search();
+        });
+        return () => {
+            unsubscribe
+        }
+    }, [navigation])
+
+    const search = async () => {
         setLoadingDataModal(true)
         const query = {
             token: token,
-            faculty: filter.faculty ? filter.faculty : ''
+            faculty: filter.faculty ? filter.faculty : '',
+            sort: '-updatedAt'
         }
         await SubjectUtils.getAllSubject(query)
             .then(async (res) => {
                 await setSubjectList(res.data.filter(val => val.name.includes(keyWord) || val.subject_code.includes(keyWord)))
             })
         setLoadingDataModal(false)
+    }
 
-    }, [keyWord || filter])
+    useEffect(async () => {
+        search()
+    }, [keyWord])
+    useEffect(async () => {
+        search()
+    }, [filter])
 
 
     const toggleModal = async () => {
