@@ -5,6 +5,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.png';
@@ -13,13 +14,25 @@ import {apiURL, authUrl} from '../../config/config';
 
 function listStudent({route, navigation}) {
   const {_id} = route.params;
-  const [info, setInfo] = useState({});
+  const [info, setInfo] = useState({
+    student_quantity: 0,
+    status: '',
+    _id: '',
+    name: '',
+    faculty: '',
+    subject_code: '',
+    schedule: [
+      {
+        _id: '',
+        weekday: '',
+        from: 0,
+        to: 0,
+      },
+    ],
+    lecture_id: '',
+  });
   const token = useContext(TokenContext);
   useEffect(async () => {
-    // setError({
-    //   username: usernameValidator(username),
-    //   password: passwordValidator(password),
-    // });
     await fetch(`${apiURL}/subject/lecture/${_id}`, {
       method: 'GET',
       headers: {
@@ -33,16 +46,64 @@ function listStudent({route, navigation}) {
         setInfo(res.data);
       });
   });
+  info.schedule.map((item, index) => {
+    if (item.weekday == 'monday') {
+      item.weekday = 'Thứ hai';
+    }
+    if (item.weekday == 'tuesday') {
+      item.weekday = 'Thứ ba';
+    }
+    if (item.weekday == 'wednesday') {
+      item.weekday = 'Thứ tư';
+    }
+    if (item.weekday == 'thursday') {
+      item.weekday = 'Thứ năm';
+    }
+    if (item.weekday == 'friday') {
+      item.weekday = 'Thứ sáu';
+    }
+    if (item.weekday == 'saturday') {
+      item.weekday = 'Thứ bảy';
+    }
+  });
   return (
-    <View style={styles.Container}>
-      <ScrollView style={styles.NotiView}>
-        <View style={styles.NotiText}>
-          <Avatar.Image size={24} source={Image1} />
-          <Text style={styles.ContentText}>{info.name} </Text>
-          <Text style={styles.ContentText}>{info._id} </Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container1}>
+        <View style={styles.headerView}>
+          <Text style={styles.headerText}>{info.name}</Text>
         </View>
-      </ScrollView>
-    </View>
+        <View style={styles.ContentText}>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Mã môn học:</Text>
+            <Text style={styles.textx}>{info.subject_code}</Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Khoa quản lý:</Text>
+            <Text style={styles.textx}>{info.faculty}</Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Sỉ số:</Text>
+            <Text style={styles.textx}>{info.student_quantity}</Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Lịch học:</Text>
+            <Text style={styles.textx}></Text>
+          </View>
+          <ScrollView>
+            {info.schedule.map((item, index) => {
+              return (
+                <View key={index} style={styles.SubContentText}>
+                  <Text style={styles.lable}>{item.weekday}</Text>
+                  <Text style={styles.textx}>
+                    Từ {item.from}h đến {item.to}h
+                  </Text>
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -50,21 +111,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 5,
+    // paddingHorizontal: 5,
+    // alignItems: 'center',
+  },
+  container1: {
+    // flex: 1,
+    paddingVertical: 10,
+    // paddingHorizontal: 5,
     alignItems: 'center',
   },
   headerText: {
     position: 'relative',
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FEFEFE',
+    color: 'black',
   },
   headerView: {
-    position: 'relative',
-    justifyContent: 'center',
+    marginVertical: 5,
+    paddingVertical: 20,
+    paddingHorizontal: 0,
+    width: '90%',
+    backgroundColor: '#FEFEFE',
+    borderRadius: 15,
+    shadowRadius: 15,
+    shadowColor: '#BFBFBF',
+    marginTop: 30,
     alignItems: 'center',
-    paddingVertical: '2.5%',
-    backgroundColor: '#4B75F2',
   },
   NotiView: {
     position: 'relative',
@@ -85,8 +157,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   ContentText: {
-    fontSize: 16,
-    marginLeft: 20,
+    marginVertical: 5,
+    paddingVertical: 20,
+    paddingHorizontal: 0,
+    width: '90%',
+    backgroundColor: '#FEFEFE',
+    borderRadius: 15,
+    shadowRadius: 15,
+    shadowColor: '#BFBFBF',
+    marginTop: 30,
+  },
+  SubContentText: {
+    justifyContent: 'space-around',
+    fontSize: 15,
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginBottom: '2%',
   },
   centeredView: {
     flex: 1,
@@ -130,6 +216,15 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  lable: {
+    flex: 1,
+    marginLeft: 30,
+    fontSize: 16,
+  },
+  textx: {
+    flex: 1,
+    fontSize: 16,
   },
 });
 export default listStudent;

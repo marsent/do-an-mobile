@@ -28,6 +28,8 @@ const examDetail = ({route}) => {
     questions: [],
     for: '',
     subject_id: '',
+    start_at: '',
+    expire_at: '',
   });
   const [subject, setSubject] = useState({
     quantity: 0,
@@ -140,7 +142,11 @@ const examDetail = ({route}) => {
       // await setIsProcessing(false);
     }, 1000);
   };
-
+  // if (exam.status === 'active') {
+  //   exam.status = 'Đang mở';
+  // } else {
+  //   exam.status = 'Đã đóng';
+  // }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerView}>
@@ -169,6 +175,18 @@ const examDetail = ({route}) => {
           <View style={styles.SubContentText}>
             <Text style={styles.lable}>Loại bài thi:</Text>
             <Text style={styles.textx}>{exam.for}</Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Ngày bắt đầu:</Text>
+            <Text style={styles.textx}>
+              {exam.start_at.split('T')[0].split('-').reverse().join('/')}
+            </Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Ngày kết thúc:</Text>
+            <Text style={styles.textx}>
+              {exam.expire_at.split('T')[0].split('-').reverse().join('/')}
+            </Text>
           </View>
           {exam.for === 'subject' && (
             <View style={styles.SubContentText}>

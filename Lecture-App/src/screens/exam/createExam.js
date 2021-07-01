@@ -22,9 +22,22 @@ import {apiURL, yearList} from '../../config/config';
 import {Text, Button, TextInput, Picker} from '../../components/Tags';
 import {mainWhite} from '../../style/color';
 
+const getDate = (date, min = 1) => {
+  return new Date(new Date(date).setMinutes(new Date(date).getMinutes() + min));
+};
 export default AddExam = ({navigation}) => {
   const token = useContext(TokenContext);
-  const initError = {name: false, subject_id: false};
+  const initError = {
+    subject_id: false,
+    name: false,
+    for: false,
+    questions: false,
+    year: false,
+    time: false,
+    start_at: false,
+    expire_at: false,
+    type: false,
+  };
   const initsubject = {
     quantity: 0,
     status: '',
@@ -73,29 +86,7 @@ export default AddExam = ({navigation}) => {
       }
     }
   };
-  const uploadStudentList = async () => {
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
-      });
-      setFileStudent(res.name);
-      const fileContents = await RNFS.readFile(res.uri, 'ascii')
-        .then(res => res)
-        .catch(err => {
-          console.log(err.message, err.code);
-        });
-      setStudentList(studentListFromat(fileContents));
-      setUploadStudent(true);
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        console.log(
-          'User cancelled the picker, exit any dialogs or menus and move on',
-        );
-      } else {
-        throw err;
-      }
-    }
-  };
+
   useEffect(async () => {
     try {
       await fetch(`${apiURL}/subject/lecture`, {
@@ -188,7 +179,6 @@ export default AddExam = ({navigation}) => {
                 selectedValue={type}
                 onValueChange={val => setType(val)}>
                 <PickerBase.Item label="Lớp" value="subject" />
-                <PickerBase.Item label="Nhóm" value="group" />
               </Picker>
             </View>
             {/* Name exam */}
@@ -207,6 +197,7 @@ export default AddExam = ({navigation}) => {
             {type === 'subject' && (
               <View style={{width: '90%', marginBottom: 15}}>
                 <Picker
+                  label="Môn học"
                   placeholder="Lớp"
                   displayValue={subject.name}
                   selectedValue={subjectId}
@@ -222,7 +213,6 @@ export default AddExam = ({navigation}) => {
                 </Picker>
               </View>
             )}
-
             {type === 'group' && (
               <View>
                 {uploadStudent ? (
@@ -249,7 +239,37 @@ export default AddExam = ({navigation}) => {
                 )}
               </View>
             )}
-
+            <View
+              style={{
+                width: '90%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 15,
+                flexWrap: 'wrap',
+              }}>
+              <View style={{flex: 0.49}}>
+                <View>
+                  <DatePicker
+                    label="Ngày bắt đầu"
+                    dateDefault={startAt}
+                    onPick={val => setStartAt(getDate(val).toISOString())}
+                    errorMessage={error.start_at}
+                  />
+                </View>
+              </View>
+              <View style={{flex: 0.49}}>
+                <View>
+                  <DatePicker
+                    label="Ngày kết thúc"
+                    dateDefault={expireAt}
+                    onPick={val =>
+                      setExpireAt(getDate(val, time).toISOString())
+                    }
+                    errorMessage={error.expire_at}
+                  />
+                </View>
+              </View>
+            </View>
             {/* Time */}
             <View
               style={{

@@ -13,7 +13,7 @@ import {
   Pressable,
 } from 'react-native';
 import {Avatar} from 'react-native-paper';
-import Image1 from '../../asset/avt.png';
+import Image1 from '../../asset/avt.jpg';
 import TokenContext from '../../Context/TokenContext';
 import {apiURL} from '../../config/config';
 import {TextInput} from 'react-native-paper';
@@ -243,7 +243,6 @@ export default function AccountDetail({route}) {
                 mode="outlined"
                 // multiline={true}
                 value={info.email}
-                secureTextEntry={true}
                 onChangeText={text => setInfo({...info, email: text})}
               />
             </View>
