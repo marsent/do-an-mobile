@@ -9,6 +9,7 @@ import {
   Image,
   Button,
   Modal,
+  Pressable,
 } from 'react-native';
 import TokenContext from '../../Context/TokenContext';
 import {apiURL, authUrl} from '../../config/config';
@@ -30,17 +31,30 @@ function exam({navigation}) {
         setListExam(res.data);
       });
   });
+  listExam.map(item => {
+    if (item.for === 'all') {
+      item.for = 'Tất cả';
+    }
+    if (item.for === 'subject') {
+      item.for = 'Môn học';
+    }
+    if (item.for === 'class') {
+      item.for = 'Lớp';
+    }
+    if (item.for === 'group') {
+      item.for = 'Nhóm sinh viên';
+    }
+  });
   return (
     <SafeAreaView style={styles.Container}>
       <View style={styles.ButtonContainer}>
-        <Button
-          title="Tạo bài thi mới"
+        <Pressable
           style={styles.button}
-          color="#3891E9"
           onPress={() => {
             navigation.navigate('Tạo bài thi');
-          }}
-        />
+          }}>
+          <Text style={styles.textStyle}>Tạo bài thi mới</Text>
+        </Pressable>
       </View>
       <ScrollView style={styles.NotiView}>
         {listExam.map((item, i) => (
@@ -52,8 +66,10 @@ function exam({navigation}) {
             }}>
             <View style={styles.NotiText}>
               <Text style={styles.TitleText}>{item.name} </Text>
-              <Text style={styles.ContentText}>{item.for} </Text>
-              <Text style={styles.Notification_date}>{item.time} </Text>
+              <Text style={styles.ContentText}>Dành cho: {item.for} </Text>
+              <Text style={styles.Notification_date}>
+                Thời gian: {item.time}{' '}
+              </Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -85,7 +101,7 @@ const styles = StyleSheet.create({
   NotiView: {
     position: 'relative',
     marginVertical: '2%',
-    marginBottom: 60,
+    marginBottom: 70,
   },
   NotiText: {
     marginHorizontal: '2.5%',
@@ -100,10 +116,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   ContentText: {
-    fontSize: 18,
+    fontSize: 16,
   },
   Notification_date: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#262626',
   },
   image: {
@@ -126,6 +142,17 @@ const styles = StyleSheet.create({
   },
   Button: {
     paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    width: 150,
+    borderRadius: 20,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 export default exam;

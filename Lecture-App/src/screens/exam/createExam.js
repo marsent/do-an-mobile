@@ -3,6 +3,8 @@ import React, {useState, useContext, useEffect} from 'react';
 import {
   View,
   ScrollView,
+  StyleSheet,
+  Pressable,
   TextInput as TextInputBase,
   TouchableOpacity,
   SafeAreaView,
@@ -345,19 +347,24 @@ export default AddExam = ({navigation}) => {
                     }}>
                     <View style={{marginRight: 5}}>
                       <View>
-                        <Button onPress={handlerSubmit}>Thêm đề thi</Button>
+                        <Pressable
+                          style={styles.submit}
+                          onPress={handlerSubmit}>
+                          <Text style={styles.textStyle}>Thêm đề thi</Text>
+                        </Pressable>
                       </View>
                     </View>
                     <View>
                       <View style={{marginLeft: 5}}>
-                        <Button
+                        <Pressable
+                          style={styles.submit}
                           onPress={() => {
                             setUploadExam(false);
                             setPrevewQuestions(false);
                             setQuestions();
                           }}>
-                          Hủy đề thi
-                        </Button>
+                          <Text style={styles.textStyle}>Hủy đề thi</Text>
+                        </Pressable>
                       </View>
                     </View>
                   </View>
@@ -365,9 +372,11 @@ export default AddExam = ({navigation}) => {
               ) : (
                 <View>
                   <View>
-                    <Button onPress={handlerUploadExam}>
-                      Thêm file đề thi
-                    </Button>
+                    <Pressable
+                      style={styles.button}
+                      onPress={handlerUploadExam}>
+                      <Text style={styles.textStyle}>Thêm file đề thi</Text>
+                    </Pressable>
                   </View>
                 </View>
               )}
@@ -437,3 +446,22 @@ function examFromat(csv) {
 function studentListFromat(studentList) {
   return studentList.split('\n');
 }
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    width: 200,
+    borderRadius: 20,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  submit: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    width: 150,
+    borderRadius: 20,
+  },
+});

@@ -1,13 +1,11 @@
 import React, {useEffect, useState, useContext} from 'react';
-import {StyleSheet, View, Text, ScrollView, Button} from 'react-native';
+import {StyleSheet, View, Text, ScrollView, Pressable} from 'react-native';
 // import {Button, } from 'react-native-paper';
 
 import 'react-native-gesture-handler';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
 import TokenContext from '../../Context/TokenContext';
 import {apiURL, authUrl} from '../../config/config';
-import classDetail from '../ClassManagement/listStudent';
+
 function listClass({navigation}) {
   const token = useContext(TokenContext);
   const [classList, setClassList] = useState([]);
@@ -32,24 +30,37 @@ function listClass({navigation}) {
       await setClassList();
     };
   });
+  classList.map(item => {
+    if (item.faculty === 'e_commerce') {
+      item.faculty = 'Thương mại điện thử';
+    }
+    if (item.faculty === 'information_security') {
+      item.faculty = 'An toàn thông tin';
+    }
+    if (item.faculty === 'data_science') {
+      item.faculty = 'Khoa học dữ liệu';
+    }
+  });
   return (
     <View style={styles.Container}>
       <ScrollView style={styles.NotiView}>
         {classList.map((item, i) => (
           <View key={i} style={styles.NotiText}>
             <Text style={styles.TitleText}>{item.name} </Text>
-            <Text style={styles.ContentText}>Sỉ số: {item.quantity} </Text>
+            <Text style={styles.ContentText}>
+              Sỉ số: {item.student_quantity}
+            </Text>
             <Text style={styles.ContentText}>Khoa: {item.faculty} </Text>
-            {/* <Text style={styles.ContentText}>Ngày BĐ: {item.StartDate} </Text>
-          <Text style={styles.ContentText}>Ngày KT: {item.FinishDate} </Text> */}
+
             <View style={styles.ButtonContainer}>
-              <Button
+              <Pressable
                 style={styles.button}
                 title=" Xem danh sách lớp"
                 onPress={async () => {
                   await navigation.navigate('Xem chi tiết', {_id: item._id});
-                }}
-              />
+                }}>
+                <Text style={styles.textStyle}>Xem chi tiết</Text>
+              </Pressable>
             </View>
           </View>
         ))}
@@ -93,11 +104,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   TitleText: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   ContentText: {
-    fontSize: 14,
+    fontSize: 16,
+    color: 'black',
   },
   Notification_date: {
     fontSize: 10,
@@ -110,11 +122,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    width: '70%',
-    height: 40,
-    backgroundColor: '#4B75F2',
-
+    backgroundColor: '#2196F3',
+    padding: 15,
+    width: 150,
     borderRadius: 20,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 export default listClass;
