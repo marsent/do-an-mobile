@@ -32,7 +32,7 @@ function listStudent({route, navigation}) {
     lecture_id: '',
   });
   const token = useContext(TokenContext);
-  useEffect(async () => {
+  const show = async () => {
     await fetch(`${apiURL}/subject/lecture/${_id}`, {
       method: 'GET',
       headers: {
@@ -45,7 +45,13 @@ function listStudent({route, navigation}) {
       .then(res => {
         setInfo(res.data);
       });
-  });
+  };
+  useEffect(async () => {
+    await show();
+    return async () => {
+      await setInfo();
+    };
+  }, []);
   info.schedule.map((item, index) => {
     if (item.weekday == 'monday') {
       item.weekday = 'Thứ hai';

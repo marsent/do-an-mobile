@@ -1,131 +1,174 @@
-import React, {useState} from 'react';
-import {
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Text,
-  View,
-  StyleSheet,
-  TextInput,
-  Button,
-} from 'react-native';
+import React, {useEffect, useState, Component} from 'react';
+import {View, ToastAndroid, SafeAreaView} from 'react-native';
+
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
+import {Checkbox} from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {authUrl} from '../../config/config';
-// import {passwordValidator} from '../../helpers/passwordValidator';
-// import {usernameValidator} from '../../helpers/usernameValidator';
-// import Toast from 'react-native-toast-message';
+import styles from '../../style/style';
+
+import TextInput from '../../components/TextInput';
+import Password from '../../components/Password';
+import Text from '../../components/Text';
+const img = require('../../../assets/public/img/online-course.png');
+import SubmitButton from '../../components/SubmitButton';
+import {mainWhite} from '../../style/color';
+
 export default Login = ({token, setToken}) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [account, setAccount] = useState({phone: '', password: ''});
+  const [error, setError] = useState({phone: false, password: false});
+  const [isLoading, SetIsLoading] = useState(false);
+  const [savePassword, setSavePassword] = useState(false);
 
-  let [error, setError] = useState({username: false, password: false});
-  const onLoginPress = async e => {
-    e.preventDefault();
-    //setError({ username: usernameValidator(username), password: passwordValidator(password) })
-    await fetch(authUrl, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        //   'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({
-        phone: username,
-        password: password,
-      }),
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (res.error == 4000) return setError(res.messages);
-        if (res.error == 7000)
-          return setError({
-            messages: 'Tài khoản hoặc mật khẩu không chính xác',
-          });
+  useEffect(async () => {
+    let data = await getPassword();
+    if (data) {
+      setSavePassword(true);
+      setAccount({phone: data.phone, password: data.password});
+    }
+  }, []);
+  useEffect(async () => {
+    await handlerSavePassword();
+  }, [account]);
+  useEffect(async () => {
+    await handlerSavePassword();
+  }, [savePassword]);
+  const handlerSavePassword = async () => {
+    if (savePassword) {
+      await storagePassword(JSON.stringify(account));
+    } else {
+      await storagePassword('');
+    }
+  };
+  const onLoginPress = async () => {
+    await SetIsLoading(true);
 
-        return setTimeout(() => setToken(res.data.token), 1000);
-      });
+    try {
+      await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: account.phone,
+          password: account.password,
+        }),
+      })
+        .then(async res => {
+          return await res.json();
+        })
+        .then(async res => {
+          await SetIsLoading(false);
+
+          if (res.error == 4000) {
+            return setError(res.messages);
+          }
+          if (res.error == 7000) {
+            return setError({
+              messages: 'Tài khoản hoặc mật khẩu không chính xác',
+            });
+          }
+          await setError({phone: false, password: false});
+          setToken(res.data.token);
+          return await SetIsLoading(false);
+        });
+    } catch (err) {
+      console.log('Login error: ', err);
+    }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
-      <View style={styles.headerView}>
-        <Text style={styles.headerText}>Đăng nhập</Text>
+    <SafeAreaView style={{flex: 1, backgroundColor: mainWhite}}>
+      <View
+        style={{
+          height: '40%',
+          borderBottomLeftRadius: 120,
+          backgroundColor: '#0598FC',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+        }}>
+        <Icon name="user-cog" size={56} color="#FFFFFF" />
       </View>
-      <View style={styles.inputLoginView}>
-        <TextInput
-          style={[
-            {marginBottom: 8},
-            styles.input,
-            {borderColor: !error.username ? '#E9EEF4' : '#ED557A'},
-          ]}
-          placeholder="Username"
-          selectionColor="#f13a59"
-          onChangeText={text => {
-            setUsername(text);
-          }}
-        />
-        <Text style={{color: '#ED557A', paddingLeft: 10}}>
-          {!error.username ? null : error.username}
-        </Text>
-        <TextInput
-          style={[
-            {marginTop: 8},
-            styles.input,
-            {borderColor: !error.password ? '#E9EEF4' : '#ED557A'},
-          ]}
-          placeholder="Password"
-          secureTextEntry={true}
-          onChangeText={text => setPassword(text)}
-        />
-        <Text style={{color: '#ED557A', paddingLeft: 10}}>
-          {!error.password ? null : error.password}
-        </Text>
+      <View style={{flex: 1, marginTop: 50}}>
+        <View style={styles.container}>
+          <View style={{width: '85%', marginBottom: 20}}>
+            <View style={{marginBottom: 15}}>
+              <TextInput
+                style={{borderRadius: 30}}
+                shadow={1}
+                isFocus={true}
+                placeholder="Tên đăng nhập"
+                value={account.phone}
+                onChangeText={val => setAccount({...account, phone: val})}
+                leftIcon="user"
+                errorMessage={error.phone}
+              />
+            </View>
+            <View style={{marginBottom: 10}}>
+              <Password
+                isFocus={true}
+                shadow={1}
+                style={{marginTop: 10}}
+                value={account.password}
+                onChangeText={val => setAccount({...account, password: val})}
+                errorMessage={error.password}
+              />
+              {error.messages && (
+                <Text size={14} style={styles.textErr}>
+                  {error.messages}
+                </Text>
+              )}
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 10,
+                marginLeft: 5,
+              }}>
+              <Checkbox
+                status={savePassword ? 'checked' : 'unchecked'}
+                onPress={() => setSavePassword(!savePassword)}
+                color="#0598FC"
+              />
+              <Text>Nhớ mật khẩu</Text>
+            </View>
+          </View>
+          <SubmitButton
+            isProcessing={isLoading}
+            onPress={() => onLoginPress()}
+            textProcessing="Đang xử lý...">
+            Đăng nhập
+          </SubmitButton>
+
+          <View
+            style={{flex: 1, justifyContent: 'flex-end', alignItems: 'center'}}>
+            <Text>Ứng dụng quản lý học vụ</Text>
+            <Text size={12}> Lecture v1.0</Text>
+          </View>
+        </View>
       </View>
-      <Button style={styles.button} title="Đăng nhập" onPress={onLoginPress} />
-      <TouchableOpacity style={{marginTop: 10}}>
-        <Text style={{color: '#067EFC'}}>Quên mật khẩu?</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
+const storagePassword = async data => {
+  try {
+    await AsyncStorage.setItem('account', data);
+  } catch (err) {
+    console.log('Save Error: ', err);
+  }
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    alignItems: 'center',
-  },
-  image: {
-    width: 24,
-    height: 24,
-  },
-  headerText: {
-    position: 'relative',
-    fontSize: 20,
-  },
-  headerView: {
-    position: 'relative',
-    top: 10,
-    left: 0,
-    right: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inputLoginView: {
-    position: 'relative',
-    width: '90%',
-    marginTop: 120,
-    marginBottom: 50,
-  },
-  input: {
-    position: 'relative',
-    padding: 10,
-    backgroundColor: '#F8FAFD',
-    borderWidth: 1,
-    borderRadius: 10,
-  },
-  button: {
-    position: 'relative',
-  },
-});
+const getPassword = async () => {
+  let data = '';
+  try {
+    data = await AsyncStorage.getItem('account');
+    return data != null ? JSON.parse(data) : null;
+  } catch (err) {
+    console.log('Read Error: ', err);
+  }
+};

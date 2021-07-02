@@ -19,7 +19,10 @@ import {apiURL} from '../../config/config';
 import {TextInput} from 'react-native-paper';
 import {Input} from 'react-native-elements';
 import Toast from 'react-native-toast-message';
+import SetTokenContext from '../../Context/SetTokenContext';
 export default function AccountDetail({route}) {
+  const setToken = useContext(SetTokenContext);
+
   const token = useContext(TokenContext);
   const [info, setInfo] = useState({
     status: '',
@@ -134,7 +137,7 @@ export default function AccountDetail({route}) {
           });
       }, 10);
     } else {
-      setError('ngu');
+      setError('Mật khẩu không khớp');
     }
   };
   return (
@@ -261,23 +264,31 @@ export default function AccountDetail({route}) {
         {!update ? (
           <View style={styles.container1}>
             <View style={{marginBottom: 10}}>
-              <Button
-                title="Cập nhật thông tin"
+              <Pressable
+                style={styles.pressable}
                 onPress={() => {
                   setUpdate(!update);
-                }}
-              />
+                }}>
+                <Text style={styles.textStyle}>Cập nhật thông tin</Text>
+              </Pressable>
             </View>
             <View style={{marginBottom: 10}}>
-              <Button
-                title="Đổi mật khẩu"
+              <Pressable
+                style={styles.pressable}
                 onPress={() => {
                   setModalVisible(!modalVisible);
-                }}
-              />
+                }}>
+                <Text style={styles.textStyle}>Đổi mặt khẩu</Text>
+              </Pressable>
             </View>
             <View style={{marginBottom: 10}}>
-              <Button title="Đăng xuất" onPress={() => {}} />
+              <Pressable
+                style={styles.pressable}
+                onPress={async () => {
+                  await setToken();
+                }}>
+                <Text style={styles.textStyle}>Đăng xuất</Text>
+              </Pressable>
             </View>
           </View>
         ) : (
@@ -290,20 +301,22 @@ export default function AccountDetail({route}) {
               justifyContent: 'center',
             }}>
             <View style={{marginRight: 20}}>
-              <Button
-                title="Lưu thay đổi"
+              <Pressable
+                style={styles.save}
                 onPress={() => {
                   save();
-                }}
-              />
+                }}>
+                <Text style={styles.textStyle}>Lưu thay đổi</Text>
+              </Pressable>
             </View>
             <View style={{marginLeft: 20}}>
-              <Button
-                title="Hủy"
+              <Pressable
+                style={styles.cancelButton}
                 onPress={() => {
                   handlerCancel();
-                }}
-              />
+                }}>
+                <Text style={styles.textStyle}>Hủy</Text>
+              </Pressable>
             </View>
           </View>
         )}
@@ -443,5 +456,23 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  pressable: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    width: 200,
+    borderRadius: 20,
+  },
+  cancelButton: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    width: 100,
+    borderRadius: 20,
+  },
+  save: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    width: 150,
+    borderRadius: 20,
   },
 });

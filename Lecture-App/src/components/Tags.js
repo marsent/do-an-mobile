@@ -5,4 +5,5 @@ import Text from './Text';
 import TextInput from './TextInput';
 import SubmitButton from './SubmitButton';
 import SubmitButtonDetail from './SubmitButton';
-export {Button, Picker, Text, TextInput, SubmitButtonDetail};
+import DatePicker from './DatePicker';
+export {Button, Picker, Text, TextInput, SubmitButtonDetail, DatePicker};
