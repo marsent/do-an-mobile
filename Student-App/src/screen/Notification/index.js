@@ -1,4 +1,4 @@
-import React, { useState, Component, useEffect }from 'react'
+import React, { useState, Component, useEffect , useContext}from 'react'
 import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView } from 'react-native';
 import CalendarStrip from 'react-native-slideable-calendar-strip';
 import { passwordValidator, retypePassValidator } from '../../helpers/passwordValidator';

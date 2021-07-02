@@ -1,5 +1,5 @@
 import React, { useState, Component, useEffect, useContext }from 'react'
-import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView,Modal, Alert, Pressable  } from 'react-native';
+import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView,Modal, Alert, Pressable, RefreshControl} from 'react-native';
 import CalendarStrip from 'react-native-slideable-calendar-strip';
 import { passwordValidator, retypePassValidator } from '../../helpers/passwordValidator';
 import { usernameValidator } from '../../helpers/usernameValidator'
@@ -7,30 +7,16 @@ import { RadioButton, Card, Avatar, IconButton } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
-import TokenContext from '../../helpers/TokenContext';
-import {ExamProvider} from '../../helpers/ExamContext';
+import TokenContext from '../../Context/TokenContext';
 import {addDays, format, getDate, isSameDay, startOfWeek, parseJSON} from 'date-fns';
-
+import { enGB, eo, ru, vi } from 'date-fns/locale';
 
 export default function OnlineExam({navigation}){
-    // const edata = [
-    //     {
-    //         ID : "123",
-    //         name : "Domo 1",
-    //     },
-    //     {
-    //         ID : "456",
-    //         name : "Domo 2",
-    //     }
-    // ];
-    // const [count, setCount] = useState(0);
-    // const onPress = () => setCount(prevCount => prevCount + 1);
-    // const token = useContext(TokenContext);
     const token = useContext(TokenContext);
     const [examList, setExamList] = useState([]);
-    useEffect(async () => {
-    //setError({ username: usernameValidator(username), password: passwordValidator(password) })
-        await fetch('http://quocha.xyz/api/exam/admin', {
+    const [answerList, setAnswerList] = useState([]);
+    const getExam = async () => {
+        await fetch('http://quocha.xyz/api/exam/student', {
         method: 'GET',
         headers: {
             Accept: 'application/json',
@@ -42,7 +28,30 @@ export default function OnlineExam({navigation}){
         .then(res => {
             setExamList(res.data);
         });
-    });
+        };
+    const getAnswer = async () => {
+        await fetch('http://quocha.xyz/api/answer/student', {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization:'Bearer '+token,
+        },
+        })
+        .then(res => res.json())
+        .then(res => {
+            setAnswerList(res.data);
+        });
+        };
+    useEffect(async () => {
+        await getExam(),
+            getAnswer();
+        return () => {
+            setExamList();
+            setAnswerList();
+        };
+        }, []);
+    console.log(answerList); 
     const [modalVisible, setModalVisible] = useState(false);
     const [examID,setExamID]=useState([]);
     // const examDetail = () => {
@@ -50,7 +59,6 @@ export default function OnlineExam({navigation}){
     //     setModalVisible(!modalVisible);
     // };
     return (
-    <ExamProvider value={examID.name}>
       <SafeAreaView style={styles.Container}>
            <Modal
                 animationType="fade"
@@ -61,41 +69,53 @@ export default function OnlineExam({navigation}){
                 }}>
                     <View style={styles.centeredView}>
                         <View style={styles.modalView}>
-                            <TouchableOpacity
+                            <Pressable
                                     style={[styles.closebutton]}
                                     onPress={() => {setModalVisible(!modalVisible)}}>
                                     <Icon name="md-close" size={23} color='#BFBFBF' />
-                            </TouchableOpacity>
-                            <Text style={{fontWeight: 'bold',}}>{examID.name}</Text>
-                            <Text>{examID.Content}</Text>
-                            <TouchableOpacity
-                                    style={[styles.button]}
-                                    onPress={() => {navigation.navigate('MainExam',{data: examID}); setModalVisible(!modalVisible)}}>
-                                    <Text style={styles.textStyle}>Làm bài</Text>
-                            </TouchableOpacity>
+                            </Pressable>
+                            <Text style={[styles.TitleText, {marginBottom:15}]}>{examID.name}</Text>
+                            <Text style={[styles.ContentText,{textAlign:'center'}]}>Bạn có {examID.time} phút để thực hiện bài làm</Text>
+                            <Text style={[styles.ContentText,{textAlign:'center'}]}>Thời gian sẽ được tính sau khi bấm "Bắt đầu"</Text>
+                            <Text style={[styles.ContentText,{textAlign:'center',marginBottom:15}]}>Bạn đã sẵn sàng !</Text>
+                            <Pressable
+                                    style={[styles.button, {backgroundColor:'green'}]}
+                                    onPress={() => {
+                                            navigation.navigate('MainExam', {data1: examID}); setModalVisible(!modalVisible)}}>
+                                    <Text style={styles.textStyle}>Bắt đầu</Text>
+                            </Pressable>
                         </View>
                     </View>
             </Modal>
-        
-            <ScrollView style={styles.NotiView}>
+            { examList.length != 0 ?
+            (<ScrollView style={styles.NotiView}>
                 {/* <Text>{token}</Text> */}
                 {examList.map((item, i)=>(
-                    <TouchableOpacity key={i} style={styles.NotiText}  onPress={() => {
-                        setExamID(item);
-                        setModalVisible(!modalVisible);
-                    }}>
-                    <View > 
+                    // <Pressable   onPress={() => {
+                    //     setExamID(item);
+                    //     setModalVisible(!modalVisible);
+                    // }}>
+                    <View key={i} style={styles.NotiText}> 
                         <Text style={styles.TitleText}>{item.name} </Text>
-                        {/* <Text style={styles.Notification_date}>{format(parseJSON(item.updatedAt),'Pp')} </Text> */}
+                        <Text style={styles.ContentText}>Thời gian: {format(parseJSON(item.start_at),'Pp', {locale: vi})} -- {format(parseJSON(item.expire_at),'Pp', {locale: vi})} </Text>
+                        <Text style={styles.ContentText}>Thời gian làm bài: {item.time} phút</Text>
+                        {/* {answerList.find(item._id) ? (<Text style={styles.ContentText}>Chưa nộp bài</Text>) : (<Text style={styles.ContentText}>Đã nộp bài</Text>)} */}
+                        <Text style={styles.ContentText}>Chưa nộp bài</Text>
+                        <Pressable  style={[styles.button, {backgroundColor:'green', marginTop:10, flexDirection:'row', alignItems: 'center', width:'24%'}]} onPress={() => {
+                            setExamID(item);
+                            setModalVisible(!modalVisible);}}>
+                                <Icon name="ios-logo-electron" color={'#FEFEFE'} size={20} />
+                                <Text style={[styles.textStyle, {marginLeft: 10}]}>Làm bài</Text>
+                        </Pressable>
                     </View> 
-                    </TouchableOpacity>
+                    //</Pressable>
                 ))}
-            </ScrollView>
+                
+            </ScrollView>):(<Text style={{textAlign:'center', marginTop: 15}}>KHÔNG CÓ DỮ LIỆU</Text>)
+            }
         </SafeAreaView>
-    </ExamProvider>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -135,6 +155,7 @@ const styles = StyleSheet.create({
     },
     ContentText: {
         fontSize: 14,
+        color:'black',
     },
     Notification_date:{
         fontSize: 10,
@@ -166,9 +187,9 @@ const styles = StyleSheet.create({
     button: {
 	    margin:2,
         borderRadius: 5,
-        borderWidth: 0.5,
+        // borderWidth: 0.5,
         padding: 10,
-        backgroundColor:'green',
+        // backgroundColor:'green',
     },
     closebutton: {
 	    alignSelf: 'flex-end',
