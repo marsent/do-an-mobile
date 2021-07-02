@@ -8,7 +8,7 @@ import { Picker } from '@react-native-picker/picker';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import TokenContext from '../../Context/TokenContext';
-import {addDays, format, getDate, isSameDay, startOfWeek, parseJSON} from 'date-fns';
+import {addDays, format, getDate, isSameDay, startOfWeek, parseJSON, isAfter, isBefore} from 'date-fns';
 import { enGB, eo, ru, vi } from 'date-fns/locale';
 
 export default function OnlineExam({navigation}){
@@ -43,21 +43,31 @@ export default function OnlineExam({navigation}){
             setAnswerList(res.data);
         });
         };
-    useEffect(async () => {
-        await getExam(),
+    useEffect(() => {
+        const unsubscribe = navigation.addListener("focus", async () => {
+            getExam(),
             getAnswer();
-        return () => {
-            setExamList();
-            setAnswerList();
-        };
-        }, []);
-    console.log(answerList); 
+            console.log('123');
+        });
+        return () => {unsubscribe; setExamList();}
+    }, [navigation]);
+    // console.log(answerList.findIndex()); 
     const [modalVisible, setModalVisible] = useState(false);
     const [examID,setExamID]=useState([]);
-    // const examDetail = () => {
-    //     setExamID(item.ID);
-    //     setModalVisible(!modalVisible);
-    // };
+    let index=[];
+    function checkExam(item = {item}){
+        index = index.concat(answerList.findIndex(x => x.exam_id === item));
+        // console.log(item ,index);
+        return index
+    };
+    let TimeChecker = [];
+    function checkTime(){
+        examList.forEach(item => {
+            TimeChecker = TimeChecker.concat(isAfter(new Date(),parseJSON(item.start_at)) && isBefore(new Date(),parseJSON(item.expire_at)));
+        });
+        return TimeChecker
+    };
+    checkTime();
     return (
       <SafeAreaView style={styles.Container}>
            <Modal
@@ -81,7 +91,7 @@ export default function OnlineExam({navigation}){
                             <Pressable
                                     style={[styles.button, {backgroundColor:'green'}]}
                                     onPress={() => {
-                                            navigation.navigate('MainExam', {data1: examID}); setModalVisible(!modalVisible)}}>
+                                            navigation.navigate('MainExam', {data1: examID, anw: false}); setModalVisible(!modalVisible)}}>
                                     <Text style={styles.textStyle}>Bắt đầu</Text>
                             </Pressable>
                         </View>
@@ -97,16 +107,43 @@ export default function OnlineExam({navigation}){
                     // }}>
                     <View key={i} style={styles.NotiText}> 
                         <Text style={styles.TitleText}>{item.name} </Text>
-                        <Text style={styles.ContentText}>Thời gian: {format(parseJSON(item.start_at),'Pp', {locale: vi})} -- {format(parseJSON(item.expire_at),'Pp', {locale: vi})} </Text>
+                        <Text style={styles.ContentText}>Thời gian: {format(parseJSON(item.start_at),'p  P', {locale: vi})} -- {format(parseJSON(item.expire_at),'p  P', {locale: vi})} </Text>
                         <Text style={styles.ContentText}>Thời gian làm bài: {item.time} phút</Text>
-                        {/* {answerList.find(item._id) ? (<Text style={styles.ContentText}>Chưa nộp bài</Text>) : (<Text style={styles.ContentText}>Đã nộp bài</Text>)} */}
-                        <Text style={styles.ContentText}>Chưa nộp bài</Text>
-                        <Pressable  style={[styles.button, {backgroundColor:'green', marginTop:10, flexDirection:'row', alignItems: 'center', width:'24%'}]} onPress={() => {
-                            setExamID(item);
-                            setModalVisible(!modalVisible);}}>
-                                <Icon name="ios-logo-electron" color={'#FEFEFE'} size={20} />
-                                <Text style={[styles.textStyle, {marginLeft: 10}]}>Làm bài</Text>
-                        </Pressable>
+                        { checkExam(item.id)[i] == -1 ? (
+                            <View>
+                                <Text style={styles.ContentText}>Chưa nộp bài</Text>
+                                { TimeChecker[i] ? (
+                                    <Pressable  style={[styles.button, {backgroundColor:'green', marginTop:10, flexDirection:'row', alignItems: 'center', width:'24%'}]} onPress={() => {
+                                        setExamID(item);
+                                        setModalVisible(!modalVisible);}}>
+                                            <Icon name="ios-logo-electron" color={'#FEFEFE'} size={20} />
+                                            <Text style={[styles.textStyle, {marginLeft: 10}]}>Làm bài</Text>
+                                    </Pressable>
+                                ) : (
+                                    <Pressable  style={[styles.button, {backgroundColor:'grey', marginTop:10, flexDirection:'row', alignItems: 'center', width:'24%'}]} disabled={true} onPress={() => {
+                                        setExamID(item);
+                                        setModalVisible(!modalVisible);}}>
+                                            <Icon name="ios-logo-electron" color={'#FEFEFE'} size={20} />
+                                            <Text style={[styles.textStyle, {marginLeft: 10}]}>Làm bài</Text>
+                                    </Pressable>
+                                )}
+                                {/* <Pressable  style={[styles.button, {backgroundColor:'green', marginTop:10, flexDirection:'row', alignItems: 'center', width:'24%'}]} onPress={() => {
+                                    setExamID(item);
+                                    setModalVisible(!modalVisible);}}>
+                                        <Icon name="ios-logo-electron" color={'#FEFEFE'} size={20} />
+                                        <Text style={[styles.textStyle, {marginLeft: 10}]}>Làm bài</Text>
+                                </Pressable> */}
+                            </View>
+                            ) : (
+                            <View>
+                                <Text style={styles.ContentText}>Nộp bài lúc: {format(parseJSON(answerList[index.key = index[i]].createdAt),'p  P', {locale: vi})}</Text>
+                                <Text style={styles.ContentText}>Điểm: {answerList[index.key = index[i]].score}</Text>
+                                <Pressable  style={[styles.button, {backgroundColor:'#3891E9', marginTop:10, flexDirection:'row', alignItems: 'center', width:'32%'}]} onPress={() => {navigation.navigate('MainExam', {data1: item, anw: answerList[index.key=index[i]]})
+                                    }}>
+                                        <Icon name="ios-logo-electron" color={'#FEFEFE'} size={20} />
+                                        <Text style={[styles.textStyle, {marginLeft: 10}]}>Xem lại bài làm</Text>
+                                </Pressable>
+                            </View>)} 
                     </View> 
                     //</Pressable>
                 ))}

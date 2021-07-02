@@ -1,13 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext,useEffect } from 'react';
 
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { FlexibleTabBarComponent, withCustomStyle } from 'react-navigation-custom-bottom-tab-component/FlexibleTabBarComponent';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView,Modal, Alert, Pressable  } from 'react-native';
+import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView,Modal, Alert, Pressable, StatusBar, BackHandler } from 'react-native';
 
 import TimeTable from './TimeTable';
 import Notification from './Notification';
@@ -15,17 +16,22 @@ import OnlineExam from './OnlineExam';
 import AccountDetail from './accountDetail';
 import mainExam from './OnlineExam/mainExam';
 
-const Stack = createStackNavigator();
+
+// const Stack = createStackNavigator();
 
 const Tab = createMaterialBottomTabNavigator();
 
-const TabS = () => (
+const TabS = ({route, navigation}) => {
+  const {setToken} = route.params
+  return(
     <Tab.Navigator
-      initialRouteName="TimeTable"
+      shifting={true}
+      initialRouteName="Thời khóa biểu"
       activeColor="#fff"
+      barStyle={{}}
     >
       <Tab.Screen
-        name="TimeTable"
+        name="Thời khóa biểu"
         component={TimeTable}
         options={{
           tabBarLabel: 'TKB',
@@ -37,7 +43,7 @@ const TabS = () => (
         
       />
       <Tab.Screen
-        name="Exam"
+        name="Kiểm tra"
         component={OnlineExam}
         options={{
           tabBarLabel: 'Kiểm tra',
@@ -69,8 +75,8 @@ const TabS = () => (
         //   };
         // }}
       />
-      <Tab.Screen
-        name="Notifications"
+      {/* <Tab.Screen
+        name="Thông báo"
         component={Notification}
         options={{
           tabBarLabel: 'Thông báo',
@@ -80,48 +86,66 @@ const TabS = () => (
           ),
           
         }}
-      />
+      /> */}
       <Tab.Screen
-        name="Account"
+        name="Thông tin cá nhân"
         component={AccountDetail}
         options={{
-          tabBarLabel: 'Tài khoản',
-          tabBarColor: '#3891E9',
+          tabBarLabel: 'Cá nhân',
+          tabBarColor: '#3891E0',
           tabBarIcon: ({ color }) => (
             <Icon name="person-circle-outline" color={color} size={26} />
           ),
         }}
+        initialParams={{ setToken }}
       />
     </Tab.Navigator>
-);
+)};
 
 // export default MainTabScreen;
 
-const StackS = ({navigation, route}) => (
-  <Stack.Navigator screenOptions={{
-          headerStyle: {
-          backgroundColor: '#3891E9',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-          fontWeight: 'bold'
-          },
-          headerTitleAlign: 'center',
-      }}
-      >
-          <Stack.Screen name="Tab" component={TabS}
-            options={({route }) => { 
-              const routeName = getFocusedRouteNameFromRoute(route);
-              return { title: routeName };  
-            }}      
-          />
-          <Stack.Screen name="MainExam" component={mainExam} options={{
-            headerShown: false
-          }}
+// const StackS = ({navigation, route}) => {
+//   console.log(route);
+//   return(
+//   <Stack.Navigator screenOptions={{
+//           headerStyle: {
+//           backgroundColor: '#3891E9',
+//           },
+//           headerTintColor: '#fff',
+//           headerTitleStyle: {
+//           fontWeight: 'bold'
+//           },
+//           headerTitleAlign: 'center',
+//       }}
+//       >
+//           <Stack.Screen name="Thời khóa biểu" component={TabS}
+//             options={({route, navigation}) => { 
+//               const routeName = getFocusedRouteNameFromRoute(route);
+//               return { title: routeName, 
+//               headerRight: () => (
+//                 <Pressable  style={[{paddingRight:15}]}onPress={() => {navigation.navigate('Notification')}}>
+//                       <Icon name="notifications-outline" color={'#FEFEFE'} size={26} />
+//               </Pressable>),
+//               headerLeft: () => (
+//                 <Pressable  style={[{paddingLeft:15}]}onPress={() => {setToken('')}}>
+//                       <Icon name="notifications-outline" color={'#FEFEFE'} size={26} />
+//               </Pressable>),
+//                }; 
+//             }          
+//           }      
+//           />
+//           <Stack.Screen name="Notification" component={Notification} options={{
+//             title: 'Thông báo'
+//           }}
           
-          />
+//           />
+//           <Stack.Screen name="MainExam" component={mainExam} options={{
+//             headerShown: false
+//           }}
           
-  </Stack.Navigator>
-);
+//           />
+          
+//   </Stack.Navigator>
+// )};
 
-export default StackS;
+export default TabS;
