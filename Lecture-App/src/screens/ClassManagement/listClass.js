@@ -12,11 +12,7 @@ function listClass({navigation}) {
   const token = useContext(TokenContext);
   const [classList, setClassList] = useState([]);
 
-  useEffect(async () => {
-    // setError({
-    //   username: usernameValidator(username),
-    //   password: passwordValidator(password),
-    // });
+  const show = async () => {
     await fetch(`${apiURL}/subject/lecture`, {
       method: 'GET',
       headers: {
@@ -26,11 +22,16 @@ function listClass({navigation}) {
       },
     })
       .then(res => res.json())
-      .then(res => {
-        setClassList(res.data);
+      .then(async res => {
+        await setClassList(res.data);
       });
+  };
+  useEffect(async () => {
+    await show();
+    return async () => {
+      await setClassList();
+    };
   });
-
   return (
     <View style={styles.Container}>
       <ScrollView style={styles.NotiView}>
@@ -45,8 +46,8 @@ function listClass({navigation}) {
               <Button
                 style={styles.button}
                 title=" Xem danh sách lớp"
-                onPress={() => {
-                  navigation.navigate('Xem chi tiết', {_id: item._id});
+                onPress={async () => {
+                  await navigation.navigate('Xem chi tiết', {_id: item._id});
                 }}
               />
             </View>

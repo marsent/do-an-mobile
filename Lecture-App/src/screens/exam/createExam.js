@@ -14,12 +14,17 @@ import {RadioButton, Checkbox} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import Spinkit from 'react-native-spinkit';
 
-import styles from '../../style/style';
 import {ExamUtils, ClassUtils} from '../../utils';
 
 import TokenContext from '../../Context/TokenContext';
 import {apiURL, yearList} from '../../config/config';
-import {Text, Button, TextInput, Picker} from '../../components/Tags';
+import {
+  Text,
+  Button,
+  TextInput,
+  Picker,
+  DatePicker,
+} from '../../components/Tags';
 import {mainWhite} from '../../style/color';
 
 const getDate = (date, min = 1) => {
@@ -61,6 +66,9 @@ export default AddExam = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [subject, setsubject] = useState(initsubject);
   const [compelete, setComplete] = useState(false);
+  const [startAt, setStartAt] = useState(getDate(new Date()));
+  const [expireAt, setExpireAt] = useState(getDate(new Date(), 2));
+  const [typeTest, setTypeTest] = useState('optional');
   // get subject List
 
   const handlerUploadExam = async () => {
@@ -125,6 +133,9 @@ export default AddExam = ({navigation}) => {
       questions: questions,
       year: new Date().getFullYear(),
       time: time,
+      start_at: startAt,
+      expire_at: expireAt,
+      type: typeTest,
     };
     if (type === 'subject') {
       exam.subject_id = subjectId;
@@ -137,7 +148,7 @@ export default AddExam = ({navigation}) => {
           setIsLoading(false);
           if (res.error == 4000) return setError(res.messages);
           if (res.error == 7000) {
-            setError({name: ''});
+            setError(initError);
             return Toast.show({
               type: 'error',
               position: 'top',
@@ -239,6 +250,23 @@ export default AddExam = ({navigation}) => {
                 )}
               </View>
             )}
+            <View style={{width: '90%', marginBottom: 15}}>
+              <Picker
+                label="Hình thức thi"
+                placeholder="Hình thức thi"
+                displayValue={
+                  typeTest == 'live'
+                    ? 'Live'
+                    : typeTest == 'optional'
+                    ? 'Optional'
+                    : ''
+                }
+                selectedValue={typeTest}
+                onValueChange={val => setTypeTest(val)}>
+                <PickerBase.Item label="Optional" value="optional" />
+                <PickerBase.Item label="Live" value="live" />
+              </Picker>
+            </View>
             <View
               style={{
                 width: '90%',

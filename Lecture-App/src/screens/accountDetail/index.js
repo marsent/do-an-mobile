@@ -19,7 +19,10 @@ import {apiURL} from '../../config/config';
 import {TextInput} from 'react-native-paper';
 import {Input} from 'react-native-elements';
 import Toast from 'react-native-toast-message';
+import SetTokenContext from '../../Context/SetTokenContext';
 export default function AccountDetail({route}) {
+  const setToken = useContext(SetTokenContext);
+
   const token = useContext(TokenContext);
   const [info, setInfo] = useState({
     status: '',
@@ -277,7 +280,13 @@ export default function AccountDetail({route}) {
               />
             </View>
             <View style={{marginBottom: 10}}>
-              <Button title="Đăng xuất" onPress={() => {}} />
+              <Button
+                title="Đăng xuất"
+                onPress={async () => {
+                  await setToken();
+                  await setInfo();
+                }}
+              />
             </View>
           </View>
         ) : (

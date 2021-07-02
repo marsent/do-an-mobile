@@ -82,7 +82,6 @@ const examDetail = ({route}) => {
   useEffect(async () => {
     if (exam.for === 'subject') {
       const url = `http://quocha.xyz/api/subject/lecture/${exam.subject_id}`;
-      console.log(url);
       await fetch(url, {
         method: 'GET',
         headers: {
@@ -129,12 +128,21 @@ const examDetail = ({route}) => {
             type: 'success',
             position: 'top',
             text1: 'Cập nhật thành công ',
-            visibilityTime: 2000,
+            visibilityTime: 1000,
             autoHide: true,
           });
           await setUpdate(!update);
         } else {
-          setError(updateExam.messages);
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Cập nhật thất bại',
+            text2: JSON.stringify(updateExam.message),
+            visibilityTime: 1000,
+            autoHide: true,
+          });
+          console.log(updateExam);
+          await handlerCancel();
         }
       } catch (err) {
         console.log('Error submit:', err);
@@ -144,8 +152,9 @@ const examDetail = ({route}) => {
   };
   // if (exam.status === 'active') {
   //   exam.status = 'Đang mở';
-  // } else {
-  //   exam.status = 'Đã đóng';
+  // }
+  // if (exam.status === 'disabled') {
+  //   exam.status === 'Đã đ';
   // }
   return (
     <SafeAreaView style={styles.container}>
