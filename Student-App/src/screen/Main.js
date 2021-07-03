@@ -76,7 +76,7 @@ const TabS = ({route, navigation}) => {
         //   };
         // }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Quản lý môn học"
         component={Subject}
         options={{
@@ -87,7 +87,7 @@ const TabS = ({route, navigation}) => {
           ),
           
         }}
-      /> */}
+      />
       <Tab.Screen
         name="Thông tin cá nhân"
         component={AccountDetail}

@@ -76,27 +76,27 @@ export default function Subject({route, navigation}) {
       setRSubject(Array(allSubject.length).fill(false));
     }
   }, [navigation]);
-  const myIndex= getMyIndex();
-  console.log(myIndex);
-  const register = async ({X = {X}}) => {
-    await setTimeout(async () => {
-      await fetch(`http://quocha.xyz/api/subject/student/register/${X._id}`, {
+const myIndex= getMyIndex();
+
+const Register = async ({i = {i}}) => {
+  console.log(i);
+      await fetch(`http://quocha.xyz/api/subject/student/register/${allSubject[i]._id}`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + token,
         },
-        body: JSON.stringify({}),
       })
         .then(res => res.json())
         .then(res => {
+          console.log(res.statusCode);
           if (res.statusCode === 200) {
             setUpdate(false);
             Toast.show({
               type: 'success',
               position: 'top',
-              text1: `Đăng ký môn ${X.subject_code} thành công `,
+              text1: `Đăng ký môn ${allSubject[i].subject_code} thành công `,
               visibilityTime: 2000,
               autoHide: true,
             });
@@ -105,33 +105,33 @@ export default function Subject({route, navigation}) {
             Toast.show({
               type: 'error',
               position: 'top',
-              text1: `Đăng ký môn ${X.subject_code} thất bại `,
+              text1: `Đăng ký môn ${allSubject[i].subject_code} thất bại `,
               autoHide: true,
             });
             return <Toast ref={ref => Toast.setRef(ref)} />
           }
-        })
-    }, 1000);
+        });
+
   };
-  const Cancel = async ({X = {X}}) => {
-    await setTimeout(async () => {
-      await fetch(`http://quocha.xyz/api/subject/student/Cancel/${X._id}`, {
+  const Cancel = async ({i = {i}}) => {
+    console.log(i);
+      await fetch(`http://quocha.xyz/api/subject/student/Cancel/${allSubject[i]._id}`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + token,
         },
-        body: JSON.stringify({}),
       })
         .then(res => res.json())
         .then(res => {
+          
           if (res.statusCode === 200) {
             setUpdate(false);
-            return Toast.show({
+            Toast.show({
               type: 'success',
               position: 'top',
-              text1: `Hủy môn ${X.subject_code} thành công `,
+              text1: `Hủy môn ${allSubject[i].subject_code} thành công `,
               visibilityTime: 2000,
               autoHide: true,
             });
@@ -140,14 +140,29 @@ export default function Subject({route, navigation}) {
             Toast.show({
               type: 'error',
               position: 'top',
-              text1: `Đăng môn ${X.subject_code} thất bại `,
+              text1: `Đăng môn ${allSubject[i].subject_code} thất bại `,
               autoHide: true,
             });
             return <Toast ref={ref => Toast.setRef(ref)} />
           }
         })
-    }, 1000);
   };
+  function xRegister() {
+    for( let i=0; i < rSubject.length; i++)
+    {
+      if(rSubject[i]){
+        Register(i={i});
+      }
+    }
+  }
+  function xCancel() {
+    for( let i=0; i < cSubject.length; i++)
+    {
+      if(cSubject[i]){
+        Cancel(i= myIndex[i]);
+      }
+    }
+  }
   return (
     <SafeAreaView style={styles.Container}>
       <View style={styles.inforView}>
@@ -156,7 +171,7 @@ export default function Subject({route, navigation}) {
                 <Text style={{fontWeight:'bold', fontSize: 18}}>Danh sách môn học</Text>
                 <TouchableOpacity
                     style={styles.pressable}
-                    onPress={() => {}}>
+                    onPress={() => {xCancel()}}>
                     <Text style={styles.textStyle}>Hủy môn</Text>
                 </TouchableOpacity>
           </View>
@@ -184,7 +199,7 @@ export default function Subject({route, navigation}) {
                 <Text style={{fontWeight:'bold', fontSize: 18}}>Đăng ký môn học</Text>
                 <TouchableOpacity
                     style={styles.pressable}
-                    onPress={() => {}}>
+                    onPress={() => {xRegister()}}>
                     <Text style={styles.textStyle}>Đăng ký</Text>
                 </TouchableOpacity>
           </View>
