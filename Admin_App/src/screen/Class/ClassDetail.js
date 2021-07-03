@@ -201,7 +201,7 @@ const ClassDetail = ({ route, navigation }) => {
                                     selectedValue={Class.status}
                                     onValueChange={val => {
                                         setClass({ ...Class, status: val })
-                                        setNewClass({ ...newClasss, status: val })
+                                        setNewClass({ ...newClass, status: val })
                                     }}
                                 >
                                     <Picker.Item label='Active' value='active' />
