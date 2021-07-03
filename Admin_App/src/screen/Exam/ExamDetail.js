@@ -157,10 +157,12 @@ const ExamDetail = ({ route, navigation }) => {
             try {
                 const updateExam = await ExamUtils.updateExam(query)
                     .then(res => {
+                        console.log(res);
                         return res
                     })
                 const updateStatus = await ExamUtils.updateExamStatus({ token: token, id: _id, status: exam.status })
                     .then(res => {
+                        console.log(res);
                         return res
                     })
                 if (updateExam.statusCode == 200 && updateStatus.statusCode == 200) {
@@ -174,21 +176,23 @@ const ExamDetail = ({ route, navigation }) => {
                     })
                     await setIsEdit(!isEdit)
                     getExam();
-                } else {
-                    if (updateExam.errors.time == 7000702) {
-                        Toast.show({
-                            type: 'error',
-                            position: 'top',
-                            text1: 'Cập nhật thất bại',
-                            text2: 'Không thể cập nhật vì quá ngày bắt đầu',
-                            visibilityTime: 2000,
-                            autoHide: true,
-                        })
-                    }
-                    else setError(updateExam.messages)
+                } else if (updateExam.errors.time == 7000702) {
+                    Toast.show({
+                        type: 'error',
+                        position: 'top',
+                        text1: 'Cập nhật thất bại',
+                        text2: 'Không thể cập nhật vì quá ngày bắt đầu',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
                 }
-
+                else if (updateExam.errors.exam == 7000500) {
+                    setError({ name: 'Tên lớp đã tồn tại' })
+                }
+                else setError(updateExam.messages);
             }
+
+
             catch (err) {
                 console.log('Error submit:', err);
             }
@@ -217,7 +221,6 @@ const ExamDetail = ({ route, navigation }) => {
                                     value={exam.name}
                                     onChangeText={text => setExam({ ...exam, name: text })}
                                     multiline={true}
-
                                     errorMessage={error.name}
                                 />
                             </View>
