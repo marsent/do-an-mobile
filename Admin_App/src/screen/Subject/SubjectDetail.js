@@ -49,12 +49,11 @@ const SubjectDetail = ({ route, navigation }) => {
     const [isEdit, setIsEdit] = useState(false)
     const [newSubject, setNewSubject] = useState({});
     const [lectureList, setLectureList] = useState([]);
-    const [lecture, setLecture] = useState()
+    const [lecture, setLecture] = useState(initLecture)
     const [preview, setPreview] = useState(false)
     const getSubjetcData = async () => {
         await SubjectUtils.getSubjectById({ token: token, id: _id })
             .then(async (res) => {
-                console.log(res);
                 await setSubject(res.data)
             })
     }
@@ -67,18 +66,18 @@ const SubjectDetail = ({ route, navigation }) => {
         }
     }, [])
     useEffect(async () => {
-        // await LectureUtils.getLectureById({ token: token, id: subject.lecture_id })
-        //     .then(res => {
-        //         if (res.data) {
-        //             setLecture(res.data)
-        //         }
-        //     })
-        await LectureUtils.getAllLecture({ token: token, faculty: subject.faculty })
+        await LectureUtils.getLectureById({ token: token, id: subject.lecture_id })
             .then(res => {
                 if (res.data) {
-                    setLectureList(res.data)
+                    setLecture(res.data)
                 }
             })
+        // await LectureUtils.getAllLecture({ token: token, faculty: subject.faculty })
+        //     .then(res => {
+        //         if (res.data) {
+        //             setLectureList(res.data)
+        //         }
+        //     })
         setIsLoadingData(false)
     }, [subject])
     const cancelHandler = async () => {
@@ -140,8 +139,6 @@ const SubjectDetail = ({ route, navigation }) => {
             })
         setIsProcessing(false)
     }
-    console.log(lectureList.length);
-
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <CustomHeaderText navigation={navigation} >Chi tiết môn học</CustomHeaderText>
@@ -197,7 +194,7 @@ const SubjectDetail = ({ route, navigation }) => {
                             <Text>Giảng viên:</Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                            <Picker
+                            {/* <Picker
                                 itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
                                 enabled={isEdit}
                                 selectedValue={subject.lecture_id}
@@ -209,14 +206,14 @@ const SubjectDetail = ({ route, navigation }) => {
                                         <Picker.Item label={val.full_name} value={val._id} key={val._id} />
                                     )
                                 })}
-                            </Picker>
-                            {/* <TextInput
+                            </Picker> */}
+                            <TextInput
                                 outLine={false}
                                 type='flat'
                                 editable={false}
-                                value={lecture.full_name}
+                                value={lecture.full_name ? lecture.full_name : 'Không có giảng viên'}
                                 multiline={true}
-                            /> */}
+                            />
                         </View>
                     </CustomView>
 

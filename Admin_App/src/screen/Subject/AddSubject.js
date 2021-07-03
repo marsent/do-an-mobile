@@ -104,7 +104,7 @@ const AddSubject = ({ navigation }) => {
         const min = new Date(val).getMinutes();
         const today = new Date();
         if (today.getDate() == date) {
-            return new Date(val.setMinutes(min + 15));
+            return new Date(val.setMinutes(min + 5));
         }
         return val
     }
@@ -112,7 +112,7 @@ const AddSubject = ({ navigation }) => {
     const onSubmitPress = async () => {
         await setError(initError)
         await setIsLoading(true);
-        await setSubject({ ...subject, register_at: compareDate(subject.register_at).toISOString(), end_register_at: compareDate(subject.end_register_at).toISOString() })
+
         await setTimeout(async () => {
             await SubjectUtils.createSubject({ token: token, subject: subject })
                 .then(res => {
@@ -241,7 +241,7 @@ const AddSubject = ({ navigation }) => {
                                 <DatePicker label='Ngày đăng kí'
                                     dateDefault={subject.register_at}
                                     onPick={val => {
-                                        setSubject({ ...subject, register_at: val.toISOString() })
+                                        setSubject({ ...subject, register_at: compareDate(val).toISOString() })
                                     }}
                                     errorMessage={error.register_at}
                                 />
@@ -251,7 +251,7 @@ const AddSubject = ({ navigation }) => {
                             <View>
                                 <DatePicker label='Ngày kết thúc'
                                     dateDefault={subject.end_register_at}
-                                    onPick={val => setSubject({ ...subject, end_register_at: val.toISOString() })}
+                                    onPick={val => setSubject({ ...subject, end_register_at: compareDate(val).toISOString() })}
                                     errorMessage={error.end_register_at}
                                 />
                             </View>
