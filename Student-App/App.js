@@ -16,6 +16,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { TokenProvider } from './src/Context/TokenContext'
+import {SetTokenProvider} from './src/Context/SetTokenContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 const Stack = createStackNavigator();
 
@@ -26,39 +27,40 @@ const App = () => {
   return(
     <NavigationContainer>
       <TokenProvider value={token}>
-        <Stack.Navigator screenOptions={{
-          headerStyle: {
-          backgroundColor: '#3891E9',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-          fontWeight: 'bold'
-          },
-          headerTitleAlign: 'center',
-      }}
-      >
-            <Stack.Screen name="MainTabScreen" component={MainTabScreen}
-            options={({route, navigation}) => { 
-              const routeName = getFocusedRouteNameFromRoute(route);
-              return { title: routeName, 
-              headerRight: () => (
-                <Pressable  style={[{paddingRight:15}]}onPress={() => {navigation.navigate('Notification')}}>
-                      <Icon name="notifications-outline" color={'#FEFEFE'} size={26} />
-              </Pressable>),
-               }; 
+        <SetTokenProvider value={setToken}>
+          <Stack.Navigator screenOptions={{
+            headerStyle: {
+            backgroundColor: '#3891E9',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+            fontWeight: 'bold'
+            },
+            headerTitleAlign: 'center',
+            }}> 
+              <Stack.Screen name="MainTabScreen" component={MainTabScreen}
+              options={({route, navigation}) => { 
+                const routeName = getFocusedRouteNameFromRoute(route);
+                return { title: routeName, 
+                headerRight: () => (
+                  <Pressable  style={[{paddingRight:15}]}onPress={() => {navigation.navigate('Notification')}}>
+                        <Icon name="notifications-outline" color={'#FEFEFE'} size={26} />
+                </Pressable>),
+                }; 
+              }}
+              // initialParams={{ setToken }}      
+            />
+            <Stack.Screen name="Notification" component={Notification} options={{
+              title: 'Thông báo'
             }}
-            initialParams={{ setToken }}      
-          />
-          <Stack.Screen name="Notification" component={Notification} options={{
-            title: 'Thông báo'
-          }}
-          
-          />
-          <Stack.Screen name="MainExam" component={mainExam} options={{
-            headerShown: false
-          }}
-          />
-          </Stack.Navigator>
+            
+            />
+            <Stack.Screen name="MainExam" component={mainExam} options={{
+              headerShown: false
+            }}
+            />
+            </Stack.Navigator>
+          </SetTokenProvider>
       </TokenProvider>
     </NavigationContainer>
   )
