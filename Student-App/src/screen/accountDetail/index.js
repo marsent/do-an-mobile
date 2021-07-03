@@ -14,12 +14,13 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Avatar} from 'react-native-paper';
-import Image1 from '../../asset/avt.png';
+import Image1 from '../../asset/avt.jpg';
 import TokenContext from '../../Context/TokenContext';
 import {TextInput} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
-export default function AccountDetail({navigation}) {
+export default function AccountDetail({route, navigation}) {
   const token = useContext(TokenContext);
+  const { setToken } = route.params;
   const [info, setInfo] = useState({
     status: '',
     _id: '',
@@ -155,7 +156,7 @@ export default function AccountDetail({navigation}) {
             </Pressable>
             <Pressable
               style={[styles.button]}
-              onPress={() => navigation.navigate('Login')}>
+              onPress={() => setToken('')}>
               <Text style={styles.textStyle}>Đăng xuất</Text>
             </Pressable>
           </View>
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     // borderWidth: 0.5,
     padding: 10,
-    backgroundColor:'#4B75F2',
+    backgroundColor:'#3891E9',
   },
   textStyle: {
     color: '#FEFEFE'

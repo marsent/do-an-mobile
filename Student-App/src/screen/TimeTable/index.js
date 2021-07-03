@@ -1,5 +1,5 @@
 import React, { useState, Component, useEffect,  useContext}from 'react'
-import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView } from 'react-native';
+import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView , StatusBar, BackHandler, Alert} from 'react-native';
 import {Calendar
     , CalendarList
     , Agenda} from 'react-native-calendars';
@@ -60,9 +60,31 @@ export default function TimeTable({navigation}){
         });
     };
     onScreenLoad();
+    // useEffect(() => {
+    //     const backAction = () => {
+    //     //   Alert.alert("Hold on!", "Are you sure you want to go back?", [
+    //     //     {
+    //     //       text: "Cancel",
+    //     //       onPress: () => null,
+    //     //       style: "cancel"
+    //     //     },
+    //     //     { text: "YES", onPress: () => BackHandler.exitApp() }
+    //     //   ]);
+    //         BackHandler.exitApp()
+    //       return true;
+    //     };
+      
+    //     const backHandler = BackHandler.addEventListener(
+    //       "hardwareBackPress",
+    //       backAction
+    //     );
+      
+    //     return () => backHandler.remove();
+    //   }, []);
     const [date, setDate] = useState(new Date());
     return (
        <SafeAreaView style={styles.safe}>
+           <StatusBar backgroundColor= '#3891E9'/>
             <WeekCalendar date={date} onChange={(newDate) => {setDate(newDate)}} />
             {TimeTable[date.getDay()].length != 0 ?( TimeTable[date.getDay()].map((item, key)=>(
                 <View style={styles.timetableText} key={key}>

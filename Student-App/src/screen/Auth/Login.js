@@ -88,7 +88,7 @@ export default Login = ({ token, setToken }) => {
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
 
             <View style={{ height: '40%', borderBottomLeftRadius: 120, backgroundColor: '#0598FC', justifyContent: 'space-around', alignItems: 'center' }}>
-                <Icon name='user-cog' size={56} color='#FFFFFF' />
+                <Icon name='user-graduate' size={95} color='#FFFFFF' />
             </View>
             <View style={{ flex: 1, marginTop: 50 }}>
                 <View style={styles.container}>
@@ -136,9 +136,9 @@ export default Login = ({ token, setToken }) => {
                         Đăng nhập
                     </SubmitButton>
 
-                    <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
+                    <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' , paddingBottom: 20}}>
                         <Text >Ứng dụng quản lý học vụ</Text>
-                        <Text size={12}> Admin v1.0</Text>
+                        <Text size={12}> Student v1.0</Text>
                     </View>
                 </View >
             </View>
