@@ -22,13 +22,14 @@ import {Input} from 'react-native-elements';
 import Toast from 'react-native-toast-message';
 import SetTokenContext from '../../Context/SetTokenContext';
 export default function Subject({route, navigation}) {
-
   const token = useContext(TokenContext);
   const [allSubject,setAllSubject]= useState([]);
   const [mySubject,setMySubject]= useState([]);
   const [rSubject,setRSubject]= useState([]);
   const [cSubject,setCSubject]= useState([]);
+  const [myIndex,setMyIndex]= useState([]);
   const getAllSubject = async () => {
+    
     await fetch(`${apiURL}/subject/student/`, {
       method: 'GET',
       headers: {
@@ -40,10 +41,9 @@ export default function Subject({route, navigation}) {
       .then(res => res.json())
       .then(res => {
         setAllSubject(res.data);   
-      });
+      }).then(getMySubject());
   };
   const getMySubject = async () => {
-    let z= [];
     await fetch(`${apiURL}/schedule/student/`, {
       method: 'GET',
       headers: {
@@ -54,33 +54,46 @@ export default function Subject({route, navigation}) {
     })
       .then(res => res.json())
       .then(res => {
-        setMySubject(res.data.subject_ids);        
+        setMySubject(res.data.subject_ids);
+        let data = [];
+        res.data.subject_ids.forEach(element => {
+          const t =allSubject.findIndex(x => x.id == element);
+          if(t != -1)
+          data = data.concat(t);
+        });  
+        setMyIndex(data);      
       });
   };
-  const getMyIndex = () => {
-    let data = [];
-      mySubject.forEach(element => {
-        data = data.concat(allSubject.findIndex(x => x.id == element))
-      });
-    return data;
+  const reload = async () =>{
+    getAllSubject();
+    getMySubject();
   }
+  useEffect(async () => {
+    await reload();
+  }, []);
+  // const getMyIndex = () => {
+  //   let data = [];
+  //     mySubject.forEach(element => {
+  //       data = data.concat(allSubject.findIndex(x => x.id == element))
+  //     });
+  //   return data;
+  // }
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
-      await getAllSubject(), getMySubject();
-
-        
+      await getAllSubject();
+      reload();
+      setCSubject(Array(mySubject.length).fill(false));
+      setRSubject(Array(allSubject.length).fill(false));        
     });
     return () => {
-      unsubscribe       
+      unsubscribe;      
       setCSubject(Array(mySubject.length).fill(false));
       setRSubject(Array(allSubject.length).fill(false));
     }
   }, [navigation]);
-const myIndex= getMyIndex();
-
-const Register = async ({i = {i}}) => {
-  console.log(i);
-      await fetch(`http://quocha.xyz/api/subject/student/register/${allSubject[i]._id}`, {
+  console.log(mySubject,myIndex);
+  async function  Register (i ={i}) {
+      await fetch(`http://quocha.xyz/api/subject/student/register/${allSubject[i].id}`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -90,32 +103,31 @@ const Register = async ({i = {i}}) => {
       })
         .then(res => res.json())
         .then(res => {
-          console.log(res.statusCode);
           if (res.statusCode === 200) {
-            setUpdate(false);
             Toast.show({
               type: 'success',
               position: 'top',
               text1: `Đăng ký môn ${allSubject[i].subject_code} thành công `,
-              visibilityTime: 2000,
+              visibilityTime: 800,
               autoHide: true,
             });
-            return <Toast ref={ref => Toast.setRef(ref)} />
+
           } else {
             Toast.show({
               type: 'error',
               position: 'top',
               text1: `Đăng ký môn ${allSubject[i].subject_code} thất bại `,
               autoHide: true,
+              visibilityTime: 800,
             });
-            return <Toast ref={ref => Toast.setRef(ref)} />
+
           }
-        });
+        }).then(reload());
 
   };
-  const Cancel = async ({i = {i}}) => {
-    console.log(i);
-      await fetch(`http://quocha.xyz/api/subject/student/Cancel/${allSubject[i]._id}`, {
+  async function Cancel (id = {id}) {
+    const i = allSubject.findIndex(x => x.id == id)
+      await fetch(`http://quocha.xyz/api/subject/student/Cancel/${allSubject[i].id}`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -124,44 +136,45 @@ const Register = async ({i = {i}}) => {
         },
       })
         .then(res => res.json())
-        .then(res => {
-          
+        .then(res => {  
           if (res.statusCode === 200) {
-            setUpdate(false);
             Toast.show({
               type: 'success',
               position: 'top',
               text1: `Hủy môn ${allSubject[i].subject_code} thành công `,
-              visibilityTime: 2000,
+              visibilityTime: 800,
               autoHide: true,
             });
-            return <Toast ref={ref => Toast.setRef(ref)} />
+
           } else {
             Toast.show({
               type: 'error',
               position: 'top',
               text1: `Đăng môn ${allSubject[i].subject_code} thất bại `,
-              autoHide: true,
+              visibilityTime: 800,
             });
-            return <Toast ref={ref => Toast.setRef(ref)} />
           }
-        })
+        }).then(reload());
   };
-  function xRegister() {
+  async function xRegister() {
     for( let i=0; i < rSubject.length; i++)
     {
       if(rSubject[i]){
-        Register(i={i});
+        await Register(i);
       }
     }
+    setRSubject(Array(allSubject.length).fill(false));
+    await getMySubject(); 
   }
-  function xCancel() {
+  async function xCancel() {
     for( let i=0; i < cSubject.length; i++)
     {
       if(cSubject[i]){
-        Cancel(i= myIndex[i]);
+        await Cancel(id = mySubject[i]);
       }
     }
+    setCSubject(Array(mySubject.length).fill(false));
+    await getMySubject();
   }
   return (
     <SafeAreaView style={styles.Container}>
@@ -221,7 +234,8 @@ const Register = async ({i = {i}}) => {
           ))}
           </ScrollView>
         </View>
-      </View>   
+      </View>
+      <Toast ref={ref => Toast.setRef(ref)} />   
     </SafeAreaView>
   );
 }
