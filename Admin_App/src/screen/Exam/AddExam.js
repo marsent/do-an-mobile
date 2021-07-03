@@ -222,7 +222,7 @@ export default AddExam = ({ navigation }) => {
             questions: questions,
             year: new Date().getFullYear(),
             time: time,
-            start_at: compareDate(startAt).toISOString(),
+            start_at: startAt,
             expire_at: expireAt,
             type: typeTest
         }
@@ -363,7 +363,7 @@ export default AddExam = ({ navigation }) => {
                         <View style={{ flex: .49 }}>
                             <View>
                                 <DatePicker label='Ngày bắt đầu' dateDefault={startAt}
-                                    onPick={val => setStartAt(val.toISOString())}
+                                    onPick={val => setStartAt(compareDate(val).toISOString())}
                                     errorMessage={error.start_at}
                                 />
                             </View>
@@ -371,7 +371,7 @@ export default AddExam = ({ navigation }) => {
                         <View style={{ flex: .49 }}>
                             <View>
                                 <DatePicker label='Ngày kết thúc' dateDefault={expireAt}
-                                    onPick={val => setExpireAt(val.toISOString())}
+                                    onPick={val => setExpireAt(compareDate(val).toISOString())}
                                     errorMessage={error.expire_at}
                                 />
                             </View>
