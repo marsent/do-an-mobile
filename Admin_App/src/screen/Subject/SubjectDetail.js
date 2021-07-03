@@ -64,6 +64,7 @@ const SubjectDetail = ({ route, navigation }) => {
             setSubject();
             setNewSubject();
             setLectureList();
+            setIsLoadingData(true)
         }
     }, [])
     useEffect(async () => {

@@ -20,6 +20,10 @@ const Stack = createStackNavigator();
 import { TokenProvider } from './src/Context/TokenContext'
 import AdminDetail from './src/screen/Admin/AdminDetail';
 
+import { LogBox } from 'react-native';
+
+LogBox.ignoreAllLogs();
+
 const App = () => {
 
   useEffect(() => {
