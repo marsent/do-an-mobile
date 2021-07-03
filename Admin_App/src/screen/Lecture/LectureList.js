@@ -8,7 +8,7 @@ import Modal from 'react-native-modal';
 
 const Stack = createStackNavigator();
 
-import { facultyList, apiURL } from '../../config/config';
+import { facultyList, apiURL, facultyToVN } from '../../config/config';
 import { LectureUtils } from '../../utils'
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
@@ -35,15 +35,7 @@ const LectureList = ({ navigation }) => {
 
     useEffect(async () => {
 
-        // try {
-        //     await LectureUtils.getAllLecture({ token: token }).then(async (res) => {
-        //         await setLectureList(res.data)
-        //     })
-        //     setLoadingDataModal(false)
-        // }
-        // catch (err) {
-        //     console.log('Get lerture list error: ', err);
-        // }
+
         return () => {
             setLectureList();
             setDataLecture();
@@ -73,7 +65,8 @@ const LectureList = ({ navigation }) => {
         await setLoadingDataModal(true)
         const query = {
             token: token,
-            faculty: faculty ? faculty : ''
+            faculty: faculty ? faculty : '',
+            sort: '-updatedAt'
         }
 
         await LectureUtils.getAllLecture(query).then(async (res) => {
@@ -86,28 +79,7 @@ const LectureList = ({ navigation }) => {
         await setLoadingDataModal(false)
     }
 
-    // useEffect(() => handlerSearch(), [keyWord])
-    // useEffect(() => handlerSearch(), [faculty])
 
-    // const handlerSearch = async () => {
-    //     await setLectureList(dataLecture);
-    //     await setTimeout(async () => {
-    //         if (faculty != 'all') {
-    //             await setLectureList(prevList => {
-    //                 return prevList.filter(lecture => {
-    //                     return (lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)) && (lecture.faculty == faculty)
-    //                 })
-    //             })
-    //         }
-    //         await setLectureList(prevList => {
-    //             return prevList.filter(lecture => {
-    //                 return lecture.full_name.includes(keyWord) || lecture.email.includes(keyWord)
-    //             })
-    //         })
-    //         await setLoadingDataModal(false)
-    //     }, 1000)
-
-    // }
 
     const toggleModal = async () => {
         setModalVisible(!modalVisible);
@@ -173,7 +145,7 @@ const LectureItem = ({ item, navigation }) => {
             <View style={{ width: '95%' }} >
                 <Text>Họ tên: {full_name}</Text>
                 <Text>Email: {email}</Text>
-                <Text>Khoa: {faculty}</Text>
+                <Text>Khoa: {facultyToVN[faculty]}</Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
 
@@ -194,7 +166,7 @@ const FacultyPicker = ({ onValueChange, faculty }) => {
             <Picker.Item label='Tất cả' value={false} />
             {facultyList.map(faculty => {
                 return (
-                    <Picker.Item label={faculty} value={faculty} key={faculty} />
+                    <Picker.Item label={facultyToVN[faculty]} value={faculty} key={faculty} />
                 )
             })}
         </Picker>

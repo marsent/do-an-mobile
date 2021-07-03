@@ -463,7 +463,7 @@ const ExamDetail = ({ route, navigation }) => {
                                     return (
                                         <View key={index} style={{ borderWidth: 1, width: '95%', marginBottom: 10, borderRadius: 5, padding: 3, borderColor: '#91919a' }}>
                                             <Text style={{ fontFamily: 'Inter', fontSize: 16 }}>{student.full_name}-{student.student_code}</Text>
-                                            <Text style={{ fontFamily: 'Inter', fontSize: 16 }}>Điểm: {val.score}</Text>
+                                            <Text style={{ fontFamily: 'Inter', fontSize: 16 }}>Điểm: {val.score.toFixed(2)}</Text>
 
                                         </View>
                                     )

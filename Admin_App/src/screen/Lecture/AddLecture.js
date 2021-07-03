@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 
 
 import HeaderText from '../../components/HeaderText'
-import { apiURL, facultyList } from '../../config/config'
+import { apiURL, facultyList, facultyToVN } from '../../config/config'
 import { LectureUtils } from '../../utils'
 import TokenContext from '../../Context/TokenContext'
 import TextInput from '../../components/TextInput'
@@ -146,13 +146,13 @@ const AddStudent = ({ navigation }) => {
                             label='Khoa'
                             leftIcon='chalkboard-teacher'
                             placeholder='Khoa'
-                            displayValue={account.faculty}
+                            displayValue={facultyToVN[account.faculty]}
                             selectedValue={account.faculty}
                             onValueChange={(val) => setAccount({ ...account, faculty: val })}
                             errorMessage={error.faculty}
                         >
                             {facultyList.map(val => <PickerBase.Item
-                                label={val}
+                                label={facultyToVN[val]}
                                 value={val}
                                 key={val} />)}
                         </Picker>

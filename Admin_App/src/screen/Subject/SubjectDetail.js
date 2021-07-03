@@ -1,14 +1,14 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { SafeAreaView, ScrollView, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5'
-import { RadioButton } from 'react-native-paper'
+import { Modal, RadioButton } from 'react-native-paper'
 import Toast from 'react-native-toast-message';
 import { Checkbox } from 'react-native-paper'
 import { Picker } from '@react-native-picker/picker'
 
 import styles from '../../style/style';
 import { mainBlue, mainWhite } from '../../style/color'
-import { apiURL } from '../../config/config';
+import { facultyToVN, getDateMonthYear, weekdayToVN } from '../../config/config';
 import TokenContext from '../../Context/TokenContext';
 import { LoadingDataModal, Text, TextInput, SubmitButtonDetail } from '../../components';
 import { SubjectUtils, LectureUtils } from '../../utils'
@@ -30,28 +30,94 @@ const SubjectDetail = ({ route, navigation }) => {
         schedule: [],
         lecture_id: '',
         status: '',
-        student_quantity: 0
+        student_quantity: 0,
+    }
+    const initLecture = {
+        "_id": "",
+        "date_of_birth": "",
+        "email": "",
+        "faculty": "",
+        "full_name": "Không có giảng viên",
+        "password": "",
+        "phone": "",
+        "status": ""
     }
     const [isLoadingData, setIsLoadingData] = useState(true)
     const [subject, setSubject] = useState(initSubject)
     const [error, setError] = useState(initError)
     const [isProcessing, setIsProcessing] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
-    useEffect(async () => {
+    const [newSubject, setNewSubject] = useState({});
+    const [lectureList, setLectureList] = useState([]);
+    const [lecture, setLecture] = useState()
+    const [preview, setPreview] = useState(false)
+    const getSubjetcData = async () => {
         await SubjectUtils.getSubjectById({ token: token, id: _id })
             .then(async (res) => {
+                console.log(res);
                 await setSubject(res.data)
             })
-        setIsLoadingData(false)
+    }
+    useEffect(async () => {
+        await getSubjetcData()
+
     }, [])
-
-    const cancelHandler = () => {
+    useEffect(async () => {
+        // await LectureUtils.getLectureById({ token: token, id: subject.lecture_id })
+        //     .then(res => {
+        //         if (res.data) {
+        //             setLecture(res.data)
+        //         }
+        //     })
+        await LectureUtils.getAllLecture({ token: token, faculty: subject.faculty })
+            .then(res => {
+                if (res.data) {
+                    setLectureList(res.data)
+                }
+            })
+        setIsLoadingData(false)
+    }, [subject])
+    const cancelHandler = async () => {
         setIsEdit(false)
+        await getSubjetcData()
     }
 
-    const save = () => {
-        setIsEdit(false)
+    const save = async () => {
+        setIsProcessing(true)
+        await setError(initError);
+        const query = {
+            token: token,
+            id: _id,
+            subject: {
+                name: subject.name,
+                faculty: subject.faculty,
+                subject_code: subject.subject_code,
+                lecture_id: subject.lecture_id
+            }
+        }
+        await SubjectUtils.updateSubject(query)
+            .then(async res => {
+                console.log(res);
+                if (res.statusCode == 200) {
+                    setIsEdit(false)
+                    await getSubjetcData();
+                    return Toast.show({
+                        type: 'success',
+                        position: 'top',
+                        text1: 'Cập nhật thành công thành công',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
+
+                }
+                else if (res.error == 4000) {
+                    setError(res.messages)
+                }
+            })
+        setIsProcessing(false)
     }
+
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <CustomHeaderText navigation={navigation} >Chi tiết môn học</CustomHeaderText>
@@ -64,13 +130,18 @@ const SubjectDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
-                                outLine={false}
+                                outLine={isEdit}
+                                outlineColor={mainBlue}
                                 isFocus={true}
                                 type='flat'
-                                editable={false}
+                                editable={isEdit}
                                 value={subject.name}
                                 multiline={true}
                                 errorMessage={error.name}
+                                onChangeText={val => {
+                                    setSubject({ ...subject, name: val })
+                                    setNewSubject({ newSubject, name: val })
+                                }}
                             />
                         </View>
                     </CustomView>
@@ -81,14 +152,47 @@ const SubjectDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
-                                outLine={false}
+                                outLine={isEdit}
+                                outlineColor={mainBlue}
                                 isFocus={true}
                                 type='flat'
-                                editable={false}
+                                editable={isEdit}
                                 value={subject.subject_code}
                                 multiline={true}
-                                errorMessage={error.name}
+                                errorMessage={error.subject_code}
+                                onChangeText={val => {
+                                    setSubject({ ...subject, subject_code: val })
+                                    setNewSubject({ newSubject, subject_code: val })
+                                }}
                             />
+                        </View>
+                    </CustomView>
+
+                    <CustomView>
+                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                            <Text>Giảng viên:</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <Picker
+                                itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
+                                enabled={isEdit}
+                                selectedValue={subject.lecture_id}
+                                onValueChange={val => setSubject({ ...subject, lecture_id: val })}
+                            >
+                                {!lectureList.find(el => el._id != subject.lecture_id) && <Picker.Item label='Không có giảng viên' value={0} />}
+                                {lectureList.map(val => {
+                                    return (
+                                        <Picker.Item label={val.full_name} value={val._id} key={val._id} />
+                                    )
+                                })}
+                            </Picker>
+                            {/* <TextInput
+                                outLine={false}
+                                type='flat'
+                                editable={false}
+                                value={lecture.full_name}
+                                multiline={true}
+                            /> */}
                         </View>
                     </CustomView>
 
@@ -99,34 +203,59 @@ const SubjectDetail = ({ route, navigation }) => {
                         <View style={{ flex: 1 }}>
                             <TextInput
                                 outLine={false}
-                                isFocus={true}
                                 type='flat'
                                 editable={false}
-                                value={subject.faculty}
+                                value={facultyToVN[subject.faculty]}
                                 multiline={true}
-                                errorMessage={error.name}
                             />
                         </View>
                     </CustomView>
 
                     <CustomView>
                         <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                            <Text>Lịch học:</Text>
+                            <Text>Ngày mở đăng kí:</Text>
                         </View>
                         <View style={{ flex: 1 }}>
+
                             <TextInput
                                 outLine={false}
-                                isFocus={true}
                                 type='flat'
                                 editable={false}
-                                value={subject.name}
+                                value={subject.register_at ? getDateMonthYear(subject.register_at) : 'Null'}
                                 multiline={true}
-                                errorMessage={error.name}
                             />
                         </View>
                     </CustomView>
-
                     <CustomView>
+                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                            <Text>Ngày đóng đăng kí:</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+
+                            <TextInput
+                                outLine={false}
+                                type='flat'
+                                editable={false}
+                                value={subject.end_register_at ? getDateMonthYear(subject.end_register_at) : 'Null'}
+                                multiline={true}
+                            />
+                        </View>
+                    </CustomView>
+                    <CustomView >
+                        <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                            <Text>Xem lịch học</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <Checkbox
+                                status={preview ? 'checked' : 'unchecked'}
+                                onPress={() => {
+                                    setPreview(!preview)
+                                }}
+                            />
+                        </View>
+
+                    </CustomView>
+                    {/* <CustomView>
                         <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
                             <Text>Trạng thái:</Text>
                         </View>
@@ -136,12 +265,16 @@ const SubjectDetail = ({ route, navigation }) => {
                                 itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
                                 enabled={false}
                                 selectedValue={subject.status}
+                                onChangeText={val => {
+                                    setSubject({ ...subject, status: val })
+                                    setNewSubject({ newSubject, status: val })
+                                }}
                             >
                                 <Picker.Item label='Active' value='active' />
                                 <Picker.Item label='Disable' value='disable' />
                             </Picker>
                         </View>
-                    </CustomView>
+                    </CustomView> */}
                     <SubmitButtonDetail
                         isEdit={isEdit}
                         isProcessing={isProcessing}
@@ -151,16 +284,37 @@ const SubjectDetail = ({ route, navigation }) => {
                             cancelHandler()
                         }}
                     />
+                    {preview && <View style={{ marginTop: 20, width: '100%' }}>
+                        <View style={{ width: '100%', alignItems: 'center' }}>
+                            {(subject.schedule && subject.schedule.length == 0) && <Text>Không có lịch học</Text>}
+                            <View style={{ width: '95%', marginBottom: 10, borderColor: '#91919a' }}>
+                                {subject.schedule.map((val) => {
+                                    return (
+                                        <View
+                                            key={val._id}
+                                            style={{ borderWidth: 1, marginBottom: 10, padding: 5, borderRadius: 5, alignItems: 'center' }}
+                                        >
+                                            <Text  >
+                                                Thứ {weekdayToVN[val.weekday]}: {val.from}h - {val.to}h
+                                            </Text>
+
+                                        </View>)
+                                })}
+                            </View>
+                        </View>
+                    </View>}
                 </View>
             }
+            <Toast ref={(ref) => Toast.setRef(ref)} />
+
         </SafeAreaView>
     );
 };
 
-const CustomView = ({ children }) => {
+const CustomView = ({ children, borderWidth = 0 }) => {
 
     return <View style={{
-        display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'
+        display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: borderWidth
     }} >
         {children}
     </View >
