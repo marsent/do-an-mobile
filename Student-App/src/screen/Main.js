@@ -14,6 +14,7 @@ import TimeTable from './TimeTable';
 import Notification from './Notification';
 import OnlineExam from './OnlineExam';
 import AccountDetail from './accountDetail';
+import Subject from './Subject';
 import mainExam from './OnlineExam/mainExam';
 
 
@@ -22,7 +23,7 @@ import mainExam from './OnlineExam/mainExam';
 const Tab = createMaterialBottomTabNavigator();
 
 const TabS = ({route, navigation}) => {
-  const {setToken} = route.params
+  // const {setToken} = route.params
   return(
     <Tab.Navigator
       shifting={true}
@@ -76,10 +77,10 @@ const TabS = ({route, navigation}) => {
         // }}
       />
       {/* <Tab.Screen
-        name="Thông báo"
-        component={Notification}
+        name="Quản lý môn học"
+        component={Subject}
         options={{
-          tabBarLabel: 'Thông báo',
+          tabBarLabel: 'Môn học',
           tabBarColor: '#3891E9',
           tabBarIcon: ({ color }) => (
             <Icon name="notifications-outline" color={color} size={26} />
@@ -97,7 +98,6 @@ const TabS = ({route, navigation}) => {
             <Icon name="person-circle-outline" color={color} size={26} />
           ),
         }}
-        initialParams={{ setToken }}
       />
     </Tab.Navigator>
 )};

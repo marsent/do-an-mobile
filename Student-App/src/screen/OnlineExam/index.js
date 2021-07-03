@@ -45,9 +45,8 @@ export default function OnlineExam({navigation}){
         };
     useEffect(() => {
         const unsubscribe = navigation.addListener("focus", async () => {
-            getExam(),
+            await getExam(),
             getAnswer();
-            console.log('123');
         });
         return () => {unsubscribe; setExamList();}
     }, [navigation]);

@@ -10,17 +10,20 @@ import {
   Modal,
   Button,
   Image,
-  Pressable 
+  Pressable,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {Avatar} from 'react-native-paper';
 import Image1 from '../../asset/avt.jpg';
 import TokenContext from '../../Context/TokenContext';
+import {apiURL} from '../../config/config';
 import {TextInput} from 'react-native-paper';
+import {Input} from 'react-native-elements';
 import Toast from 'react-native-toast-message';
-export default function AccountDetail({route, navigation}) {
+import SetTokenContext from '../../Context/SetTokenContext';
+export default function AccountDetail({route}) {
+  const setToken = useContext(SetTokenContext);
+
   const token = useContext(TokenContext);
-  const { setToken } = route.params;
   const [info, setInfo] = useState({
     status: '',
     _id: '',
@@ -28,11 +31,17 @@ export default function AccountDetail({route, navigation}) {
     phone: '',
     full_name: '',
     date_of_birth: '',
-    password: ''
+    student_code: '',
+    password: '',
   });
   const [update, setUpdate] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [updatePassword, setUpdatePassword] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const [error, setError] = useState('');
+  const [error1, setError1] = useState('');
   const getLectureInfo = async () => {
-    await fetch(`http://quocha.xyz/api/student/`, {
+    await fetch(`${apiURL}/student`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -88,12 +97,97 @@ export default function AccountDetail({route, navigation}) {
           }
         })
         .catch(error => {
-          console.log('Error update lecture', error);
+          console.log('Error update student', error);
         });
     }, 1000);
   };
+  const confirm = async () => {
+    if (confirmPass === updatePassword) {
+      setError('');
+      await setTimeout(async () => {
+        await fetch(`http://quocha.xyz/api/student/`, {
+          method: 'PUT',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+          },
+          body: JSON.stringify({password: info.password}),
+        })
+          .then(res => res.json())
+          .then(res => {
+            console.log(res.statusCode);
+            if (res.statusCode === 200) {
+              setModalVisible(false);
+              setError1('');
+              return Toast.show({
+                type: 'success',
+                position: 'top',
+                text1: 'Cập nhật thành công ',
+                visibilityTime: 1000,
+                autoHide: true,
+              });
+            } else {
+              setError1(JSON.stringify(res.messages));
+            }
+          })
+          .catch(error => {
+            console.log('Error update student', error);
+          });
+      }, 10);
+    } else {
+      setError('Mật khẩu không khớp');
+    }
+  };
   return (
     <SafeAreaView style={styles.Container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View
+              style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
+              <Input
+                label="Mật khẩu mới"
+                secureTextEntry={true}
+                onChangeText={text => {
+                  setInfo({...info, password: text});
+                  setUpdatePassword(text);
+                }}
+                errorStyle={{color: 'red'}}
+                errorMessage={error1}
+              />
+            </View>
+            <View
+              style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
+              <Input
+                label="Xác nhận mật khẩu mới"
+                // multiline={true}
+                secureTextEntry={true}
+                onChangeText={text => setConfirmPass(text)}
+                errorStyle={{color: 'red'}}
+                errorMessage={error}
+              />
+            </View>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => confirm()}>
+              <Text style={styles.textStyle}>Cập nhật</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose, {marginTop: 10}]}
+              onPress={() => setModalVisible(!modalVisible)}>
+              <Text style={styles.textStyle}>Hủy</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.inforView}>
         <View style={styles.inforText}>
           <View style={styles.avatar}>
@@ -102,28 +196,28 @@ export default function AccountDetail({route, navigation}) {
           <Text style={styles.TitleText}>{info.full_name}</Text>
           <Text style={styles.SubTitleText}>Sinh viên | {info.student_code}</Text>
         </View>
-        
+        {!update ? (
           <View style={styles.ContentText}>            
-            <View style={styles.SubContentText}>
-              <Text style={styles.lable}>Số điện thoại:</Text>
-              <Text style={styles.textx}>{info.phone}</Text>
-            </View>
-            <View style={styles.SubContentText}>
-              <Text style={styles.lable}>Email:</Text>
-              <Text style={styles.textx}>{info.email}</Text>
-            </View>
-            <View style={styles.SubContentText}>
-              <Text style={styles.lable}>Ngày sinh:</Text>
-              <Text style={styles.textx}>
-                {info.date_of_birth
-                  .split('T')[0]
-                  .split('-')
-                  .reverse()
-                  .join('/')}
-              </Text>
-            </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Số điện thoại:</Text>
+            <Text style={styles.textx}>{info.phone}</Text>
           </View>
-        {update ? (
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Email:</Text>
+            <Text style={styles.textx}>{info.email}</Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Ngày sinh:</Text>
+            <Text style={styles.textx}>
+              {info.date_of_birth
+                .split('T')[0]
+                .split('-')
+                .reverse()
+                .join('/')}
+            </Text>
+          </View>
+        </View>
+        ) : (
           <View style={styles.ContentText}>
             <View
               style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
@@ -138,27 +232,58 @@ export default function AccountDetail({route, navigation}) {
             <View
               style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
               <TextInput
-                label="Mật khẩu"
+                label="Số điện thoại"
                 mode="outlined"
                 // multiline={true}
-                value={info.password}
-                onChangeText={text => setInfo({...info, password: text})}
+                value={info.phone}
+                onChangeText={text => setInfo({...info, phone: text})}
               />
             </View>
+            <View style={styles.SubContentText}>
+              <Text style={styles.lable}>Ngày sinh:</Text>
+              <Text style={styles.textx}>
+                {info.date_of_birth
+                  .split('T')[0]
+                  .split('-')
+                  .reverse()
+                  .join('/')}
+              </Text>
+            </View>   
           </View>
-        ):(<View></View>)}
+        )}
         {!update ? (
           <View style={styles.container1}>
-            <Pressable
-              style={[styles.button]}
-              onPress={() => setUpdate(!update)}>
-              <Text style={styles.textStyle}>Cập nhật tài khoản</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.button]}
-              onPress={() => setToken('')}>
-              <Text style={styles.textStyle}>Đăng xuất</Text>
-            </Pressable>
+            <View style={{flexDirection:'row', justifyContent: 'space-around'}}>
+              <View style={{marginBottom: 10}}>
+              <Pressable
+                style={styles.pressable}
+                onPress={() => {
+                  setUpdate(!update);
+                }}>
+                <Text style={styles.textStyle}>Cập nhật thông tin</Text>
+              </Pressable>
+            </View>
+            <Text>    </Text>
+            <View style={{marginBottom: 10}}>
+              <Pressable
+                style={styles.pressable}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                }}>
+                <Text style={styles.textStyle}>Đổi mặt khẩu</Text>
+              </Pressable>
+            </View>
+            </View>
+            
+            <View style={{marginBottom: 10}}>
+              <Pressable
+                style={styles.pressable}
+                onPress={async () => {
+                  await setToken();
+                }}>
+                <Text style={styles.textStyle}>Đăng xuất</Text>
+              </Pressable>
+            </View>
           </View>
         ) : (
           <View
@@ -170,21 +295,22 @@ export default function AccountDetail({route, navigation}) {
               justifyContent: 'center',
             }}>
             <View style={{marginRight: 20}}>
-              <Button
-                title="Lưu thay đổi"
+              <Pressable
+                style={styles.save}
                 onPress={() => {
                   save();
-                }}
-              />
+                }}>
+                <Text style={styles.textStyle}>Lưu thay đổi</Text>
+              </Pressable>
             </View>
-            
             <View style={{marginLeft: 20}}>
-              <Button
-                title="Hủy"
+              <Pressable
+                style={styles.cancelButton}
                 onPress={() => {
                   handlerCancel();
-                }}
-              />
+                }}>
+                <Text style={styles.textStyle}>Hủy</Text>
+              </Pressable>
             </View>
           </View>
         )}
@@ -284,14 +410,63 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 5,
     alignItems: 'center',
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
   button: {
-    margin:2,
-    borderRadius: 5,
-    // borderWidth: 0.5,
+    borderRadius: 20,
     padding: 10,
-    backgroundColor:'#3891E9',
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#3891E9',
+  },
+  buttonClose: {
+    backgroundColor: '#3891E9',
   },
   textStyle: {
-    color: '#FEFEFE'
-  }
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  pressable: {
+    backgroundColor: '#3891E9',
+    padding: 15,
+    width: 150,
+    borderRadius: 10,
+  },
+  cancelButton: {
+    backgroundColor: '#3891E9',
+    padding: 15,
+    width: 100,
+    borderRadius: 10,
+  },
+  save: {
+    backgroundColor: '#3891E9',
+    padding: 15,
+    width: 120,
+    borderRadius: 10,
+  },
 });
