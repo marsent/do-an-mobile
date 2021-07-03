@@ -28,6 +28,8 @@ const examDetail = ({route}) => {
     questions: [],
     for: '',
     subject_id: '',
+    start_at: '',
+    expire_at: '',
   });
   const [subject, setSubject] = useState({
     quantity: 0,
@@ -80,7 +82,6 @@ const examDetail = ({route}) => {
   useEffect(async () => {
     if (exam.for === 'subject') {
       const url = `http://quocha.xyz/api/subject/lecture/${exam.subject_id}`;
-      console.log(url);
       await fetch(url, {
         method: 'GET',
         headers: {
@@ -127,12 +128,21 @@ const examDetail = ({route}) => {
             type: 'success',
             position: 'top',
             text1: 'Cập nhật thành công ',
-            visibilityTime: 2000,
+            visibilityTime: 1000,
             autoHide: true,
           });
           await setUpdate(!update);
         } else {
-          setError(updateExam.messages);
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Cập nhật thất bại',
+            text2: JSON.stringify(updateExam.message),
+            visibilityTime: 1000,
+            autoHide: true,
+          });
+          console.log(updateExam);
+          await handlerCancel();
         }
       } catch (err) {
         console.log('Error submit:', err);
@@ -140,7 +150,12 @@ const examDetail = ({route}) => {
       // await setIsProcessing(false);
     }, 1000);
   };
-
+  // if (exam.status === 'active') {
+  //   exam.status = 'Đang mở';
+  // }
+  // if (exam.status === 'disabled') {
+  //   exam.status === 'Đã đ';
+  // }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerView}>
@@ -169,6 +184,18 @@ const examDetail = ({route}) => {
           <View style={styles.SubContentText}>
             <Text style={styles.lable}>Loại bài thi:</Text>
             <Text style={styles.textx}>{exam.for}</Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Ngày bắt đầu:</Text>
+            <Text style={styles.textx}>
+              {exam.start_at.split('T')[0].split('-').reverse().join('/')}
+            </Text>
+          </View>
+          <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Ngày kết thúc:</Text>
+            <Text style={styles.textx}>
+              {exam.expire_at.split('T')[0].split('-').reverse().join('/')}
+            </Text>
           </View>
           {exam.for === 'subject' && (
             <View style={styles.SubContentText}>

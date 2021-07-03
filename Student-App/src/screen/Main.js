@@ -1,45 +1,38 @@
-import React from 'react';
+import React, { useContext,useEffect } from 'react';
 
-import { 
-  NavigationContainer, 
-  DefaultTheme as NavigationDefaultTheme,
-  DarkTheme as NavigationDarkTheme
-} from '@react-navigation/native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import BubbleTabBar, {
-  IBubbleTabConfig,
-  IIconRenderer,
-} from 'react-native-bubble-tabbar';
+
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
-import CustomTabBar from './MainStyle'
 import { FlexibleTabBarComponent, withCustomStyle } from 'react-navigation-custom-bottom-tab-component/FlexibleTabBarComponent';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView,Modal, Alert, Pressable  } from 'react-native';
+import { KeyboardAvoidingView, View, Text, StyleSheet, TextInput, Button, TouchableOpacity, SafeAreaView,ScrollView,Modal, Alert, Pressable, StatusBar, BackHandler } from 'react-native';
 
-import TimeTable from '../components/TimeTable';
-import Notification from '../components/Notification';
-import OnlineExam from '../components/OnlineExam';
-import AccountDetail from '../components/accountDetail';
-import mainExam from '../components/OnlineExam/mainExam';
+import TimeTable from './TimeTable';
+import Notification from './Notification';
+import OnlineExam from './OnlineExam';
+import AccountDetail from './accountDetail';
+import mainExam from './OnlineExam/mainExam';
 
-const TTStack = createStackNavigator();
-const NTStack = createStackNavigator();
-const OEStack = createStackNavigator();
-const ADStack = createStackNavigator();
+
+// const Stack = createStackNavigator();
 
 const Tab = createMaterialBottomTabNavigator();
 
-const MainTabScreen = () => (
+const TabS = ({route, navigation}) => {
+  const {setToken} = route.params
+  return(
     <Tab.Navigator
-      initialRouteName="TimeTable"
+      shifting={true}
+      initialRouteName="Thời khóa biểu"
       activeColor="#fff"
+      barStyle={{}}
     >
       <Tab.Screen
-        name="TimeTable"
-        component={TTStackS}
+        name="Thời khóa biểu"
+        component={TimeTable}
         options={{
           tabBarLabel: 'TKB',
           tabBarColor: '#3891E9',
@@ -47,10 +40,11 @@ const MainTabScreen = () => (
             <Icon name="calendar-outline" color={color} size={26} />
           ),
         }}
+        
       />
       <Tab.Screen
-        name="Exam"
-        component={OEStackS}
+        name="Kiểm tra"
+        component={OnlineExam}
         options={{
           tabBarLabel: 'Kiểm tra',
           tabBarColor: '#3891E9',
@@ -58,6 +52,12 @@ const MainTabScreen = () => (
             <Icons name="add-task" color={color} size={26} />
           ),          
         }}
+        // listeners ={({navigation})=>({
+        //   tabPress: (event) => {
+        //     event.preventDefault();
+        //     navigation.navigate('Exam', {screen:'OnlineExam'})
+        //   }
+        // })}
         // options={({ navigation }) => {
         //   const { routes, index } = navigation.dangerouslyGetState();
         //   const { state: exploreState } = routes[index];
@@ -75,9 +75,9 @@ const MainTabScreen = () => (
         //   };
         // }}
       />
-      <Tab.Screen
-        name="Notifications"
-        component={NTStackS}
+      {/* <Tab.Screen
+        name="Thông báo"
+        component={Notification}
         options={{
           tabBarLabel: 'Thông báo',
           tabBarColor: '#3891E9',
@@ -86,128 +86,66 @@ const MainTabScreen = () => (
           ),
           
         }}
-      />
+      /> */}
       <Tab.Screen
-        name="Account"
-        component={ADStackS}
+        name="Thông tin cá nhân"
+        component={AccountDetail}
         options={{
-          tabBarLabel: 'Tài khoản',
-          tabBarColor: '#3891E9',
+          tabBarLabel: 'Cá nhân',
+          tabBarColor: '#3891E0',
           tabBarIcon: ({ color }) => (
             <Icon name="person-circle-outline" color={color} size={26} />
           ),
         }}
+        initialParams={{ setToken }}
       />
     </Tab.Navigator>
-);
+)};
 
-export default MainTabScreen;
+// export default MainTabScreen;
 
-const TTStackS = ({navigation}) => (
-    <TTStack.Navigator screenOptions={{
-            headerStyle: {
-            backgroundColor: '#3891E9',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-            fontWeight: 'bold',
-            },
-            headerTitleAlign: 'center'
-        }}>
-            <TTStack.Screen name="TimeTable" component={TimeTable} options={{
-            title:'Lịch học',
-            }} />
-    </TTStack.Navigator>
-);
-const OEStackS = ({navigation, route}) => (
-  <OEStack.Navigator screenOptions={{
-          headerStyle: {
-          backgroundColor: '#3891E9',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-          fontWeight: 'bold'
-          },
-          headerTitleAlign: 'center',
-      }}
-      >
-          <OEStack.Screen name="OnlineExam" component={OnlineExam} options={{
-          title:'Kiểm tra',
-          }} />
-          <OEStack.Screen name="MainExam" component={mainExam} options={{
-          title:'Kiểm tra',
-          
-          }}
-          
-          />
-  </OEStack.Navigator>
-);
-// const OEStackS = ({ navigation, route }) => {
-//   React.useLayoutEffect(() => {
-//     if(tabHiddenRoutes.includes(getFocusedRouteNameFromRoute(route))){
-//       navigation.setOptions({tabBarVisible: false});
-//      }else{
-//      navigation.setOptions({tabBarVisible: true});
-//     }
-//   }, [navigation, route]);
+// const StackS = ({navigation, route}) => {
+//   console.log(route);
 //   return(
-//     <OEStack.Navigator screenOptions={{
-//             headerStyle: {
-//             backgroundColor: '#3891E9',
-//             },
-//             headerTintColor: '#fff',
-//             headerTitleStyle: {
-//             fontWeight: 'bold'
-//             },
-//             headerTitleAlign: 'center'
-//         }}
-//         >
-//             <OEStack.Screen name="OnlineExam" component={OnlineExam} options={{
-//             title:'Kiểm tra',
-//             }} />
-//             <OEStack.Screen name="MainExam" component={mainExam} options={{
-//             title:'Kiểm tra',
-//             }} />
-//     </OEStack.Navigator>
-//   )};
+//   <Stack.Navigator screenOptions={{
+//           headerStyle: {
+//           backgroundColor: '#3891E9',
+//           },
+//           headerTintColor: '#fff',
+//           headerTitleStyle: {
+//           fontWeight: 'bold'
+//           },
+//           headerTitleAlign: 'center',
+//       }}
+//       >
+//           <Stack.Screen name="Thời khóa biểu" component={TabS}
+//             options={({route, navigation}) => { 
+//               const routeName = getFocusedRouteNameFromRoute(route);
+//               return { title: routeName, 
+//               headerRight: () => (
+//                 <Pressable  style={[{paddingRight:15}]}onPress={() => {navigation.navigate('Notification')}}>
+//                       <Icon name="notifications-outline" color={'#FEFEFE'} size={26} />
+//               </Pressable>),
+//               headerLeft: () => (
+//                 <Pressable  style={[{paddingLeft:15}]}onPress={() => {setToken('')}}>
+//                       <Icon name="notifications-outline" color={'#FEFEFE'} size={26} />
+//               </Pressable>),
+//                }; 
+//             }          
+//           }      
+//           />
+//           <Stack.Screen name="Notification" component={Notification} options={{
+//             title: 'Thông báo'
+//           }}
+          
+//           />
+//           <Stack.Screen name="MainExam" component={mainExam} options={{
+//             headerShown: false
+//           }}
+          
+//           />
+          
+//   </Stack.Navigator>
+// )};
 
-const NTStackS = ({navigation}) => (
-  <NTStack.Navigator screenOptions={{
-          headerStyle: {
-          backgroundColor: '#3891E9',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-          fontWeight: 'bold'
-          },
-          headerTitleAlign: 'center'
-      }}>
-          <NTStack.Screen name="Notification" component={Notification} options={{
-          title:'Thông báo',
-          }} />
-  </NTStack.Navigator>
-);
-const ADStackS = ({navigation}) => (
-  <ADStack.Navigator screenOptions={{
-          headerStyle: {
-          backgroundColor: '#3891E9',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-          fontWeight: 'bold'
-          },
-          headerTitleAlign: 'center'
-      }}>
-          <ADStack.Screen name="AccountDetail" component={AccountDetail} options={{
-          title:'Thông tin cá nhân',
-          }} />
-  </ADStack.Navigator>
-);
-// const styles = StyleSheet.create({
-//   barstyle : {
-//     // display: "none"
-//   },
-//   sbarstyle : {
-//     display: "none"
-//   },
-// });
+export default TabS;
