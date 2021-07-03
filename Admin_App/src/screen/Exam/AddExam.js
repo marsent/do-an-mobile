@@ -382,6 +382,7 @@ export default AddExam = ({ navigation }) => {
                     {type === 'class' &&
                         <View style={{ width: '90%', marginBottom: 15 }}>
                             <Picker
+                                label='Lớp'
                                 placeholder='Lớp'
                                 displayValue={Class.name}
                                 selectedValue={Class._id}

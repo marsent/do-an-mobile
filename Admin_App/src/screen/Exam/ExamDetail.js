@@ -114,7 +114,6 @@ const ExamDetail = ({ route, navigation }) => {
             await SubjectUtils.getAllSubject({ token: token, })
                 .then(res => {
                     if (res.data) {
-                        console.log(res.data);
                         setSubjectList(res.data)
                     }
                 })
@@ -157,12 +156,10 @@ const ExamDetail = ({ route, navigation }) => {
             try {
                 const updateExam = await ExamUtils.updateExam(query)
                     .then(res => {
-                        console.log(res);
                         return res
                     })
                 const updateStatus = await ExamUtils.updateExamStatus({ token: token, id: _id, status: exam.status })
                     .then(res => {
-                        console.log(res);
                         return res
                     })
                 if (updateExam.statusCode == 200 && updateStatus.statusCode == 200) {
@@ -199,6 +196,7 @@ const ExamDetail = ({ route, navigation }) => {
             await setIsProcessing(false)
         }, 1000)
     }
+    console.log(AnswerList.length);
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <CustomHeaderText navigation={navigation} >Chi tiết bài thi</CustomHeaderText>
@@ -471,8 +469,9 @@ const ExamDetail = ({ route, navigation }) => {
                                 <Text>Chưa có kết quả</Text>
                             </View>
                             }
-                            {AnswerList.length > 0 && AnswerList.map((val, index) => {
+                            {AnswerList.length > 0 && AnswerList.length > 0 && AnswerList.map((val, index) => {
                                 let student = studentList.find(element => element._id == val.student_id)
+                                console.log(student);
                                 if (student) {
                                     return (
                                         <View key={index} style={{ borderWidth: 1, width: '95%', marginBottom: 10, borderRadius: 5, padding: 3, borderColor: '#91919a' }}>
