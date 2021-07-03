@@ -415,7 +415,7 @@ const ExamDetail = ({ route, navigation }) => {
                         onCancelPress={() => handlerCancel()}
                         onSavePress={() => save()}
                     />
-                    <View style={{ borderWidth: 1, width: '100%', borderColor: mainGray }} />
+                    {(preview || showResult || showStudentList) && <View style={{ borderWidth: 1, width: '100%', borderColor: mainGray }} />}
                     {showStudentList && <View style={{ marginTop: 20, width: '100%' }}>
                         <View style={{ width: '100%', alignItems: 'center' }}>
                             <View style={{ width: '95%', marginBottom: 10, borderColor: '#91919a' }}>

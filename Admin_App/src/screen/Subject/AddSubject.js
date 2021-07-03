@@ -112,11 +112,11 @@ const AddSubject = ({ navigation }) => {
     const onSubmitPress = async () => {
         await setError(initError)
         await setIsLoading(true);
-
+        await setSubject({ ...subject, register_at: compareDate(subject.register_at).toISOString(), end_register_at: compareDate(subject.end_register_at).toISOString() })
         await setTimeout(async () => {
             await SubjectUtils.createSubject({ token: token, subject: subject })
                 .then(res => {
-                    if (res.statusCode == 200) {
+                    if (res.data) {
                         setSubject(initSubject)
                         setSchedule([])
                         return Toast.show({
@@ -128,8 +128,8 @@ const AddSubject = ({ navigation }) => {
                         })
                     }
 
-                    if (res.error == 7000) {
-                        Toast.show({
+                    else if (res.error == 7000) {
+                        return Toast.show({
                             type: 'error',
                             position: 'top',
                             text1: 'Thêm môn học không thành công',
@@ -140,9 +140,17 @@ const AddSubject = ({ navigation }) => {
 
 
                     }
-                    if (res.error == 4000) {
-                        setError(res.messages)
+                    else if (res.error == 4000) {
+                        return setError(res.messages)
                     }
+                    return Toast.show({
+                        type: 'error',
+                        position: 'top',
+                        text1: 'Error',
+                        text2: JSON.stringify(res),
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
                 })
         })
         setIsLoading(false)
@@ -233,7 +241,7 @@ const AddSubject = ({ navigation }) => {
                                 <DatePicker label='Ngày đăng kí'
                                     dateDefault={subject.register_at}
                                     onPick={val => {
-                                        setSubject({ ...subject, register_at: compareDate(val).toISOString() })
+                                        setSubject({ ...subject, register_at: val.toISOString() })
                                     }}
                                     errorMessage={error.register_at}
                                 />
@@ -243,7 +251,7 @@ const AddSubject = ({ navigation }) => {
                             <View>
                                 <DatePicker label='Ngày kết thúc'
                                     dateDefault={subject.end_register_at}
-                                    onPick={val => setSubject({ ...subject, end_register_at: compareDate(val).toISOString() })}
+                                    onPick={val => setSubject({ ...subject, end_register_at: val.toISOString() })}
                                     errorMessage={error.end_register_at}
                                 />
                             </View>

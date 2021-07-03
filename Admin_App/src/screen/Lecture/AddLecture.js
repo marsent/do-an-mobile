@@ -42,14 +42,25 @@ const AddStudent = ({ navigation }) => {
 
     const onSubmitPress = async () => {
         setIsLoading(true);
+        setError(initError)
         await setTimeout(async () => {
             try {
-                LectureUtils.createLecture({ token: token, lecture: account })
+                await LectureUtils.createLecture({ token: token, lecture: account })
                     .then(res => {
+                        console.log(res);
                         setIsLoading(false)
-                        if (res.error == 4000) return setError(res.messages)
-                        if (res.error == 7000) {
-                            setError(initAccount)
+                        if (res.data) {
+                            setAccount(initAccount);
+                            return Toast.show({
+                                type: 'success',
+                                position: 'top',
+                                text1: 'Thêm tài khoản thành công',
+                                visibilityTime: 2000,
+                                autoHide: true,
+                            })
+                        }
+                        else if (res.error == 4000) return setError(res.messages)
+                        else if (res.error == 7000) {
                             return Toast.show({
                                 type: 'error',
                                 position: 'top',
@@ -59,12 +70,11 @@ const AddStudent = ({ navigation }) => {
                                 autoHide: true,
                             })
                         }
-                        setAccount(initAccount);
-                        setError(initError)
                         return Toast.show({
-                            type: 'success',
+                            type: 'error',
                             position: 'top',
-                            text1: 'Thêm tài khoản thành công',
+                            text1: 'Error',
+                            text2: JSON.stringify(res),
                             visibilityTime: 2000,
                             autoHide: true,
                         })

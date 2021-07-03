@@ -73,7 +73,9 @@ const StudentList = ({ navigation }) => {
         const query = {
             token: token,
             year: filterData.year ? filterData.year : '',
-            class_id: filterData.class ? filterData.class : ''
+            class_id: filterData.class ? filterData.class : '',
+            sort: '-updatedAt'
+
         }
         await StudentUtils.getAllStudent(query)
             .then(res => {

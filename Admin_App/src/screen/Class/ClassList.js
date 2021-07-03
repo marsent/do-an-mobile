@@ -88,7 +88,7 @@ const ClassList = ({ navigation }) => {
                 <View style={[styles.container]}>
                     <View style={{ width: '90%', marginTop: 10 }} >
                         <Search
-                            placeholder='Tên bài thi'
+                            placeholder='Tên lớp'
                             value={keyWord}
                             onEndEditing={setKeyWord}
                             onFilter={() => { setModalVisible(true) }}

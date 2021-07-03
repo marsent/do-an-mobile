@@ -73,10 +73,10 @@ const ClassDetail = ({ route, navigation }) => {
                         if (res.error == 4000) {
                             return setError(res.messages)
                         }
-                        if (res.error == 7000) {
+                        else if (res.error == 7000) {
                             return setError({ name: 'Tên lớp đã tồn tại' })
                         }
-                        if (res.statusCode == 200) {
+                        else if (res.statusCode == 200) {
                             await setIsEdit(false)
                             return Toast.show({
                                 type: 'success',
@@ -86,6 +86,16 @@ const ClassDetail = ({ route, navigation }) => {
                                 autoHide: true,
                             })
                         }
+
+                        return Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            text1: 'Error',
+                            text2: JSON.stringify(res),
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        })
+
                     })
                 setNewClass({});
             }

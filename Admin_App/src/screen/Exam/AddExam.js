@@ -197,8 +197,6 @@ export default AddExam = ({ navigation }) => {
                                 setStudentList(prev => [...prev, student]);
                             }
                         })
-
-
                     })
                 setLoadingStudentList(false)
             }
@@ -215,14 +213,16 @@ export default AddExam = ({ navigation }) => {
     }
 
     const handlerSubmit = async (e) => {
+        setError(initError);
         setIsLoading(true)
+        console.log(compareDate(expireAt));
         const exam = {
             name: nameExam,
             for: type,
             questions: questions,
             year: new Date().getFullYear(),
             time: time,
-            start_at: startAt,
+            start_at: compareDate(startAt).toISOString(),
             expire_at: expireAt,
             type: typeTest
         }
@@ -235,14 +235,12 @@ export default AddExam = ({ navigation }) => {
         if (type == 'group') {
             exam.student_ids = studentList.map(student => student._id)
         }
-        console.log(exam);
         try {
             await setTimeout(async () => {
                 await ExamUtils.createExam({ token: token, exam: exam })
                     .then(res => {
-                        console.log(res);
                         if (res.error == 4000) return setError(res.messages)
-                        if (res.error == 7000) {
+                        else if (res.error == 7000) {
                             setError(initError);
                             return Toast.show({
                                 type: 'error',
@@ -253,8 +251,8 @@ export default AddExam = ({ navigation }) => {
                                 autoHide: true,
                             })
                         }
-                        else {
-                            setError(initError);
+                        else if (res.data) {
+
                             setNameExam('');
                             setQuestions('')
                             setUploadExam(false)
@@ -270,6 +268,14 @@ export default AddExam = ({ navigation }) => {
                                 autoHide: true,
                             })
                         }
+                        return Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            text1: 'Error',
+                            text2: JSON.stringify(res),
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        })
                     })
                 setIsLoading(false)
 
@@ -357,7 +363,7 @@ export default AddExam = ({ navigation }) => {
                         <View style={{ flex: .49 }}>
                             <View>
                                 <DatePicker label='Ngày bắt đầu' dateDefault={startAt}
-                                    onPick={val => setStartAt(compareDate(val).toISOString())}
+                                    onPick={val => setStartAt(val.toISOString())}
                                     errorMessage={error.start_at}
                                 />
                             </View>
@@ -365,7 +371,7 @@ export default AddExam = ({ navigation }) => {
                         <View style={{ flex: .49 }}>
                             <View>
                                 <DatePicker label='Ngày kết thúc' dateDefault={expireAt}
-                                    onPick={val => setExpireAt(compareDate(val).toISOString())}
+                                    onPick={val => setExpireAt(val.toISOString())}
                                     errorMessage={error.expire_at}
                                 />
                             </View>

@@ -116,6 +116,7 @@ const LectureDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <TextInput
+                                multiline={true}
                                 outLine={false}
                                 type='flat'
                                 editable={false}

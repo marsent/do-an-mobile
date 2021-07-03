@@ -88,6 +88,8 @@ const AddStudent = ({ navigation }) => {
     }, [account.class_id])
 
     const onSubmitPress = async () => {
+        setError(initError)
+
         await setIsLoading(true)
         await setTimeout(async () => {
             StudentUtils.createStudent({ token: token, student: account }).then(res => {
@@ -106,19 +108,25 @@ const AddStudent = ({ navigation }) => {
                         autoHide: true,
                     })
                 }
-                setAccount(initAccount)
-                setError(initError)
+                else if (res.data) {
+                    setAccount(initAccount)
 
+                    return Toast.show({
+                        type: 'success',
+                        position: 'top',
+                        text1: 'Thêm tài khoản thành công',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
+                }
                 return Toast.show({
-                    type: 'success',
+                    type: 'error',
                     position: 'top',
-                    text1: 'Thêm tài khoản thành công',
+                    text1: 'Error',
+                    text2: JSON.stringify(res),
                     visibilityTime: 2000,
                     autoHide: true,
-
-
                 })
-
             })
         }, 1000)
 

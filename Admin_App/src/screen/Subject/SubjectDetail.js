@@ -113,10 +113,10 @@ const SubjectDetail = ({ route, navigation }) => {
                     })
 
                 }
-                if (res.error == 4000) {
+                else if (res.error == 4000) {
                     setError(res.messages)
                 }
-                if (res.errors.time && res.errors.time == 7000702) {
+                else if (res.errors.time && res.errors.time == 7000702) {
                     Toast.show({
                         type: 'error',
                         position: 'top',
@@ -126,7 +126,16 @@ const SubjectDetail = ({ route, navigation }) => {
                         autoHide: true,
                     })
                 }
-
+                else {
+                    Toast.show({
+                        type: 'error',
+                        position: 'top',
+                        text1: 'Error',
+                        text2: JSON.stringify(res),
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
+                }
 
             })
         setIsProcessing(false)

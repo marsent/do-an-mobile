@@ -9,7 +9,7 @@ import TokenContext from '../../Context/TokenContext'
 import { yearList, facultyList, apiURL, facultyToVN } from '../../config/config'
 import { LoadingModal, Button, TextInput, Picker, Text, SubmitButton } from '../../components'
 import { mainWhite } from '../../style/color';
-
+import { ClassUtils } from '../../utils';
 const AddClass = ({ navigation }) => {
     const token = useContext(TokenContext)
     const initClass = { name: '', year: new Date().getFullYear().toString(), faculty: facultyList[0] }
@@ -27,21 +27,15 @@ const AddClass = ({ navigation }) => {
 
     const onSubmitPress = async () => {
         setIsLoading(true)
+        await setError(initError)
+
         await setTimeout(async () => {
-            await fetch(`${apiURL}/class/admin`, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify(Class)
-            }).then(res => res.json())
+            await ClassUtils.createClass({ token: token, Class: Class })
                 .then(async (res) => {
                     await setIsLoading(false)
-
+                    console.log(res);
                     if (res.error == 4000) return setError(res.messages)
-                    if (res.error == 7000) {
+                    else if (res.error == 7000) {
                         setError(initError)
                         return Toast.show({
                             type: 'error',
@@ -52,16 +46,24 @@ const AddClass = ({ navigation }) => {
                             autoHide: true,
                         })
                     }
-                    await setError(initError)
-                    await setClass(initClass);
+                    else if (res.data) {
+                        await setClass(initClass);
+                        return Toast.show({
+                            type: 'success',
+                            position: 'top',
+                            text1: 'Thêm lớp thành công',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        })
+                    }
                     return Toast.show({
-                        type: 'success',
+                        type: 'error',
                         position: 'top',
-                        text1: 'Thêm lớp thành công',
+                        text1: 'Error',
+                        text2: JSON.stringify(res),
                         visibilityTime: 2000,
                         autoHide: true,
                     })
-
 
                 })
         }, 2000)
