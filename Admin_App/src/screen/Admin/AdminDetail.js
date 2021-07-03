@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5'
 import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message'
 
-import { StudentUtils, ClassUtils } from '../../utils'
+import { AdminUtils } from '../../utils'
 import styles from '../../style/style';
 import TokenContext from '../../Context/TokenContext';
 import {
@@ -14,68 +14,44 @@ import {
     HeaderUserDetail,
     LoadingDataModal
 } from '../../components'
-import { mainWhite } from '../../style/color';
+import { mainWhite, mainBlue } from '../../style/color';
 import { ScrollView } from 'react-native';
-const StudentDetail = ({ route, navigation }) => {
+const AdminDetail = ({ navigation }) => {
     const token = useContext(TokenContext);
-    const initStudent = {
-        "_id": "",
-        "class_id": "",
-        "date_of_birth": "",
-        "decrypt_pass": "",
-        "email": "",
-        "full_name": "",
-        "is_verified": "",
-        "password": "",
-        "phone": "",
+    const initAdmin = {
         "status": "",
-        "student_code": "",
-        "year": ''
-    }
-    const initClass = {
         "_id": "",
-        "faculty": "",
         "name": "",
-        "quantity": '',
-        "status": "",
-        "year": ''
+        "date_of_birth": "",
+        "phone": "",
+        "password": "",
+        "email": "",
     }
 
-    const { _id } = route.params;
-    const [student, setStudent] = useState(initStudent)
+
+    const [admin, setAdmin] = useState(initAdmin)
     const [isEdit, setIsEdit] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
-    const [classList, setClassList] = useState([])
     const [isProcessing, setIsProcessing] = useState(false)
-    const getSudentData = async () => {
-        await StudentUtils.getStudentById({ token: token, id: _id })
+    const getAdminData = async () => {
+        await AdminUtils.getAdmin({ token: token })
             .then(async (res) => {
-                console.log(res.data.status);
-                return setStudent(res.data)
+                console.log(res.data);
+                return setAdmin(res.data)
             })
+        setIsLoading(false);
     }
     useEffect(async () => {
-        await getSudentData();
+        await getAdminData();
 
         return () => {
-            setStudent();
-            setClassList()
+            setAdmin();
         }
     }, [])
 
-    useEffect(async () => {
-        if (student.year) {
-            await ClassUtils.getAllClass({ token: token, year: student.year })
-                .then(res => {
-                    return setClassList(res.data)
-                })
-            setIsLoading(false)
-        }
-
-    }, [student])
 
     const handlerCancel = async () => {
-        await getSudentData();
+        await getAdminData();
         setIsEdit(false)
     }
 
@@ -84,19 +60,18 @@ const StudentDetail = ({ route, navigation }) => {
         const query = {
 
             token: token,
-            id: student._id,
-            student: {
-                status: student.status,
-                class_id: student.class_id
+            admin: {
+                email: admin.email,
+                name: admin.name
             }
         }
         await setTimeout(async () => {
-            await StudentUtils.updateStudent(query)
+            await AdminUtils.updateAdmin(query)
                 .then(async (res) => {
                     setIsProcessing(false)
                     if (res.statusCode == 200) {
                         setIsEdit(false);
-                        await getSudentData()
+                        await getAdminData()
                         return Toast.show({
                             type: 'success',
                             position: 'top',
@@ -126,57 +101,27 @@ const StudentDetail = ({ route, navigation }) => {
             />
             <LoadingDataModal visible={isLoading} />
             {!isLoading &&
-                <ScrollView style={{ flex: 1 }} >
+                <ScrollView style={{ flex: 1, marginTop: 50 }} >
                     <View style={{ alignItems: 'center' }}>
                         <View style={{ width: '90%' }}>
-                            <CustomView  >
-                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                                    <Text>Mã sinh viên:</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <TextInput
-                                        outLine={false}
-                                        editable={false}
-                                        type='flat'
-                                        value={student.student_code} />
-                                </View>
-                            </CustomView>
                             <CustomView>
                                 <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                                    <Text>Họ tên:</Text>
+                                    <Text>Tên:</Text>
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <TextInput
                                         outLine={false}
-                                        editable={false}
+                                        editable={isEdit}
+                                        outLine={isEdit}
+                                        outlineColor={mainBlue}
+
                                         type='flat'
-                                        value={student.full_name} />
+                                        value={admin.name}
+                                        onChangeText={val => setAdmin({ ...admin, name: val })}
+                                    />
                                 </View>
                             </CustomView>
-                            <CustomView>
-                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                                    <Text>Ngày sinh:</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <TextInput
-                                        outLine={false}
-                                        editable={false}
-                                        type='flat'
-                                        value={student.date_of_birth.split('T')[0].split('-').reverse().join('/')} />
-                                </View>
-                            </CustomView>
-                            <CustomView>
-                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                                    <Text>Số điện thoại:</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <TextInput
-                                        outLine={false}
-                                        editable={false}
-                                        type='flat'
-                                        value={student.phone} />
-                                </View>
-                            </CustomView>
+
                             <CustomView>
                                 <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
                                     <Text>Email:</Text>
@@ -184,30 +129,14 @@ const StudentDetail = ({ route, navigation }) => {
                                 <View style={{ flex: 1 }}>
                                     <TextInput
                                         outLine={false}
-                                        editable={false}
+                                        editable={isEdit}
                                         multiline={true}
-
+                                        outLine={isEdit}
+                                        outlineColor={mainBlue}
                                         type='flat'
-                                        value={student.email} />
-                                </View>
-                            </CustomView>
-                            <CustomView>
-                                <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
-                                    <Text>Lớp sinh hoạt:</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Picker
-                                        itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
-                                        enabled={isEdit}
-                                        selectedValue={student.class_id}
-                                        onValueChange={val => setStudent({ ...student, class_id: val })}
-                                    >
-                                        {classList.map(val => {
-                                            return (
-                                                <Picker.Item label={val.name} value={val._id} key={val._id} />
-                                            )
-                                        })}
-                                    </Picker>
+                                        value={admin.email}
+                                        onChangeText={val => setAdmin({ ...admin, email: val })}
+                                    />
                                 </View>
                             </CustomView>
 
@@ -219,9 +148,9 @@ const StudentDetail = ({ route, navigation }) => {
                                     <Picker style={{ marginRight: '23%' }}
                                         mode='dropdown'
                                         itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
-                                        enabled={isEdit}
-                                        selectedValue={student.status}
-                                        onValueChange={val => setStudent({ ...student, status: val })}
+                                        enabled={false}
+                                        selectedValue={admin.status}
+                                        onValueChange={val => setAdmin({ ...admin, status: val })}
                                     >
                                         <Picker.Item label='Active' value='active' />
                                         <Picker.Item label='Disabled' value='disabled' />
@@ -277,4 +206,4 @@ const CustomHeaderText = ({ children, navigation }) => {
     )
 }
 
-export default StudentDetail;
+export default AdminDetail;

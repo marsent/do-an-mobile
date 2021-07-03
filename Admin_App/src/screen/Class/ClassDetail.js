@@ -6,7 +6,7 @@ import { Picker } from '@react-native-picker/picker'
 
 import styles from '../../style/style';
 import { mainBlue, mainBlack, mainWhite } from '../../style/color'
-import { apiURL } from '../../config/config';
+import { apiURL, facultyList, facultyToVN } from '../../config/config';
 import TokenContext from '../../Context/TokenContext';
 import { LoadingDataModal, Text, SubmitButtonDetail, TextInput } from '../../components';
 import { ClassUtils } from '../../utils';
@@ -22,11 +22,12 @@ const ClassDetail = ({ route, navigation }) => {
         "year": "",
         "faculty": "",
     }
-    const [Class, setClass] = useState(initClass)
-    const [isLoadingData, setIsLoadingData] = useState(false)
-    const [error, setError] = useState(initError)
-    const [isEdit, setIsEdit] = useState(false)
-    const [isProcessing, setIsProcessing] = useState(false)
+    const [Class, setClass] = useState(initClass);
+    const [isLoadingData, setIsLoadingData] = useState(false);
+    const [error, setError] = useState(initError);
+    const [isEdit, setIsEdit] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [newClass, setNewClass] = useState({})
     const getData = async () => {
         const query = {
             token: token,
@@ -59,23 +60,24 @@ const ClassDetail = ({ route, navigation }) => {
         const query = {
             token: token,
             id: _id,
-            Class: {
-                name: Class.name,
-                status: Class.status
-            }
+            Class: newClass
         }
+
         await setTimeout(async () => {
+
+            setError(initError)
             try {
                 await ClassUtils.updateClass(query)
                     .then(async (res) => {
                         console.log(res);
-                        if (res.statusCode == 400) {
+                        if (res.error == 4000) {
                             return setError(res.messages)
                         }
-                        if (res.statusCode = 200) {
-                            setError(initError)
+                        if (res.error == 7000) {
+                            return setError({ name: 'Tên lớp đã tồn tại' })
+                        }
+                        if (res.statusCode == 200) {
                             await setIsEdit(false)
-
                             return Toast.show({
                                 type: 'success',
                                 position: 'top',
@@ -85,6 +87,7 @@ const ClassDetail = ({ route, navigation }) => {
                             })
                         }
                     })
+                setNewClass({});
             }
             catch (err) {
                 console.log('Error submit:', err);
@@ -113,13 +116,17 @@ const ClassDetail = ({ route, navigation }) => {
                             </View>
                             <View style={{ flex: 1 }}>
                                 <TextInput
-                                    errorMessage={error.name}
+                                    // errorMessage={error.name}
                                     type='flat'
                                     value={Class.name}
                                     editable={isEdit}
                                     outLine={isEdit}
                                     outlineColor={mainBlue}
-                                    onChangeText={text => setClass({ ...Class, name: text })}
+                                    onChangeText={text => {
+                                        setClass({ ...Class, name: text })
+                                        setNewClass({ ...newClass, name: text })
+                                    }
+                                    }
                                 />
                             </View>
                         </CustomView>
@@ -137,19 +144,28 @@ const ClassDetail = ({ route, navigation }) => {
 
                         </CustomView>
                         <CustomView>
-                            <View style={{ flex: .7, alignItems: 'flex-end', marginRight: 10 }}>
-                                <Text>Khoa quản lý: </Text>
+                            <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
+                                <Text>Khoa quản lý:</Text>
                             </View>
                             <View style={{ flex: 1 }}>
-                                <TextInput
-                                    outLine={false}
-                                    type='flat'
-                                    editable={false}
-                                    value={Class.faculty} />
+                                <Picker
+                                    itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
+                                    enabled={isEdit}
+                                    selectedValue={Class.faculty}
+                                    onValueChange={val => {
+                                        setClass({ ...Class, faculty: val })
+                                        setNewClass({ ...newClass, faculty: val })
+                                    }}
+                                >
+                                    {facultyList.map(val => {
+                                        return (
+                                            <Picker.Item label={facultyToVN[val]} value={val} key={val} />
+                                        )
+                                    })}
+                                </Picker>
                             </View>
-
                         </CustomView>
-                        <CustomView>
+                        {/* <CustomView>
                             <View style={{ flex: .7, alignItems: 'flex-end', marginRight: 10 }}>
                                 <Text>Số lượng: </Text>
                             </View>
@@ -161,7 +177,7 @@ const ClassDetail = ({ route, navigation }) => {
                                     value={Class.quantity.toString()} />
                             </View>
 
-                        </CustomView>
+                        </CustomView> */}
                         <CustomView>
                             <View style={{ flex: .8, alignItems: 'flex-end', marginRight: 10 }}>
                                 <Text>Trạng thái:</Text>
@@ -172,7 +188,10 @@ const ClassDetail = ({ route, navigation }) => {
                                     itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
                                     enabled={isEdit}
                                     selectedValue={Class.status}
-                                    onValueChange={val => setClass({ ...Class, status: val })}
+                                    onValueChange={val => {
+                                        setClass({ ...Class, status: val })
+                                        setNewClass({ ...newClasss, status: val })
+                                    }}
                                 >
                                     <Picker.Item label='Active' value='active' />
                                     <Picker.Item label='Disabled' value='disabled' />

@@ -18,6 +18,7 @@ const Stack = createStackNavigator();
 
 // import Context
 import { TokenProvider } from './src/Context/TokenContext'
+import AdminDetail from './src/screen/Admin/AdminDetail';
 
 const App = () => {
 
@@ -33,13 +34,14 @@ const App = () => {
         <Stack.Navigator
           headerMode='none'
         >
-          <Stack.Screen name='Home' component={Home} initialParams={{ setToken }} />
+          <Stack.Screen name='Home' component={Home} initialParams={{ setToken, token }} />
           <Stack.Screen name="Quản lý thông báo" component={AddNotification} />
           <Stack.Screen name="Quản lý sinh viên" component={StudentManagement} />
           <Stack.Screen name="Quản lý giảng viên" component={LecturerManagement} />
           <Stack.Screen name="Quản lý lớp học" component={ClassManagement} />
           <Stack.Screen name="Quản lý đề thi" component={ExamManagement} />
           <Stack.Screen name="Quản lý môn học" component={SubjectManagement} />
+          <Stack.Screen name="Thông tin tài khoản" component={AdminDetail} />
         </Stack.Navigator>
       </TokenProvider >
     </NavigationContainer >

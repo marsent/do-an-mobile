@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message'
 
 
 import styles from '../../style/style'
-import { apiURL, facultyList } from '../../config/config';
+import { apiURL, facultyList, facultyToVN } from '../../config/config';
 import { LectureUtils } from '../../utils'
 import TokenContext from '../../Context/TokenContext'
 import {
@@ -165,7 +165,6 @@ const LectureDetail = ({ route, navigation }) => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <Picker
-                                mode='dropdown'
                                 itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
                                 enabled={isEdit}
                                 selectedValue={lecture.faculty}
@@ -173,7 +172,7 @@ const LectureDetail = ({ route, navigation }) => {
                             >
                                 {facultyList.map(val => {
                                     return (
-                                        <Picker.Item label={val} value={val} key={val} />
+                                        <Picker.Item label={facultyToVN[val]} value={val} key={val} />
                                     )
                                 })}
                             </Picker>

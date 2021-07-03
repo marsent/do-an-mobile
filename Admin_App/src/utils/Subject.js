@@ -36,7 +36,7 @@ const createSubject = async ({ token, subject }) => {
     }).then(res => res.json())
 }
 
-const updateSubject = async ({ token, id, status }) => {
+const updateSubject = async ({ token, id, subject }) => {
     let url = `${apiURL}/subject/admin/${id}`
     return await fetch(url,
         {
@@ -46,7 +46,7 @@ const updateSubject = async ({ token, id, status }) => {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             },
-            body: JSON.stringify({ status: status })
+            body: JSON.stringify(subject)
         }).then(res => res.json())
 }
 

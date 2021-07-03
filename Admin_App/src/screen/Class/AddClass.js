@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message';
 
 import styles from '../../style/style'
 import TokenContext from '../../Context/TokenContext'
-import { yearList, facultyList, apiURL } from '../../config/config'
+import { yearList, facultyList, apiURL, facultyToVN } from '../../config/config'
 import { LoadingModal, Button, TextInput, Picker, Text, SubmitButton } from '../../components'
 import { mainWhite } from '../../style/color';
 
@@ -114,14 +114,13 @@ const AddClass = ({ navigation }) => {
                             style={{ borderRadius: 5 }}
                             label='Khoa quản lý'
                             placeholder='Khoa'
-                            displayValue={Class.faculty != 'Khoa' ? Class.faculty : ''
-                            }
+                            displayValue={facultyToVN[Class.faculty]}
                             selectedValue={Class.faculty}
                             onValueChange={(val, index) => setClass({ ...Class, faculty: val })}
                             errorMessage={error.faculty}
                         >
                             {facultyList.map(val => <PickerBase.Item
-                                label={val}
+                                label={facultyToVN[val]}
                                 value={val}
                                 key={val} />)}
                         </Picker>

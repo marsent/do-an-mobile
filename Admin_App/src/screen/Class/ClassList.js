@@ -7,7 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
 
 import ClassDetail from './ClassDetail'
-import { apiURL, facultyList, yearList } from '../../config/config'
+import { apiURL, facultyList, facultyToVN, yearList } from '../../config/config'
 import styles from '../../style/style'
 import TokenContext from '../../Context/TokenContext'
 import {
@@ -35,15 +35,7 @@ const ClassList = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false)
 
     useEffect(async () => {
-        // try {
-        //     await ClassUtils.getAllClass({token:token})
-        //     .then(async (res) => {
-        //         await setClassList(res.data)
-        //     })
-        //     await setLoadingDataModal(false)
-        // } catch (err) {
-        //     console.log('Error get classList: ', err);
-        // }
+
         return () => {
             setClassList();
             setDumpFilter();
@@ -72,7 +64,8 @@ const ClassList = ({ navigation }) => {
         const query = {
             token: token,
             year: filterData.year ? filterData.year : '',
-            faculty: filterData.faculty ? filterData.faculty : ''
+            faculty: filterData.faculty ? filterData.faculty : '',
+            sort: '-updatedAt'
         }
         await ClassUtils.getAllClass(query)
             .then(async res => {
@@ -81,34 +74,7 @@ const ClassList = ({ navigation }) => {
         setLoadingDataModal(false)
     }
 
-    // const handlerSearch = async () => {
-    //     setClassList(dataClass);
-    //     try {
-    //         if (filterData.faculty == 'all' && filterData.year == 'all') {
-    //             await setClassList(prevList => {
-    //                 return prevList.filter(classObj => {
-    //                     return classObj.name.includes(keyWord)
-    //                 })
-    //             })
-    //         }
-    //         else if (filterData.faculty != 'all' && filterData.year != 'all') {
-    //             await setClassList(prevList => {
-    //                 return prevList.filter(classObj => {
-    //                     return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year && classObj.faculty == filterData.faculty)
-    //                 })
-    //             })
-    //         }
-    //         else if (filterData.faculty != 'all' || filterData.year != 'all') {
-    //             await setClassList(prevList => {
-    //                 return prevList.filter(classObj => {
-    //                     return (classObj.name.includes(keyWord)) && (classObj.year == filterData.year || classObj.faculty == filterData.faculty)
-    //                 })
-    //             })
-    //         }
-    //     } catch (err) {
-    //         console.log('Error Search :', err);
-    //     }
-    // }
+
 
     const toggleModal = async () => {
         setModalVisible(!modalVisible);
@@ -178,7 +144,7 @@ const ClassItem = ({ item, navigation }) => {
             <View style={{ width: '95%' }} >
                 <Text>Tên lớp: {item.name}</Text>
                 <Text>Năm: {item.year}</Text>
-                <Text>Khoa quản lý: {item.faculty}</Text>
+                <Text>Khoa quản lý: {facultyToVN[item.faculty]}</Text>
                 <View style={{ width: '25%', marginTop: 10 }}
                 >
                     {/* <Button title='Chi tiết'

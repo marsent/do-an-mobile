@@ -8,7 +8,7 @@ import Modal from 'react-native-modal'
 
 import styles from '../../style/style'
 import TokenContext from '../../Context/TokenContext'
-import { yearList, facultyList, apiURL } from '../../config/config'
+import { yearList, facultyList, apiURL, facultyToVN } from '../../config/config'
 import { LoadingModal, Button, TextInput, Picker, Text, SubmitButton, HeaderText, DatePicker } from '../../components'
 import { mainGray, mainWhite } from '../../style/color';
 import { SubjectUtils, LectureUtils, } from '../../utils'
@@ -52,7 +52,8 @@ const AddSubject = ({ navigation }) => {
         tuesday: false,
         wednesday: false,
         friday: false,
-        saturday: false
+        saturday: false,
+        sunday: false
 
     }
     const [weekday, setWeekDay] = useState('')
@@ -66,9 +67,8 @@ const AddSubject = ({ navigation }) => {
 
     useEffect(() => {
         return () => {
-            setError();
             setSubject();
-            setLectureList();
+            setLectureList([]);
             setLecture();
         }
     }, [])
@@ -98,14 +98,27 @@ const AddSubject = ({ navigation }) => {
 
     }, [schedule])
 
+    const compareDate = (val) => {
+        const date = new Date(val).getDate();
+        const hour = new Date(val).getHours();
+        const min = new Date(val).getMinutes();
+        const today = new Date();
+        if (today.getDate() == date) {
+            return new Date(val.setMinutes(min + 15));
+        }
+        return val
+    }
+
     const onSubmitPress = async () => {
-        setIsLoading(true);
+        await setError(initError)
+        await setIsLoading(true);
+
         await setTimeout(async () => {
             await SubjectUtils.createSubject({ token: token, subject: subject })
                 .then(res => {
-                    console.log(res);
                     if (res.statusCode == 200) {
                         setSubject(initSubject)
+                        setSchedule([])
                         return Toast.show({
                             type: 'success',
                             position: 'top',
@@ -114,20 +127,21 @@ const AddSubject = ({ navigation }) => {
                             autoHide: true,
                         })
                     }
-                    else if (res.statusCode == 400) {
-                        if (res.error == 7000) {
-                            Toast.show({
-                                type: 'error',
-                                position: 'top',
-                                text1: 'Thêm môn học không thành công',
-                                text2: 'Môn học đã tồn tại trong hệ thống',
-                                visibilityTime: 2000,
-                                autoHide: true,
-                            })
-                        }
-                        else if (res.error == 4000) {
-                            setError(res.messages)
-                        }
+
+                    if (res.error == 7000) {
+                        Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            text1: 'Thêm môn học không thành công',
+                            text2: 'Môn học đã tồn tại trong hệ thống',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        })
+
+
+                    }
+                    if (res.error == 4000) {
+                        setError(res.messages)
                     }
                 })
         })
@@ -152,6 +166,7 @@ const AddSubject = ({ navigation }) => {
             setWeekDay(weekday)
         }
     }
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <HeaderText navigation={navigation} >Thêm mới môn học</HeaderText>
@@ -163,6 +178,7 @@ const AddSubject = ({ navigation }) => {
                             placeholder='Tên môn học'
                             onChangeText={val => setSubject({ ...subject, name: val })}
                             value={subject.name}
+
                             errorMessage={error.name}
                         />
                     </View>
@@ -179,14 +195,14 @@ const AddSubject = ({ navigation }) => {
                     <View style={{ width: '90%', marginBottom: 15 }}>
                         <Picker
                             label='Khoa'
-                            displayValue={subject.faculty}
+                            displayValue={facultyToVN[subject.faculty]}
                             selectedValue={subject.faculty}
                             placeholder='Khoa'
                             onValueChange={val => setSubject({ ...subject, faculty: val })}
                             errorMessage={error.faculty}
                         >
                             {facultyList.map(val => <PickerBase.Item
-                                label={val}
+                                label={facultyToVN[val]}
                                 value={val}
                                 key={val} />)}
                         </Picker>
@@ -216,7 +232,9 @@ const AddSubject = ({ navigation }) => {
                             <View>
                                 <DatePicker label='Ngày đăng kí'
                                     dateDefault={subject.register_at}
-                                    onPick={val => setSubject({ ...subject, resgisterAt: getDate(val).toISOString() })}
+                                    onPick={val => {
+                                        setSubject({ ...subject, register_at: compareDate(val).toISOString() })
+                                    }}
                                     errorMessage={error.register_at}
                                 />
                             </View>
@@ -225,7 +243,7 @@ const AddSubject = ({ navigation }) => {
                             <View>
                                 <DatePicker label='Ngày kết thúc'
                                     dateDefault={subject.end_register_at}
-                                    onPick={val => setSubject({ ...subject, end_register_at: getDate(val, 2).toISOString() })}
+                                    onPick={val => setSubject({ ...subject, end_register_at: compareDate(val).toISOString() })}
                                     errorMessage={error.end_register_at}
                                 />
                             </View>
@@ -244,8 +262,8 @@ const AddSubject = ({ navigation }) => {
                         </View>
                         <View style={{ borderWidth: 1, borderRadius: 5, borderColor: mainGray, alignItems: 'center', paddingTop: 3 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <View style={{ width: '15%', flexDirection: 'column', alignItems: 'center', }}>
-                                    <Text>2</Text>
+                                <View style={{ width: '10%', flexDirection: 'column', alignItems: 'center', }}>
+                                    <Text>Hai</Text>
                                     <Checkbox
                                         status={findWeekday('monday') ? 'checked' : 'unchecked'}
                                         onPress={() => {
@@ -254,43 +272,51 @@ const AddSubject = ({ navigation }) => {
                                     />
 
                                 </View>
-                                <View style={{ width: '15%', flexDirection: 'column', alignItems: 'center', }}>
-                                    <Text>3</Text>
+                                <View style={{ width: '13%', flexDirection: 'column', alignItems: 'center', }}>
+                                    <Text>Ba</Text>
                                     <Checkbox
                                         status={findWeekday('tuesday') ? 'checked' : 'unchecked'}
                                         onPress={() => handlerCheckSchedule('tuesday')}
 
                                     />
                                 </View>
-                                <View style={{ width: '15%', flexDirection: 'column', alignItems: 'center', }}>
-                                    <Text>4</Text>
+                                <View style={{ width: '13%', flexDirection: 'column', alignItems: 'center', }}>
+                                    <Text>Tư</Text>
                                     <Checkbox
                                         status={findWeekday('wednesday') ? 'checked' : 'unchecked'}
                                         onPress={() => handlerCheckSchedule('wednesday')}
 
                                     />
                                 </View>
-                                <View style={{ width: '15%', flexDirection: 'column', alignItems: 'center', }}>
-                                    <Text>5</Text>
+                                <View style={{ width: '13%', flexDirection: 'column', alignItems: 'center', }}>
+                                    <Text>Năm</Text>
                                     <Checkbox
                                         status={findWeekday('thursday') ? 'checked' : 'unchecked'}
                                         onPress={() => handlerCheckSchedule('thursday')}
 
                                     />
                                 </View>
-                                <View style={{ width: '15%', flexDirection: 'column', alignItems: 'center', }}>
-                                    <Text>6</Text>
+                                <View style={{ width: '13%', flexDirection: 'column', alignItems: 'center', }}>
+                                    <Text>Sáu</Text>
                                     <Checkbox
                                         status={findWeekday('friday') ? 'checked' : 'unchecked'}
                                         onPress={() => handlerCheckSchedule('friday')}
 
                                     />
                                 </View>
-                                <View style={{ width: '15%', flexDirection: 'column', alignItems: 'center', }}>
-                                    <Text>7</Text>
+                                <View style={{ width: '13%', flexDirection: 'column', alignItems: 'center', }}>
+                                    <Text>Bảy</Text>
                                     <Checkbox
                                         status={findWeekday('saturday') ? 'checked' : 'unchecked'}
                                         onPress={() => handlerCheckSchedule('saturday')}
+
+                                    />
+                                </View>
+                                <View style={{ width: '13%', flexDirection: 'column', alignItems: 'center', }}>
+                                    <Text>CN</Text>
+                                    <Checkbox
+                                        status={findWeekday('sunday') ? 'checked' : 'unchecked'}
+                                        onPress={() => handlerCheckSchedule('sunday')}
 
                                     />
                                 </View>

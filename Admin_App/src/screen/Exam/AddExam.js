@@ -74,6 +74,17 @@ export default AddExam = ({ navigation }) => {
     const [typeTest, setTypeTest] = useState('optional');
     // get Class List
 
+    const compareDate = (val) => {
+        const date = new Date(val).getDate();
+        const hour = new Date(val).getHours();
+        const min = new Date(val).getMinutes();
+        const today = new Date();
+        if (today.getDate() == date) {
+            return new Date(val.setMinutes(min + 1));
+        }
+        return val
+    }
+
     const handlerUploadExam = async () => {
         try {
             const res = await DocumentPicker.pick({
@@ -346,7 +357,7 @@ export default AddExam = ({ navigation }) => {
                         <View style={{ flex: .49 }}>
                             <View>
                                 <DatePicker label='Ngày bắt đầu' dateDefault={startAt}
-                                    onPick={val => setStartAt(getDate(val).toISOString())}
+                                    onPick={val => setStartAt(compareDate(val).toISOString())}
                                     errorMessage={error.start_at}
                                 />
                             </View>
@@ -354,7 +365,7 @@ export default AddExam = ({ navigation }) => {
                         <View style={{ flex: .49 }}>
                             <View>
                                 <DatePicker label='Ngày kết thúc' dateDefault={expireAt}
-                                    onPick={val => setExpireAt(getDate(val, time).toISOString())}
+                                    onPick={val => setExpireAt(compareDate(val).toISOString())}
                                     errorMessage={error.expire_at}
                                 />
                             </View>

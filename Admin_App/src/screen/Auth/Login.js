@@ -109,6 +109,7 @@ export default Login = ({ token, setToken }) => {
                         </View>
                         <View style={{ marginBottom: 10 }}>
                             <Password
+                                placeholder='Mật khẩu'
                                 isFocus={true}
                                 shadow={1}
                                 outLine={true}

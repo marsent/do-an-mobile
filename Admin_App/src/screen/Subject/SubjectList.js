@@ -7,7 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 const Stack = createStackNavigator();
 
 import styles from '../../style/style'
-import { facultyList } from '../../config/config'
+import { facultyList, facultyToVN } from '../../config/config'
 import { mainWhite } from '../../style/color';
 import TokenContext from '../../Context/TokenContext'
 import { HeaderText, Search, LoadingDataModal, FlatList, CardView, Text, Button } from '../../components'
@@ -139,15 +139,15 @@ const SubjectItem = ({ item, navigation }) => {
                 }
             })
     }, [])
+
+
     return (
         <CardView onPress={() => navigation.navigate('SubjectDetail', { _id: item._id })}>
             <View style={{ width: '95%' }} >
                 <Text>Tên môn học: {item.name}</Text>
                 <Text>Mã môn học: {item.subject_code}</Text>
-                <Text>Lịch học: {item.schedule.length > 0 ?
-                    item.schedule.map(val => val.weekday).toString().replace(',', ', ') : 'Không có lịch'}</Text>
                 <Text>Giảng viên: {lecture.full_name ? lecture.full_name : ''}</Text>
-                <Text>Khoa quản lý: {item.faculty}</Text>
+                <Text>Khoa quản lý: {facultyToVN[item.faculty]}</Text>
             </View>
         </CardView >
 
