@@ -127,6 +127,7 @@ const ClassDetail = ({ route, navigation }) => {
                                         setNewClass({ ...newClass, name: text })
                                     }
                                     }
+                                    errorMessage={error.name}
                                 />
                             </View>
                         </CustomView>

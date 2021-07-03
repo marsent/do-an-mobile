@@ -144,6 +144,7 @@ const ExamDetail = ({ route, navigation }) => {
         getExam()
     }
     const save = async () => {
+        setError(initError)
         setIsProcessing(true)
         const query = {
             token: token,
@@ -174,7 +175,17 @@ const ExamDetail = ({ route, navigation }) => {
                     await setIsEdit(!isEdit)
                     getExam();
                 } else {
-                    setError(updateExam.messages)
+                    if (updateExam.errors.time == 7000702) {
+                        Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            text1: 'Cập nhật thất bại',
+                            text2: 'Không thể cập nhật vì quá ngày bắt đầu',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        })
+                    }
+                    else setError(updateExam.messages)
                 }
 
             }

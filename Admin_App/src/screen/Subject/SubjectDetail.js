@@ -60,7 +60,11 @@ const SubjectDetail = ({ route, navigation }) => {
     }
     useEffect(async () => {
         await getSubjetcData()
-
+        return () => {
+            setSubject();
+            setNewSubject();
+            setLectureList();
+        }
     }, [])
     useEffect(async () => {
         // await LectureUtils.getLectureById({ token: token, id: subject.lecture_id })
@@ -97,11 +101,10 @@ const SubjectDetail = ({ route, navigation }) => {
         }
         await SubjectUtils.updateSubject(query)
             .then(async res => {
-                console.log(res);
                 if (res.statusCode == 200) {
                     setIsEdit(false)
                     await getSubjetcData();
-                    return Toast.show({
+                    Toast.show({
                         type: 'success',
                         position: 'top',
                         text1: 'Cập nhật thành công thành công',
@@ -110,13 +113,25 @@ const SubjectDetail = ({ route, navigation }) => {
                     })
 
                 }
-                else if (res.error == 4000) {
+                if (res.error == 4000) {
                     setError(res.messages)
                 }
+                if (res.errors.time && res.errors.time == 7000702) {
+                    Toast.show({
+                        type: 'error',
+                        position: 'top',
+                        text1: 'Cập nhật thất bại',
+                        text2: 'Không thể cập nhật vì quá ngày bắt đầu',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
+                }
+
+
             })
         setIsProcessing(false)
     }
-
+    console.log(lectureList.length);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
@@ -179,8 +194,8 @@ const SubjectDetail = ({ route, navigation }) => {
                                 selectedValue={subject.lecture_id}
                                 onValueChange={val => setSubject({ ...subject, lecture_id: val })}
                             >
-                                {!lectureList.find(el => el._id != subject.lecture_id) && <Picker.Item label='Không có giảng viên' value={0} />}
-                                {lectureList.map(val => {
+                                {lectureList.length == 0 && <Picker.Item label='Không có giảng viên' value={0} />}
+                                {lectureList.length > 0 && lectureList.map(val => {
                                     return (
                                         <Picker.Item label={val.full_name} value={val._id} key={val._id} />
                                     )
