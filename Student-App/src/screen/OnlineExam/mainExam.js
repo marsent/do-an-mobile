@@ -106,7 +106,7 @@ export default function MainExam({route, navigation}){
                                 <Text>      </Text>
                                 <TouchableOpacity
                                     style={[styles.buttonGn]}
-                                    onPress={() => {setModalVisible(!modalVisible); onSubmit(); navigation.goBack()}}>
+                                    onPress={() => {setModalVisible(!modalVisible); onSubmit() ;navigation.goBack()}}>
                                     <Text style={{  }}>Nộp bài</Text>
                                 </TouchableOpacity>
                             </View>

@@ -83,7 +83,7 @@ const TabS = ({route, navigation}) => {
           tabBarLabel: 'Môn học',
           tabBarColor: '#3891E9',
           tabBarIcon: ({ color }) => (
-            <Icon name="notifications-outline" color={color} size={26} />
+            <Icons name="more-time" color={color} size={26} />
           ),
           
         }}

@@ -71,17 +71,16 @@ export default function Subject({route, navigation}) {
   useEffect(async () => {
     await reload();
   }, []);
-  // const getMyIndex = () => {
-  //   let data = [];
-  //     mySubject.forEach(element => {
-  //       data = data.concat(allSubject.findIndex(x => x.id == element))
-  //     });
-  //   return data;
-  // }
+  // // const getMyIndex = () => {
+  // //   let data = [];
+  // //     mySubject.forEach(element => {
+  // //       data = data.concat(allSubject.findIndex(x => x.id == element))
+  // //     });
+  // //   return data;
+  // // }
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
       await getAllSubject();
-      reload();
       setCSubject(Array(mySubject.length).fill(false));
       setRSubject(Array(allSubject.length).fill(false));        
     });
@@ -91,7 +90,7 @@ export default function Subject({route, navigation}) {
       setRSubject(Array(allSubject.length).fill(false));
     }
   }, [navigation]);
-  console.log(mySubject,myIndex);
+  // console.log(mySubject,myIndex);
   async function  Register (i ={i}) {
       await fetch(`http://quocha.xyz/api/subject/student/register/${allSubject[i].id}`, {
         method: 'GET',
@@ -117,6 +116,7 @@ export default function Subject({route, navigation}) {
               type: 'error',
               position: 'top',
               text1: `Đăng ký môn ${allSubject[i].subject_code} thất bại `,
+              text2: res.message,
               autoHide: true,
               visibilityTime: 800,
             });
@@ -151,6 +151,7 @@ export default function Subject({route, navigation}) {
               type: 'error',
               position: 'top',
               text1: `Đăng môn ${allSubject[i].subject_code} thất bại `,
+              text2: res.message,
               visibilityTime: 800,
             });
           }
@@ -181,7 +182,7 @@ export default function Subject({route, navigation}) {
       <View style={styles.inforView}>
         <View style={[styles.ContentText,{height:"50%"}]}>
           <View style={styles.NotiView, {flexDirection: 'row',justifyContent: 'space-between',paddingVertical: 7.5, marginHorizontal: 10}}>
-                <Text style={{fontWeight:'bold', fontSize: 18}}>Danh sách môn học</Text>
+                <Text style={{fontWeight:'bold', fontSize: 18}}>Danh sách môn học đã đăng kí</Text>
                 <TouchableOpacity
                     style={styles.pressable}
                     onPress={() => {xCancel()}}>
@@ -223,10 +224,16 @@ export default function Subject({route, navigation}) {
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <Checkbox
+                {myIndex.findIndex(ix => ix == i) === -1 ? (
+                <Checkbox
                 status={rSubject[i] ? 'checked' : 'unchecked'}
                 onPress={() => {const X=[...rSubject]; X[i] = !rSubject[i];setRSubject(X)}}
-              />
+                />):(
+                <Checkbox
+                  status={rSubject[i] ? 'checked' : 'unchecked'} disabled = {true}
+                  onPress={() => {const X=[...rSubject]; X[i] = !rSubject[i];setRSubject(X)}}
+                />)}
+              
               <Text style= {{width:'25%'}}>{item.subject_code}</Text>
               <Text style= {{width: '42%'}}>{item.name}</Text>
               <Text style= {{width: '33%'}}>{item.faculty}</Text>

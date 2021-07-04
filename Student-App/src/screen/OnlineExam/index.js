@@ -15,6 +15,8 @@ export default function OnlineExam({navigation}){
     const token = useContext(TokenContext);
     const [examList, setExamList] = useState([]);
     const [answerList, setAnswerList] = useState([]);
+    const [TimeChecker, setTimeChecker] = useState([]);
+    // const [index, setIndex] = useState([]);
     const getExam = async () => {
         await fetch('http://quocha.xyz/api/exam/student', {
         method: 'GET',
@@ -27,6 +29,12 @@ export default function OnlineExam({navigation}){
         .then(res => res.json())
         .then(res => {
             setExamList(res.data);
+            let TimeCheckers = [];
+            res.data.forEach(item => {
+                TimeCheckers = TimeCheckers.concat(isAfter(new Date(),parseJSON(item.start_at)) && isBefore(new Date(),parseJSON(item.expire_at)));
+            });
+            setTimeChecker(TimeCheckers);
+            // setIndex(Array(res.data.length).fill(-1));
         });
         };
     const getAnswer = async () => {
@@ -41,15 +49,35 @@ export default function OnlineExam({navigation}){
         .then(res => res.json())
         .then(res => {
             setAnswerList(res.data);
-        });
-        };
+        }).then(getExam);
+    };
+    const reload = async () =>{
+        let indexs = [...index];
+            for( let i =0 ; i < answerList.length; i++){
+                console.log(answerList[i].exam_id);
+                indexs[examList.findIndex(x => x.id === answerList[i].exam_id)] = i;
+            }
+            // for( const item of examList){
+            //     indexs = indexs.concat(answerList.findIndex(x => x.exam_id === item));
+            //     console.log(indexs);   
+            // };
+        setIndex(indexs) ;
+    };  
     useEffect(() => {
         const unsubscribe = navigation.addListener("focus", async () => {
-            await getExam(),
-            getAnswer();
+            await  getAnswer(), getExam();
+            console.log(answerList); 
         });
+        // reload();
         return () => {unsubscribe; setExamList();}
     }, [navigation]);
+    
+    // const index = reload();
+
+    // useEffect(async () => {
+    //     await setTimeout(async () => {
+    //     await reload();}, 100);
+    // });
     // console.log(answerList.findIndex()); 
     const [modalVisible, setModalVisible] = useState(false);
     const [examID,setExamID]=useState([]);
@@ -59,14 +87,16 @@ export default function OnlineExam({navigation}){
         // console.log(item ,index);
         return index
     };
-    let TimeChecker = [];
-    function checkTime(){
-        examList.forEach(item => {
-            TimeChecker = TimeChecker.concat(isAfter(new Date(),parseJSON(item.start_at)) && isBefore(new Date(),parseJSON(item.expire_at)));
-        });
-        return TimeChecker
-    };
-    checkTime();
+    // let TimeChecker = [];
+    // async function checkTime(){
+    //     examList.forEach(item => {
+    //         TimeChecker = TimeChecker.concat(isAfter(new Date(),parseJSON(item.start_at)) && isBefore(new Date(),parseJSON(item.expire_at)));
+    //     });
+    //     return TimeChecker
+    // };
+    // checkTime();
+    
+    console.log(index);
     return (
       <SafeAreaView style={styles.Container}>
            <Modal
@@ -137,7 +167,7 @@ export default function OnlineExam({navigation}){
                             <View>
                                 <Text style={styles.ContentText}>Nộp bài lúc: {format(parseJSON(answerList[index.key = index[i]].createdAt),'p  P', {locale: vi})}</Text>
                                 <Text style={styles.ContentText}>Điểm: {answerList[index.key = index[i]].score}</Text>
-                                <Pressable  style={[styles.button, {backgroundColor:'#3891E9', marginTop:10, flexDirection:'row', alignItems: 'center', width:'32%'}]} onPress={() => {navigation.navigate('MainExam', {data1: item, anw: answerList[index.key=index[i]]})
+                                <Pressable  style={[styles.button, {backgroundColor:'#3891E9', marginTop:10, flexDirection:'row', alignItems: 'center', width:'32%'}]} onPress={() => {navigation.navigate('MainExam', {data1: item, anw: answerList[index.key = index[i]]})
                                     }}>
                                         <Icon name="ios-logo-electron" color={'#FEFEFE'} size={20} />
                                         <Text style={[styles.textStyle, {marginLeft: 10}]}>Xem lại bài làm</Text>
