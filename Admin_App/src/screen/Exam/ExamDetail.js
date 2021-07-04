@@ -75,7 +75,8 @@ const ExamDetail = ({ route, navigation }) => {
     const [showResult, setShowRestult] = useState(false);
     const [AnswerList, setAnswerList] = useState([]);
     const [studentList, setStudentList] = useState([]);
-    const [showStudentList, setShowStudentList] = useState(false)
+    const [showStudentList, setShowStudentList] = useState(false);
+    const [newStatus, setNewStatus] = useState('')
     const getExam = async () => {
         await ExamUtils.getExamById({ token: token, id: _id })
             .then(async (res) => {
@@ -154,15 +155,19 @@ const ExamDetail = ({ route, navigation }) => {
         }
         await setTimeout(async () => {
             try {
+                let updateStatus = undefined;
                 const updateExam = await ExamUtils.updateExam(query)
                     .then(res => {
                         return res
                     })
-                const updateStatus = await ExamUtils.updateExamStatus({ token: token, id: _id, status: exam.status })
-                    .then(res => {
-                        return res
-                    })
-                if (updateExam.statusCode == 200 && updateStatus.statusCode == 200) {
+                if (newStatus) {
+                    updateStatus = await ExamUtils.updateExamStatus({ token: token, id: _id, status: exam.status })
+                        .then(res => {
+                            console.log(res);
+                            return res
+                        })
+                }
+                if (updateExam.statusCode == 200 && updateStatus && updateStatus.statusCode == 200) {
 
                     Toast.show({
                         type: 'success',
@@ -173,7 +178,20 @@ const ExamDetail = ({ route, navigation }) => {
                     })
                     await setIsEdit(!isEdit)
                     getExam();
-                } else if (updateExam.errors.time == 7000702) {
+                }
+                else if (updateStatus && updateStatus.statusCode == 200) {
+
+                    Toast.show({
+                        type: 'success',
+                        position: 'top',
+                        text1: 'Cập nhật trạng thái thành công ',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
+                    await setIsEdit(!isEdit)
+                    getExam();
+                }
+                else if (updateExam.errors.time == 7000702) {
                     Toast.show({
                         type: 'error',
                         position: 'top',
@@ -196,7 +214,6 @@ const ExamDetail = ({ route, navigation }) => {
             await setIsProcessing(false)
         }, 1000)
     }
-    console.log(AnswerList.length);
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: mainWhite }}>
             <CustomHeaderText navigation={navigation} >Chi tiết bài thi</CustomHeaderText>
@@ -352,7 +369,10 @@ const ExamDetail = ({ route, navigation }) => {
                                     itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
                                     enabled={isEdit}
                                     selectedValue={exam.status}
-                                    onValueChange={val => setExam({ ...exam, status: val })}
+                                    onValueChange={val => {
+                                        setExam({ ...exam, status: val })
+                                        setNewStatus(val)
+                                    }}
                                 >
                                     <Picker.Item label='Active' value='active' />
                                     <Picker.Item label='Disabled' value='disabled' />
@@ -471,7 +491,6 @@ const ExamDetail = ({ route, navigation }) => {
                             }
                             {AnswerList.length > 0 && AnswerList.length > 0 && AnswerList.map((val, index) => {
                                 let student = studentList.find(element => element._id == val.student_id)
-                                console.log(student);
                                 if (student) {
                                     return (
                                         <View key={index} style={{ borderWidth: 1, width: '95%', marginBottom: 10, borderRadius: 5, padding: 3, borderColor: '#91919a' }}>
