@@ -75,7 +75,8 @@ const ExamDetail = ({ route, navigation }) => {
     const [showResult, setShowRestult] = useState(false);
     const [AnswerList, setAnswerList] = useState([]);
     const [studentList, setStudentList] = useState([]);
-    const [showStudentList, setShowStudentList] = useState(false)
+    const [showStudentList, setShowStudentList] = useState(false);
+
     const getExam = async () => {
         await ExamUtils.getExamById({ token: token, id: _id })
             .then(async (res) => {
@@ -114,7 +115,6 @@ const ExamDetail = ({ route, navigation }) => {
             await SubjectUtils.getAllSubject({ token: token, })
                 .then(res => {
                     if (res.data) {
-                        console.log(res.data);
                         setSubjectList(res.data)
                     }
                 })
@@ -157,7 +157,6 @@ const ExamDetail = ({ route, navigation }) => {
             try {
                 const updateExam = await ExamUtils.updateExam(query)
                     .then(res => {
-                        console.log(res);
                         return res
                     })
                 const updateStatus = await ExamUtils.updateExamStatus({ token: token, id: _id, status: exam.status })
@@ -165,7 +164,7 @@ const ExamDetail = ({ route, navigation }) => {
                         console.log(res);
                         return res
                     })
-                if (updateExam.statusCode == 200 && updateStatus.statusCode == 200) {
+                if (updateExam.statusCode == 200 || updateStatus.statusCode == 200) {
 
                     Toast.show({
                         type: 'success',
@@ -176,7 +175,20 @@ const ExamDetail = ({ route, navigation }) => {
                     })
                     await setIsEdit(!isEdit)
                     getExam();
-                } else if (updateExam.errors.time == 7000702) {
+                }
+                else if (updateStatus.statusCode == 200) {
+
+                    Toast.show({
+                        type: 'success',
+                        position: 'top',
+                        text1: 'Cập nhật trạng thái thành công ',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    })
+                    await setIsEdit(!isEdit)
+                    getExam();
+                }
+                else if (updateExam.errors.time == 7000702) {
                     Toast.show({
                         type: 'error',
                         position: 'top',
@@ -213,11 +225,11 @@ const ExamDetail = ({ route, navigation }) => {
                             </View>
                             <View style={{ flex: 1 }}>
                                 <TextInput
-                                    outLine={isEdit}
+                                    outLine={isEdit && new Date() < new Date(exam.start_at)}
                                     outlineColor={mainBlue}
                                     isFocus={true}
                                     type='flat'
-                                    editable={isEdit}
+                                    editable={isEdit && new Date() < new Date(exam.start_at)}
                                     value={exam.name}
                                     onChangeText={text => setExam({ ...exam, name: text })}
                                     multiline={true}
@@ -471,14 +483,13 @@ const ExamDetail = ({ route, navigation }) => {
                                 <Text>Chưa có kết quả</Text>
                             </View>
                             }
-                            {AnswerList.length > 0 && AnswerList.map((val, index) => {
+                            {AnswerList.length > 0 && AnswerList.length > 0 && AnswerList.map((val, index) => {
                                 let student = studentList.find(element => element._id == val.student_id)
                                 if (student) {
                                     return (
                                         <View key={index} style={{ borderWidth: 1, width: '95%', marginBottom: 10, borderRadius: 5, padding: 3, borderColor: '#91919a' }}>
                                             <Text style={{ fontFamily: 'Inter', fontSize: 16 }}>{student.full_name}-{student.student_code}</Text>
                                             <Text style={{ fontFamily: 'Inter', fontSize: 16 }}>Điểm: {val.score.toFixed(2)}</Text>
-
                                         </View>
                                     )
                                 }
