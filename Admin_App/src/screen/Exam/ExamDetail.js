@@ -212,6 +212,7 @@ const ExamDetail = ({ route, navigation }) => {
                 console.log('Error submit:', err);
             }
             await setIsProcessing(false)
+            setNewStatus('')
         }, 1000)
     }
     return (
