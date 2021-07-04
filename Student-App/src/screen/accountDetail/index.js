@@ -73,7 +73,7 @@ export default function AccountDetail({route}) {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + token,
         },
-        body: JSON.stringify({email: info.email, password: info.password}),
+        body: JSON.stringify({email: info.email}),
       })
         .then(res => res.json())
         .then(res => {
@@ -229,15 +229,9 @@ export default function AccountDetail({route}) {
                 onChangeText={text => setInfo({...info, email: text})}
               />
             </View>
-            <View
-              style={(styles.SubContentText, {width: '90%', marginTop: 10})}>
-              <TextInput
-                label="Số điện thoại"
-                mode="outlined"
-                // multiline={true}
-                value={info.phone}
-                onChangeText={text => setInfo({...info, phone: text})}
-              />
+            <View style={styles.SubContentText}>
+            <Text style={styles.lable}>Số điện thoại:</Text>
+            <Text style={styles.textx}>{info.phone}</Text>
             </View>
             <View style={styles.SubContentText}>
               <Text style={styles.lable}>Ngày sinh:</Text>
@@ -270,7 +264,7 @@ export default function AccountDetail({route}) {
                 onPress={() => {
                   setModalVisible(!modalVisible);
                 }}>
-                <Text style={styles.textStyle}>Đổi mặt khẩu</Text>
+                <Text style={styles.textStyle}>Đổi mật khẩu</Text>
               </Pressable>
             </View>
             </View>
