@@ -76,7 +76,7 @@ const ExamDetail = ({ route, navigation }) => {
     const [AnswerList, setAnswerList] = useState([]);
     const [studentList, setStudentList] = useState([]);
     const [showStudentList, setShowStudentList] = useState(false);
-    const [newStatus, setNewStatus] = useState('')
+
     const getExam = async () => {
         await ExamUtils.getExamById({ token: token, id: _id })
             .then(async (res) => {
@@ -155,19 +155,16 @@ const ExamDetail = ({ route, navigation }) => {
         }
         await setTimeout(async () => {
             try {
-                let updateStatus = undefined;
                 const updateExam = await ExamUtils.updateExam(query)
                     .then(res => {
                         return res
                     })
-                if (newStatus) {
-                    updateStatus = await ExamUtils.updateExamStatus({ token: token, id: _id, status: exam.status })
-                        .then(res => {
-                            console.log(res);
-                            return res
-                        })
-                }
-                if (updateExam.statusCode == 200 && updateStatus && updateStatus.statusCode == 200) {
+                const updateStatus = await ExamUtils.updateExamStatus({ token: token, id: _id, status: exam.status })
+                    .then(res => {
+                        console.log(res);
+                        return res
+                    })
+                if (updateExam.statusCode == 200 || updateStatus.statusCode == 200) {
 
                     Toast.show({
                         type: 'success',
@@ -179,7 +176,7 @@ const ExamDetail = ({ route, navigation }) => {
                     await setIsEdit(!isEdit)
                     getExam();
                 }
-                else if (updateStatus && updateStatus.statusCode == 200) {
+                else if (updateStatus.statusCode == 200) {
 
                     Toast.show({
                         type: 'success',
@@ -212,7 +209,6 @@ const ExamDetail = ({ route, navigation }) => {
                 console.log('Error submit:', err);
             }
             await setIsProcessing(false)
-            setNewStatus('')
         }, 1000)
     }
     return (
@@ -229,11 +225,11 @@ const ExamDetail = ({ route, navigation }) => {
                             </View>
                             <View style={{ flex: 1 }}>
                                 <TextInput
-                                    outLine={isEdit}
+                                    outLine={isEdit && new Date() < new Date(exam.start_at)}
                                     outlineColor={mainBlue}
                                     isFocus={true}
                                     type='flat'
-                                    editable={isEdit}
+                                    editable={isEdit && new Date() < new Date(exam.start_at)}
                                     value={exam.name}
                                     onChangeText={text => setExam({ ...exam, name: text })}
                                     multiline={true}
@@ -370,10 +366,7 @@ const ExamDetail = ({ route, navigation }) => {
                                     itemStyle={{ fontFamily: 'Inter', fontSize: 18 }}
                                     enabled={isEdit}
                                     selectedValue={exam.status}
-                                    onValueChange={val => {
-                                        setExam({ ...exam, status: val })
-                                        setNewStatus(val)
-                                    }}
+                                    onValueChange={val => setExam({ ...exam, status: val })}
                                 >
                                     <Picker.Item label='Active' value='active' />
                                     <Picker.Item label='Disabled' value='disabled' />
