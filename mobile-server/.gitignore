@@ -1,0 +1,13 @@
+node_modules/
+dist
+uploads/
+private/
+public/build
+**.log
+.env
+package-lock.json
+.idea
+/logs
+.vscode
+public/uploads
+*.DS_Store

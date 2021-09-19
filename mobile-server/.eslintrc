@@ -1,0 +1,29 @@
+{
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "prettier", "plugin:jsdoc/recommended"],
+  "plugins": ["prettier", "jsdoc"],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-undef": "off",
+    "no-useless-catch": "off",
+    "no-useless-escape": "off",
+    "no-unused-vars": "off",
+    "no-empty": "off",
+    "jsdoc/require-param-description": "off",
+    "jsdoc/require-returns-description": "off",
+    "jsdoc/no-undefined-types": "off",
+    "jsdoc/require-property-description": "off",
+    "jsdoc/require-jsdoc": "off"
+  }
+}
